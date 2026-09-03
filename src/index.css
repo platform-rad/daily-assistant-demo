@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ── Tokens Design System "RAD" — variante Slate / Indigo ──
+       Le vert historique BNP Paribas est volontairement remplacé par un
+       accent Indigo/Navy, tout en conservant la grille, les rayons et la
+       densité typographique du DS bancaire. */
+    --background: 210 40% 98%; /* slate-50 */
+    --foreground: 222 47% 11%; /* slate-900 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 243 75% 59%; /* indigo-600 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%; /* slate-500 */
+
+    --accent: 226 100% 97%; /* indigo-50 */
+    --accent-foreground: 244 55% 41%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%; /* slate-200 */
+    --input: 214 32% 91%;
+    --ring: 243 75% 59%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'tnum';
+  }
+}
+
+@layer utilities {
+  .rad-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .rad-scroll::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-slate-300;
+  }
+  .rad-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Bloc de document éditable */
+  .rad-editable:focus {
+    outline: none;
+    @apply rounded-[3px] bg-rad-indigo-50/50 ring-2 ring-rad-indigo-200;
+  }
+  .rad-editable:empty::before {
+    content: attr(data-placeholder);
+    @apply text-slate-400;
+  }
+}

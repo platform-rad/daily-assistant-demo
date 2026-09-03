@@ -1,0 +1,6 @@
+node_modules
+dist
+.standalone-tmp
+scripts/inter-embedded.css
+.DS_Store
+*.local
