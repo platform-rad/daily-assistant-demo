@@ -2,11 +2,11 @@ import { useState, useRef, useEffect } from 'react'
 import { Send, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { CopilotMessage, OrchestratedAction } from '@/data/orchestrator'
-import { DEMO_SCENARIO } from '@/data/orchestrator'
 import { ActionCard } from './ActionCard'
 import { ToolPreview } from './ToolPreview'
 import { SkillSuggestions } from './SkillSuggestions'
 import { ContextualSuggestions } from './ContextualSuggestions'
+import { CONTEXTUAL_RESPONSES } from '@/data/contextualResponses'
 
 export interface CopilotChatProps {
   /** Mode d'affichage: standalone ou widget */
@@ -57,24 +57,45 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
     setInput('')
 
     setTimeout(() => {
-      const action: OrchestratedAction = {
-        id: 'action-1',
-        toolId: 'my-client-dev',
-        analysis: DEMO_SCENARIO.aiAnalysis,
-        summary: 'Créer client + facility de crédit',
-        steps: DEMO_SCENARIO.steps,
-        status: 'pending',
+      // Trouver la réponse contextuelle qui match le prompt
+      const contextData = CONTEXTUAL_RESPONSES[detectedContext] || {}
+      let contextualResponse = null
+
+      // Chercher une réponse exacte ou approximative
+      for (const [key, response] of Object.entries(contextData)) {
+        if (key.toLowerCase().includes(input.toLowerCase().substring(0, 20)) ||
+            input.toLowerCase().includes(key.toLowerCase().substring(0, 15))) {
+          contextualResponse = response
+          break
+        }
       }
 
-      const assistantMessage: CopilotMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: action.analysis,
-        timestamp: new Date(),
-        actions: [action],
+      // Si pas trouvée, utiliser la première réponse du contexte
+      if (!contextualResponse) {
+        const responses = Object.values(contextData)
+        contextualResponse = responses.length > 0 ? responses[0] : null
       }
 
-      setMessages((prev) => [...prev, assistantMessage])
+      if (contextualResponse) {
+        const action: OrchestratedAction = {
+          id: 'action-1',
+          toolId: contextualResponse.toolsNeeded[0] === 'my-credit-app' ? 'my-credit-app' : 'my-client-dev',
+          analysis: contextualResponse.analysis,
+          summary: contextualResponse.summary,
+          steps: contextualResponse.steps,
+          status: 'pending',
+        }
+
+        const assistantMessage: CopilotMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: action.analysis,
+          timestamp: new Date(),
+          actions: [action],
+        }
+
+        setMessages((prev) => [...prev, assistantMessage])
+      }
     }, 500)
   }
 
