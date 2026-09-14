@@ -1,0 +1,28 @@
+{
+  "productName": "Daily Assistant",
+  "version": "0.1.0",
+  "identifier": "com.bnpparibas.dailyassistant",
+  "build": {
+    "beforeBuildCommand": "npm run build",
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Daily Assistant",
+        "width": 500,
+        "height": 700,
+        "minWidth": 400,
+        "minHeight": 500,
+        "resizable": true,
+        "fullscreen": false,
+        "focus": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  }
+}

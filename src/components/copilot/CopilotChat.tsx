@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, X } from 'lucide-react'
+import { Send, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { CopilotMessage, OrchestratedAction } from '@/data/orchestrator'
 import { DEMO_SCENARIO } from '@/data/orchestrator'
 import { ActionCard } from './ActionCard'
 import { ToolPreview } from './ToolPreview'
+import { SkillSuggestions } from './SkillSuggestions'
 
 export interface CopilotChatProps {
   /** Mode d'affichage: standalone ou widget */
@@ -24,6 +25,7 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
 
   const [input, setInput] = useState('')
   const [selectedToolId, setSelectedToolId] = useState<string | null>(null)
+  const [detectedContext, setDetectedContext] = useState('myClientDev')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -31,10 +33,18 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  // Simuler la détection contextuelle
+  useEffect(() => {
+    const contexts = ['myClientDev', 'myCreditApp', 'dashboard', 'reporting']
+    const interval = setInterval(() => {
+      setDetectedContext(contexts[Math.floor(Math.random() * contexts.length)])
+    }, 30000) // Changer tous les 30 secondes
+    return () => clearInterval(interval)
+  }, [])
+
   const handleSendMessage = () => {
     if (!input.trim()) return
 
-    // Ajouter le message utilisateur
     const userMessage: CopilotMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -45,7 +55,6 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
     setMessages((prev) => [...prev, userMessage])
     setInput('')
 
-    // Simuler une réponse de l'IA avec les actions
     setTimeout(() => {
       const action: OrchestratedAction = {
         id: 'action-1',
@@ -83,7 +92,6 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
       })
     )
 
-    // Simuler l'exécution
     setTimeout(() => {
       setMessages((prev) =>
         prev.map((msg) => {
@@ -105,7 +113,6 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
         })
       )
 
-      // Ajouter un message de confirmation
       const confirmMessage: CopilotMessage = {
         id: (Date.now() + 100).toString(),
         role: 'assistant',
@@ -122,56 +129,71 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
     setSelectedToolId(toolId)
   }
 
+  const handleSkillClick = (skill: string) => {
+    setInput(skill)
+    inputRef.current?.focus()
+  }
+
   return (
     <div className={`flex h-full flex-col bg-white ${mode === 'widget' ? 'rounded-lg shadow-lg' : ''}`}>
       {/* Header */}
-      <div className="flex items-center justify-between border-b bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-4 text-white">
-        <div>
-          <h1 className="text-lg font-bold">Daily Assistant</h1>
-          <p className="text-xs text-blue-100">Copilot métier</p>
-        </div>
-        {mode === 'widget' && (
-          <button className="rounded p-1 hover:bg-blue-500">
-            <X size={20} />
-          </button>
-        )}
+      <div className="border-b bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-4 text-white">
+        <h1 className="text-lg font-bold">Daily Assistant</h1>
+        <p className="text-xs text-blue-100">
+          {detectedContext === 'myClientDev' && '📊 Contexte: MyClientDev'}
+          {detectedContext === 'myCreditApp' && '💳 Contexte: MyCreditApp'}
+          {detectedContext === 'dashboard' && '📈 Contexte: Dashboard'}
+          {detectedContext === 'reporting' && '📑 Contexte: Reporting'}
+        </p>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-4 p-4">
-        {messages.map((message) => (
-          <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div
-              className={`max-w-md rounded-lg px-4 py-3 ${
-                message.role === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-900'
-              }`}
-            >
-              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-
-              {/* Actions */}
-              {message.actions && (
-                <div className="mt-4 space-y-3">
-                  {message.actions.map((action) => (
-                    <ActionCard
-                      key={action.id}
-                      action={action}
-                      onAuthorize={() => handleAuthorizeAction(message.id, action.id)}
-                      onOpenTool={handleOpenTool}
-                    />
-                  ))}
-                </div>
-              )}
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        {messages.length <= 1 ? (
+          <div className="flex flex-col items-center justify-center h-full space-y-6">
+            <div className="text-center">
+              <Sparkles size={48} className="mx-auto mb-4 text-blue-500" />
+              <h2 className="text-xl font-bold text-gray-900">Qu'y a-t-il pour vous?</h2>
+              <p className="text-sm text-gray-600 mt-2">Je suis là pour vous aider avec vos tâches métier</p>
             </div>
+            <SkillSuggestions context={detectedContext} onSkillClick={handleSkillClick} />
           </div>
-        ))}
-        <div ref={messagesEndRef} />
+        ) : (
+          <div className="space-y-4">
+            {messages.map((message) => (
+              <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  className={`max-w-md rounded-lg px-4 py-3 ${
+                    message.role === 'user'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-900'
+                  }`}
+                >
+                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+
+                  {message.actions && (
+                    <div className="mt-4 space-y-3">
+                      {message.actions.map((action) => (
+                        <ActionCard
+                          key={action.id}
+                          action={action}
+                          onAuthorize={() => handleAuthorizeAction(message.id, action.id)}
+                          onOpenTool={handleOpenTool}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
       </div>
 
       {/* Input */}
       <div className="border-t bg-gray-50 p-4">
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <input
             ref={inputRef}
             type="text"
@@ -184,9 +206,10 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
           <Button
             onClick={handleSendMessage}
             disabled={!input.trim()}
+            size="sm"
             className="bg-blue-600 hover:bg-blue-700"
           >
-            <Send size={20} />
+            <Send size={18} />
           </Button>
         </div>
       </div>

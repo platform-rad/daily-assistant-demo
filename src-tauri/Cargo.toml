@@ -1,0 +1,20 @@
+[package]
+name = "daily-assistant"
+version = "0.1.0"
+description = "Daily Assistant - AI Copilot for Business Tools"
+authors = ["BNP Paribas"]
+edition = "2021"
+rust-version = "1.60"
+
+[build-dependencies]
+tauri-build = { version = "2.11", features = [] }
+
+[dependencies]
+tauri = { version = "2.11", features = ["window-all"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["full"] }
+
+[features]
+default = [ "custom-protocol" ]
+custom-protocol = [ "tauri/custom-protocol" ]
