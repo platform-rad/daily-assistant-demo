@@ -6,6 +6,7 @@ import { DEMO_SCENARIO } from '@/data/orchestrator'
 import { ActionCard } from './ActionCard'
 import { ToolPreview } from './ToolPreview'
 import { SkillSuggestions } from './SkillSuggestions'
+import { ContextualSuggestions } from './ContextualSuggestions'
 
 export interface CopilotChatProps {
   /** Mode d'affichage: standalone ou widget */
@@ -137,9 +138,13 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
   return (
     <div className={`flex h-full flex-col bg-white ${mode === 'widget' ? 'rounded-lg shadow-rad-lg' : ''}`}>
       {/* Header - RAD Indigo */}
-      <div className="border-b border-slate-200 bg-white px-4 py-3">
-        <h1 className="text-sm font-semibold text-slate-900">Daily Assistant</h1>
-        <p className="text-2xs text-slate-500 mt-0.5">
+      <div className={`border-b px-4 py-3 ${
+        mode === 'widget'
+          ? 'bg-gradient-to-r from-rad-indigo-600 to-rad-indigo-700 text-white border-rad-indigo-700'
+          : 'bg-white border-slate-200'
+      }`}>
+        <h1 className={`text-sm font-semibold ${mode === 'widget' ? 'text-white' : 'text-slate-900'}`}>Daily Assistant</h1>
+        <p className={`text-2xs mt-0.5 ${mode === 'widget' ? 'text-rad-indigo-100' : 'text-slate-500'}`}>
           {detectedContext === 'myClientDev' && '📊 MyClientDev'}
           {detectedContext === 'myCreditApp' && '💳 MyCreditApp'}
           {detectedContext === 'dashboard' && '📈 Dashboard'}
@@ -150,13 +155,16 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
         {messages.length <= 1 ? (
-          <div className="flex flex-col items-center justify-center h-full space-y-6">
-            <div className="text-center">
-              <Sparkles size={48} className="mx-auto mb-4 text-rad-indigo-500" />
+          <div className="flex flex-col items-start justify-start h-full space-y-4 pb-4">
+            <div>
               <h2 className="text-base font-semibold text-slate-900">Qu'y a-t-il pour vous?</h2>
-              <p className="text-2xs text-slate-500 mt-2">Je suis là pour vous aider avec vos tâches métier</p>
+              <p className="text-2xs text-slate-500 mt-1">Basé sur votre contexte actuel</p>
             </div>
-            <SkillSuggestions context={detectedContext} onSkillClick={handleSkillClick} />
+            {mode === 'widget' ? (
+              <ContextualSuggestions context={detectedContext} onActionClick={handleSkillClick} />
+            ) : (
+              <SkillSuggestions context={detectedContext} onSkillClick={handleSkillClick} />
+            )}
           </div>
         ) : (
           <div className="space-y-3">
