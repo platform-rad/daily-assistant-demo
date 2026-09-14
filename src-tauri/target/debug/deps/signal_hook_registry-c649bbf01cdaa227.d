@@ -1,0 +1,9 @@
+/Users/annesophie.leroy/Desktop/Giftproject/daily-assistant/src-tauri/target/debug/deps/signal_hook_registry-c649bbf01cdaa227.d: /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/lib.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/half_lock.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/vec_map.rs
+
+/Users/annesophie.leroy/Desktop/Giftproject/daily-assistant/src-tauri/target/debug/deps/libsignal_hook_registry-c649bbf01cdaa227.rlib: /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/lib.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/half_lock.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/vec_map.rs
+
+/Users/annesophie.leroy/Desktop/Giftproject/daily-assistant/src-tauri/target/debug/deps/libsignal_hook_registry-c649bbf01cdaa227.rmeta: /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/lib.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/half_lock.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/vec_map.rs
+
+/Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/lib.rs:
+/Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/half_lock.rs:
+/Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/vec_map.rs:

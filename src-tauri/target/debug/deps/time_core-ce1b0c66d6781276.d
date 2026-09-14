@@ -1,0 +1,10 @@
+/Users/annesophie.leroy/Desktop/Giftproject/daily-assistant/src-tauri/target/debug/deps/time_core-ce1b0c66d6781276.d: /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/lib.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/hint.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/unit.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/util.rs
+
+/Users/annesophie.leroy/Desktop/Giftproject/daily-assistant/src-tauri/target/debug/deps/libtime_core-ce1b0c66d6781276.rlib: /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/lib.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/hint.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/unit.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/util.rs
+
+/Users/annesophie.leroy/Desktop/Giftproject/daily-assistant/src-tauri/target/debug/deps/libtime_core-ce1b0c66d6781276.rmeta: /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/lib.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/hint.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/unit.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/util.rs
+
+/Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/lib.rs:
+/Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/hint.rs:
+/Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/unit.rs:
+/Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/time-core-0.1.9/src/util.rs:

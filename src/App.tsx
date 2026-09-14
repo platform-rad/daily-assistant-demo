@@ -7,7 +7,7 @@ import {
   type AssistantMode,
   type AssistantView,
 } from '@/components/assistant/DailyAssistant'
-import { CopilotChat } from '@/components/copilot/CopilotChat'
+import { DesktopEnvironment } from '@/components/desktop/DesktopEnvironment'
 import { AGENTS, DEFAULT_PINNED, MAX_PINNED } from '@/data/agents'
 import { BRIEFING_ALERTS } from '@/data/briefing'
 import { ROUTES } from '@/data/hostRoutes'
@@ -16,10 +16,10 @@ import { fakeLatency } from '@/lib/utils'
 
 const PENDING_COUNT = BRIEFING_ALERTS.filter((a) => a.severity !== 'low').length
 
-export type AppMode = 'standalone' | 'legacy' | 'widget'
+export type AppMode = 'desktop' | 'legacy' | 'widget'
 
 export default function App() {
-  const [appMode, setAppMode] = useState<AppMode>('standalone')
+  const [appMode, setAppMode] = useState<AppMode>('desktop')
   const [mode, setMode] = useState<AssistantMode>('widget')
   const [view, setView] = useState<AssistantView>('home')
   const [docId, setDocId] = useState<'cbs' | 'memo'>('cbs')
@@ -114,19 +114,9 @@ export default function App() {
 
   return (
     <TooltipProvider delayDuration={150}>
-      {appMode === 'standalone' ? (
-        /* Mode Standalone: Copilot Chat uniquement */
-        <div className="h-screen w-screen">
-          <CopilotChat mode="standalone" />
-          <div className="fixed bottom-4 left-4 z-40">
-            <button
-              onClick={() => setAppMode('legacy')}
-              className="px-3 py-1 text-xs rounded bg-gray-600 text-white hover:bg-gray-700 opacity-50 hover:opacity-100"
-            >
-              Mode Legacy
-            </button>
-          </div>
-        </div>
+      {appMode === 'desktop' ? (
+        /* Mode Desktop: Simulation d'un environnement Windows */
+        <DesktopEnvironment />
       ) : (
         /* Mode Legacy: MyClientDev + DailyAssistant */
         <div className="flex h-screen w-screen overflow-hidden bg-slate-200">
@@ -165,10 +155,10 @@ export default function App() {
 
           <div className="fixed bottom-4 right-4 z-40">
             <button
-              onClick={() => setAppMode('standalone')}
+              onClick={() => setAppMode('desktop')}
               className="px-3 py-1 text-xs rounded bg-gray-600 text-white hover:bg-gray-700 opacity-50 hover:opacity-100"
             >
-              Mode Standalone
+              Mode Desktop
             </button>
           </div>
         </div>
