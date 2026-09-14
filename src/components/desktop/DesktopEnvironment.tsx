@@ -4,7 +4,11 @@ import { FloatingWindow } from './FloatingWindow'
 import { Taskbar } from './Taskbar'
 import { CopilotChat } from '@/components/copilot/CopilotChat'
 
-export function DesktopEnvironment() {
+interface DesktopEnvironmentProps {
+  onOpenMyClientDev?: () => void
+}
+
+export function DesktopEnvironment({ onOpenMyClientDev }: DesktopEnvironmentProps) {
   const [chatOpen, setChatOpen] = useState(false)
   const [currentTime, setCurrentTime] = useState('')
 
@@ -21,10 +25,23 @@ export function DesktopEnvironment() {
   const handleTaskbarClick = (appId: string) => {
     if (appId === 'daily-assistant') {
       setChatOpen(!chatOpen)
+    } else if (appId === 'myclientdev') {
+      onOpenMyClientDev?.()
     }
   }
 
+  const handleOpenMyClientDev = () => {
+    onOpenMyClientDev?.()
+  }
+
   const taskbarApps = [
+    {
+      id: 'myclientdev',
+      label: 'MyClientDev',
+      icon: <span className="text-sm">📊</span>,
+      isActive: false,
+      isMinimized: false,
+    },
     {
       id: 'daily-assistant',
       label: 'Daily Assistant',
@@ -46,6 +63,17 @@ export function DesktopEnvironment() {
       >
         {/* Desktop Icons */}
         <div className="p-4 space-y-4 w-24">
+          <div
+            className="group cursor-pointer"
+            onDoubleClick={handleOpenMyClientDev}
+          >
+            <div className="bg-black/20 hover:bg-black/30 rounded-lg p-4 transition flex flex-col items-center gap-2">
+              <span className="text-4xl">📊</span>
+              <span className="text-xs text-white text-center font-medium group-hover:bg-black/40 rounded px-2 py-1">
+                MyClientDev
+              </span>
+            </div>
+          </div>
           <div className="group cursor-pointer">
             <div className="bg-black/20 hover:bg-black/30 rounded-lg p-4 transition flex flex-col items-center gap-2">
               <span className="text-4xl">📁</span>
@@ -75,20 +103,34 @@ export function DesktopEnvironment() {
             defaultY={100}
             onClose={() => setChatOpen(false)}
           >
-            <CopilotChat mode="standalone" />
+            <CopilotChatWrapper onOpenMyClientDev={handleOpenMyClientDev} />
           </FloatingWindow>
         )}
 
         {/* Desktop context menu hint */}
         {!chatOpen && (
           <div className="fixed bottom-20 right-8 bg-black/40 text-white text-xs px-3 py-2 rounded pointer-events-none">
-            💡 Cliquez sur Daily Assistant dans la taskbar pour ouvrir
+            💡 Double-cliquez MyClientDev ou utilisez la taskbar
           </div>
         )}
       </div>
 
       {/* Taskbar */}
       <Taskbar apps={taskbarApps} onAppClick={handleTaskbarClick} currentTime={currentTime} />
+    </div>
+  )
+}
+
+// Wrapper pour passer la callback au chat
+function CopilotChatWrapper({ onOpenMyClientDev }: { onOpenMyClientDev: () => void }) {
+  return (
+    <div onClick={(e) => {
+      const target = e.target as HTMLElement
+      if (target.textContent?.includes('Ouvrir')) {
+        onOpenMyClientDev()
+      }
+    }}>
+      <CopilotChat mode="standalone" />
     </div>
   )
 }

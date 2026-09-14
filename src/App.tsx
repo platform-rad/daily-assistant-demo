@@ -116,7 +116,7 @@ export default function App() {
     <TooltipProvider delayDuration={150}>
       {appMode === 'desktop' ? (
         /* Mode Desktop: Simulation d'un environnement Windows */
-        <DesktopEnvironment />
+        <DesktopEnvironment onOpenMyClientDev={() => setAppMode('legacy')} />
       ) : (
         /* Mode Legacy: MyClientDev + DailyAssistant */
         <div className="flex h-screen w-screen overflow-hidden bg-slate-200">
