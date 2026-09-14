@@ -1,5 +1,4 @@
 import { Zap, TrendingUp, Users, FileText, AlertCircle } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 interface SkillSuggestionsProps {
   context: string
@@ -81,20 +80,21 @@ export function SkillSuggestions({ context, onSkillClick }: SkillSuggestionsProp
   const skills = SKILLS_BY_CONTEXT[context] || SKILLS_BY_CONTEXT.myClientDev
 
   return (
-    <div className="grid grid-cols-1 gap-3 w-full max-w-md">
+    <div className="grid grid-cols-1 gap-2 w-full max-w-sm">
       {skills.map((skill, idx) => (
-        <Button
+        <button
           key={idx}
           onClick={() => onSkillClick(skill.prompt)}
-          variant="outline"
-          className="justify-start gap-3 h-12 text-left hover:bg-blue-50 border-gray-300"
+          className="justify-start gap-2.5 px-3 py-2 text-left rounded border border-slate-200 bg-slate-50 hover:border-rad-indigo-300 hover:bg-rad-indigo-50 transition-colors group"
         >
-          <div className="text-blue-600">{skill.icon}</div>
-          <div className="flex-1">
-            <div className="font-medium text-sm text-gray-900">{skill.label}</div>
-            <div className="text-xs text-gray-500">{skill.prompt}</div>
+          <div className="flex gap-2.5">
+            <div className="text-rad-indigo-500 flex-shrink-0">{skill.icon}</div>
+            <div className="flex-1">
+              <div className="font-medium text-2xs text-slate-900 group-hover:text-rad-indigo-700">{skill.label}</div>
+              <div className="text-2xs text-slate-500 mt-0.5 group-hover:text-rad-indigo-600">{skill.prompt}</div>
+            </div>
           </div>
-        </Button>
+        </button>
       ))}
     </div>
   )

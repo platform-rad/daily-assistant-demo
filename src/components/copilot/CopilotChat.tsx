@@ -135,15 +135,15 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
   }
 
   return (
-    <div className={`flex h-full flex-col bg-white ${mode === 'widget' ? 'rounded-lg shadow-lg' : ''}`}>
-      {/* Header */}
-      <div className="border-b bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-4 text-white">
-        <h1 className="text-lg font-bold">Daily Assistant</h1>
-        <p className="text-xs text-blue-100">
-          {detectedContext === 'myClientDev' && '📊 Contexte: MyClientDev'}
-          {detectedContext === 'myCreditApp' && '💳 Contexte: MyCreditApp'}
-          {detectedContext === 'dashboard' && '📈 Contexte: Dashboard'}
-          {detectedContext === 'reporting' && '📑 Contexte: Reporting'}
+    <div className={`flex h-full flex-col bg-white ${mode === 'widget' ? 'rounded-lg shadow-rad-lg' : ''}`}>
+      {/* Header - RAD Indigo */}
+      <div className="border-b border-slate-200 bg-white px-4 py-3">
+        <h1 className="text-sm font-semibold text-slate-900">Daily Assistant</h1>
+        <p className="text-2xs text-slate-500 mt-0.5">
+          {detectedContext === 'myClientDev' && '📊 MyClientDev'}
+          {detectedContext === 'myCreditApp' && '💳 MyCreditApp'}
+          {detectedContext === 'dashboard' && '📈 Dashboard'}
+          {detectedContext === 'reporting' && '📑 Reporting'}
         </p>
       </div>
 
@@ -152,27 +152,27 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
         {messages.length <= 1 ? (
           <div className="flex flex-col items-center justify-center h-full space-y-6">
             <div className="text-center">
-              <Sparkles size={48} className="mx-auto mb-4 text-blue-500" />
-              <h2 className="text-xl font-bold text-gray-900">Qu'y a-t-il pour vous?</h2>
-              <p className="text-sm text-gray-600 mt-2">Je suis là pour vous aider avec vos tâches métier</p>
+              <Sparkles size={48} className="mx-auto mb-4 text-rad-indigo-500" />
+              <h2 className="text-base font-semibold text-slate-900">Qu'y a-t-il pour vous?</h2>
+              <p className="text-2xs text-slate-500 mt-2">Je suis là pour vous aider avec vos tâches métier</p>
             </div>
             <SkillSuggestions context={detectedContext} onSkillClick={handleSkillClick} />
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
-                  className={`max-w-md rounded-lg px-4 py-3 ${
+                  className={`max-w-sm rounded-lg px-3 py-2 text-xs ${
                     message.role === 'user'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-900'
+                      ? 'bg-rad-indigo-600 text-white'
+                      : 'bg-slate-100 text-slate-900'
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="whitespace-pre-wrap">{message.content}</p>
 
                   {message.actions && (
-                    <div className="mt-4 space-y-3">
+                    <div className="mt-3 space-y-2">
                       {message.actions.map((action) => (
                         <ActionCard
                           key={action.id}
@@ -191,25 +191,28 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
         )}
       </div>
 
-      {/* Input */}
-      <div className="border-t bg-gray-50 p-4">
-        <div className="flex gap-2">
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Décrivez ce que vous voulez faire..."
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+      {/* Input - Composer style */}
+      <div className="shrink-0 border-t border-slate-200 bg-white px-2.5 py-2.5">
+        <div className="flex gap-1.5">
+          <div className="relative flex-1">
+            <Sparkles className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-rad-indigo-500" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              placeholder="Décrivez ce que vous voulez faire…"
+              className="h-9 w-full rounded border border-slate-200 bg-white pl-8 pr-2.5 text-xs focus:border-rad-indigo-300 focus:outline-none focus:ring-1 focus:ring-rad-indigo-500"
+            />
+          </div>
           <Button
             onClick={handleSendMessage}
             disabled={!input.trim()}
             size="sm"
-            className="bg-blue-600 hover:bg-blue-700"
+            className="h-9 bg-rad-indigo-600 hover:bg-rad-indigo-700 text-white"
           >
-            <Send size={18} />
+            <Send size={16} />
           </Button>
         </div>
       </div>
