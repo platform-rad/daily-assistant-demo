@@ -6,7 +6,7 @@ interface ActionCardProps {
   action: OrchestratedAction
   onAuthorize: () => void
   onOpenTool: (toolId: ToolId) => void
-  onValidate?: () => void
+  onValidate?: (destination?: 'client-dev' | 'credit-app' | 'credit-memo') => void
 }
 
 export function ActionCard({ action, onAuthorize, onOpenTool, onValidate }: ActionCardProps) {
@@ -82,7 +82,7 @@ export function ActionCard({ action, onAuthorize, onOpenTool, onValidate }: Acti
             Aperçu {tool?.name}
           </button>
           <button
-            onClick={onValidate}
+            onClick={() => onValidate?.(action.validationDestination)}
             className="flex-1 rounded px-2 py-1 text-2xs font-medium bg-rad-indigo-600 text-white hover:bg-rad-indigo-700 transition"
           >
             ✓ Valider & Éditer

@@ -5,6 +5,8 @@ export interface ContextualResponse {
   summary: string
   steps: string[]
   toolsNeeded: string[]
+  /** Destination après validation: 'client-dev', 'credit-app', ou 'credit-memo' */
+  validationDestination?: 'client-dev' | 'credit-app' | 'credit-memo'
 }
 
 // Note: Les réponses sont préétablies pour chaque client/contexte
@@ -133,6 +135,47 @@ L'exposition totale est de €847.3M avec un rating moyen de BBB+. Cependant, je
         'Planifier les rencontres clients',
       ],
       toolsNeeded: ['my-client-dev'],
+    },
+    'Génère un Credit Memo complet pour ce client': {
+      analysis: `J'ai généré un Credit Memo complet pour TechCorp France:
+
+**En-tête:**
+- Date: 2026-09-15
+- Client: TechCorp France
+- Analyste: Claude AI Assistant
+
+**Executive Summary:**
+TechCorp France est un client corporate de qualité BBB+ avec une exposition de €10.0M.
+Recommandation: RENOUVELER les facilities existantes.
+
+**Analyse Financière:**
+- Revenue (2025): €1.2B (+3.2% vs 2024)
+- EBITDA: €280M (+2.8% vs 2024)
+- Leverage: 2.1x (bien-géré, stable)
+- Interest Coverage: 4.5x (sain)
+- Liquidity: Sufficient
+
+**Analyse des Risques:**
+- Exposition secteur Technology: Modérée
+- Covenants: Tous respectés
+- Mitigations: Monitoring mensuel, covenants stricts
+
+**Recommandations:**
+1. Reconduire les facilities actuelles
+2. Revoir pricing annuellement
+3. Maintenir monitoring mensuel
+4. Prévoir review annuelle
+
+Le memo est prêt pour révision et signature.`,
+      summary: 'Générer Credit Memo pour TechCorp France',
+      steps: [
+        'Collecter les données financières',
+        'Analyser les risques',
+        'Évaluer les ratios',
+        'Générer le memo complet',
+      ],
+      toolsNeeded: ['my-client-dev'],
+      validationDestination: 'credit-memo',
     },
   },
   portfolio: {

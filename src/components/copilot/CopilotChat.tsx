@@ -105,6 +105,7 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
           summary: contextualResponse.summary,
           steps: contextualResponse.steps,
           status: 'pending',
+          validationDestination: contextualResponse.validationDestination,
         }
 
         const assistantMessage: CopilotMessage = {
@@ -168,9 +169,14 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
     }, 2000)
   }
 
-  const handleValidateAndEdit = () => {
-    // Basculer vers MyClientDev en mode édition (client-edit)
-    onValidateAndEdit?.('client-edit')
+  const handleValidateAndEdit = (destination?: 'client-dev' | 'credit-app' | 'credit-memo') => {
+    // Router vers la destination appropriée
+    if (destination === 'credit-memo') {
+      onCreateCreditMemo?.()
+    } else {
+      // Par défaut, basculer vers MyClientDev en mode édition
+      onValidateAndEdit?.('client-edit')
+    }
   }
 
   const handleOpenTool = (toolId: string) => {
