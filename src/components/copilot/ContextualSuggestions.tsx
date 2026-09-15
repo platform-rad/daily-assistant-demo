@@ -17,6 +17,11 @@ interface Action {
 interface ContextualSuggestionsProps {
   context: string
   onActionClick: (prompt: string) => void
+  contextData?: {
+    currentItem?: string
+    itemType?: string
+    data?: Record<string, any>
+  }
 }
 
 const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
@@ -186,9 +191,11 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
 export function ContextualSuggestions({
   context,
   onActionClick,
+  contextData,
 }: ContextualSuggestionsProps) {
   const data = CONTEXT_DATA[context] || CONTEXT_DATA.myClientDev
   const { kpis, actions } = data
+  const currentItem = contextData?.currentItem || 'ce contexte'
 
   const getTrendIcon = (trend?: string) => {
     if (trend === 'up') return '📈'
@@ -224,29 +231,39 @@ export function ContextualSuggestions({
 
       {/* Actions */}
       <div>
-        <p className="text-2xs font-semibold text-slate-700 mb-2 uppercase tracking-wide">Actions recommandées</p>
+        <p className="text-2xs font-semibold text-slate-700 mb-2 uppercase tracking-wide">Actions pour {currentItem}</p>
         <div className="space-y-2">
-          {actions.map((action, idx) => (
-            <button
-              key={idx}
-              onClick={() => onActionClick(action.prompt)}
-              className="w-full text-left rounded border border-slate-200 bg-white p-2 hover:bg-rad-indigo-50 hover:border-rad-indigo-300 transition group"
-            >
-              <div className="flex gap-2">
-                <div className="text-rad-indigo-600 group-hover:text-rad-indigo-700 flex-shrink-0">
-                  {action.icon}
+          {actions.map((action, idx) => {
+            // Adapter le texte pour inclure le contexte actuel
+            const adaptedTitle = currentItem && currentItem !== 'ce contexte'
+              ? `${action.title} - ${currentItem}`
+              : action.title
+            const adaptedPrompt = currentItem && currentItem !== 'ce contexte'
+              ? action.prompt.replace(/ce client|this client|de ce contexte/gi, `de ${currentItem}`)
+              : action.prompt
+
+            return (
+              <button
+                key={idx}
+                onClick={() => onActionClick(adaptedPrompt)}
+                className="w-full text-left rounded border border-slate-200 bg-white p-2 hover:bg-rad-indigo-50 hover:border-rad-indigo-300 transition group"
+              >
+                <div className="flex gap-2">
+                  <div className="text-rad-indigo-600 group-hover:text-rad-indigo-700 flex-shrink-0">
+                    {action.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-2xs font-semibold text-slate-900 group-hover:text-rad-indigo-700 truncate">
+                      {adaptedTitle}
+                    </p>
+                    <p className="text-2xs text-slate-500 group-hover:text-rad-indigo-600">
+                      {action.description}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-2xs font-semibold text-slate-900 group-hover:text-rad-indigo-700">
-                    {action.title}
-                  </p>
-                  <p className="text-2xs text-slate-500 group-hover:text-rad-indigo-600">
-                    {action.description}
-                  </p>
-                </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            )
+          })}
         </div>
       </div>
     </div>

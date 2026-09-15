@@ -8,12 +8,18 @@ import { SkillSuggestions } from './SkillSuggestions'
 import { ContextualSuggestions } from './ContextualSuggestions'
 import { CONTEXTUAL_RESPONSES } from '@/data/contextualResponses'
 
+import type { HostRoute } from '@/data/types'
+import { CONTEXT_DATA_BY_ROUTE } from '@/data/contextualData'
+
 export interface CopilotChatProps {
   /** Mode d'affichage: standalone ou widget */
   mode?: 'standalone' | 'widget'
+  /** Route actuelle pour le contexte */
+  currentRoute?: HostRoute
 }
 
-export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
+export function CopilotChat({ mode = 'standalone', currentRoute = 'client' }: CopilotChatProps) {
+  const contextData = CONTEXT_DATA_BY_ROUTE[currentRoute] || CONTEXT_DATA_BY_ROUTE.client
   const [messages, setMessages] = useState<CopilotMessage[]>([
     {
       id: '0',
@@ -182,7 +188,11 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
               <p className="text-2xs text-slate-500 mt-1">Basé sur votre contexte actuel</p>
             </div>
             {mode === 'widget' ? (
-              <ContextualSuggestions context={detectedContext} onActionClick={handleSkillClick} />
+              <ContextualSuggestions
+                context={detectedContext}
+                onActionClick={handleSkillClick}
+                contextData={contextData}
+              />
             ) : (
               <SkillSuggestions context={detectedContext} onSkillClick={handleSkillClick} />
             )}

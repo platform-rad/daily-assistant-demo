@@ -33,7 +33,7 @@ export default function App() {
 
           {/* Chat Copilot en side panel - Mêmes couleurs partout */}
           <div className="w-96 border-l border-slate-300 bg-white flex flex-col shadow-rad-lg">
-            <CopilotChat mode="widget" />
+            <CopilotChat mode="widget" currentRoute={route} />
 
             <div className="border-t border-slate-200 px-4 py-3 bg-slate-50">
               <button
