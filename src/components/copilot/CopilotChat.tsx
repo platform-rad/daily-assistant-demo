@@ -20,6 +20,17 @@ export interface CopilotChatProps {
 
 export function CopilotChat({ mode = 'standalone', currentRoute = 'client' }: CopilotChatProps) {
   const contextData = CONTEXT_DATA_BY_ROUTE[currentRoute] || CONTEXT_DATA_BY_ROUTE.client
+
+  // Mapper la route au contexte pour les suggestions
+  const getContextFromRoute = (route: HostRoute): string => {
+    if (route === 'client' || route === 'client-edit') return 'myClientDev'
+    if (route === 'credit') return 'myCreditApp'
+    if (route === 'portfolio') return 'portfolio'
+    if (route === 'pipeline') return 'pipeline'
+    return 'myClientDev'
+  }
+
+  const displayContext = getContextFromRoute(currentRoute)
   const [messages, setMessages] = useState<CopilotMessage[]>([
     {
       id: '0',
@@ -189,7 +200,7 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client' }: Co
             </div>
             {mode === 'widget' ? (
               <ContextualSuggestions
-                context={detectedContext}
+                context={displayContext}
                 onActionClick={handleSkillClick}
                 contextData={contextData}
               />

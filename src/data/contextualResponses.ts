@@ -135,6 +135,133 @@ L'exposition totale est de €847.3M avec un rating moyen de BBB+. Cependant, je
       toolsNeeded: ['my-client-dev'],
     },
   },
+  portfolio: {
+    'Fais une analyse du portefeuille par secteur': {
+      analysis: `Analyse de composition du portefeuille global:
+
+**Répartition par secteur:**
+- Secteur Financier: 32% (€270M) - Segment stable
+- Technologie: 28% (€237M) - Croissance modérée
+- Manufacturing: 22% (€186M) - Cyclique
+- Services: 18% (€154M) - En développement
+
+**Exposition totale:** €847.3M
+**Nombre de clients:** 847
+**Rating moyen:** BBB+
+
+**Analyse des risques:**
+- 12 clients identifiés à risque (1.4%)
+- Concentration acceptable
+- Diversification bien équilibrée`,
+      summary: 'Analyser composition portefeuille',
+      steps: [
+        'Récupérer données par secteur',
+        'Calculer exposition',
+        'Identifier concentration',
+        'Comparer benchmarks',
+      ],
+      toolsNeeded: ['my-client-dev'],
+    },
+    'Quel est le profil de risque du portefeuille?': {
+      analysis: `Profil de risque du portefeuille global:
+
+**Risque Global: MODÉRÉ**
+
+**Par dimension:**
+- Concentration: Acceptable (Herfindahl Index: 0.12)
+- Diversification secteur: Bonne (4 secteurs majeurs)
+- Rating: Sain (BBB+ moyenne)
+- Géographie: Diversifiée (EMEA)
+
+**Expositions critiques:**
+- 12 clients BBB- ou moins (monitoring accru)
+- 3 facilities > 90% utilisées
+- 0 violations de covenant actuellement
+
+**Recommandations:**
+- Maintenir surveillance mensuelle
+- Réduire exposition Manufacturing si possible
+- Surveiller secteur Services`,
+      summary: 'Évaluer profil risque portefeuille',
+      steps: [
+        'Analyser ratings par client',
+        'Évaluer secteurs',
+        'Identifier concentrations',
+        'Proposer ajustements',
+      ],
+      toolsNeeded: ['my-client-dev'],
+    },
+  },
+  pipeline: {
+    'Résume l\'état du pipeline': {
+      analysis: `État du deal pipeline Q3 2026:
+
+**Deals actifs: 23**
+
+**Par stage:**
+- Origination: 8 deals (€680M)
+- Structuring: 7 deals (€920M)
+- Due Diligence: 5 deals (€540M)
+- Close: 3 deals (€160M)
+
+**Volume total:** €2.3B
+**Forecast Q3:** €850M
+**Close rate moyenne:** 67%
+
+**Top clients en pipeline:**
+1. TechCorp France - €280M
+2. Manufacturing Ltd - €450M
+3. Finance Corp - €320M
+
+**Status:**
+- On track: 20 deals
+- At risk: 2 deals
+- Delayed: 1 deal`,
+      summary: 'Résumer état pipeline',
+      steps: [
+        'Récupérer deals par stage',
+        'Calculer volumes',
+        'Identifier risques',
+        'Projeter forecast',
+      ],
+      toolsNeeded: ['my-client-dev'],
+    },
+    'Quels deals sont à risque?': {
+      analysis: `Deals identifiés comme étant à risque:
+
+**À risque immédiat (2 deals):**
+
+1. **Manufacturing Corp - €280M**
+   - Issue: Client covenant concerns
+   - Stage: Due Diligence (retard 2 semaines)
+   - Action: Call client cette semaine
+   - Probabilité close: 45% (vs 80% normal)
+
+2. **Finance Solutions - €150M**
+   - Issue: Documentation incomplete
+   - Stage: Structuring
+   - Action: Fournir docs manquantes
+   - Probabilité close: 55%
+
+**Delayed (1 deal):**
+- Retail Group - €95M
+- Cause: Approvals internes
+- Timeline: +3 semaines
+
+**Recommandations:**
+- Engagement immédiat clients
+- Support documentaire
+- Possible deal restructuring`,
+      summary: 'Identifier deals à risque',
+      steps: [
+        'Analyser par stage',
+        'Identifier blocages',
+        'Évaluer probabilités',
+        'Proposer mitigations',
+      ],
+      toolsNeeded: ['my-client-dev'],
+    },
+  },
   myCreditApp: {
     'Analyse les facilities par produit et date de maturité': {
       analysis: `Analyse des credit facilities par produit et maturité:

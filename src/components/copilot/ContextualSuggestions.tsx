@@ -182,6 +182,86 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
       },
     ],
   },
+  portfolio: {
+    kpis: [
+      {
+        label: 'Total Exposure',
+        value: '€847.3M',
+        trend: 'up',
+        status: 'warning',
+      },
+      {
+        label: 'Avg Rating',
+        value: 'BBB+',
+        status: 'good',
+      },
+      {
+        label: 'At-Risk Clients',
+        value: '12',
+        trend: 'up',
+        status: 'warning',
+      },
+    ],
+    actions: [
+      {
+        icon: <TrendingUp size={16} />,
+        title: 'Portfolio Composition',
+        description: 'Analyze by sector and size',
+        prompt: 'Fais une analyse du portefeuille par secteur',
+      },
+      {
+        icon: <AlertCircle size={16} />,
+        title: 'Risk Overview',
+        description: 'Identify portfolio risks',
+        prompt: 'Quel est le profil de risque du portefeuille?',
+      },
+      {
+        icon: <Zap size={16} />,
+        title: 'Optimization',
+        description: 'Rebalancing opportunities',
+        prompt: 'Quelles optimisations recommandez-vous?',
+      },
+    ],
+  },
+  pipeline: {
+    kpis: [
+      {
+        label: 'Active Deals',
+        value: '23',
+        status: 'good',
+      },
+      {
+        label: 'Total Volume',
+        value: '€2.3B',
+        status: 'good',
+      },
+      {
+        label: 'Q3 Forecast',
+        value: '€850M',
+        status: 'neutral',
+      },
+    ],
+    actions: [
+      {
+        icon: <TrendingUp size={16} />,
+        title: 'Pipeline Status',
+        description: 'View deal stages',
+        prompt: 'Résume l\'état du pipeline',
+      },
+      {
+        icon: <AlertCircle size={16} />,
+        title: 'At-Risk Deals',
+        description: 'Deals needing attention',
+        prompt: 'Quels deals sont à risque?',
+      },
+      {
+        icon: <Zap size={16} />,
+        title: 'Forecast',
+        description: 'Quarter projection',
+        prompt: 'Quelle est la projection Q3?',
+      },
+    ],
+  },
 }
 
 export function ContextualSuggestions({
