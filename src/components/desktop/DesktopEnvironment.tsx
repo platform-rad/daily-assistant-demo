@@ -105,8 +105,14 @@ export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: De
             onClose={() => setChatOpen(false)}
           >
             <CopilotChatWrapper
-              onOpenMyClientDev={handleOpenMyClientDev}
-              onCreateCreditMemo={onCreateCreditMemo}
+              onOpenMyClientDev={() => {
+                setChatOpen(false)
+                handleOpenMyClientDev()
+              }}
+              onCreateCreditMemo={() => {
+                setChatOpen(false)
+                onCreateCreditMemo?.()
+              }}
             />
           </FloatingWindow>
         )}
