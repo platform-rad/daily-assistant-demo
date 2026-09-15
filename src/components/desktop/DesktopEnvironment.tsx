@@ -6,9 +6,10 @@ import { CopilotChat } from '@/components/copilot/CopilotChat'
 
 interface DesktopEnvironmentProps {
   onOpenMyClientDev?: () => void
+  onCreateCreditMemo?: () => void
 }
 
-export function DesktopEnvironment({ onOpenMyClientDev }: DesktopEnvironmentProps) {
+export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: DesktopEnvironmentProps) {
   const [chatOpen, setChatOpen] = useState(false)
   const [currentTime, setCurrentTime] = useState('')
 
@@ -103,7 +104,10 @@ export function DesktopEnvironment({ onOpenMyClientDev }: DesktopEnvironmentProp
             defaultY={100}
             onClose={() => setChatOpen(false)}
           >
-            <CopilotChatWrapper onOpenMyClientDev={handleOpenMyClientDev} />
+            <CopilotChatWrapper
+              onOpenMyClientDev={handleOpenMyClientDev}
+              onCreateCreditMemo={onCreateCreditMemo}
+            />
           </FloatingWindow>
         )}
 
@@ -121,16 +125,20 @@ export function DesktopEnvironment({ onOpenMyClientDev }: DesktopEnvironmentProp
   )
 }
 
-// Wrapper pour passer la callback au chat
-function CopilotChatWrapper({ onOpenMyClientDev }: { onOpenMyClientDev: () => void }) {
+// Wrapper pour passer les callbacks au chat
+function CopilotChatWrapper({
+  onOpenMyClientDev,
+  onCreateCreditMemo,
+}: {
+  onOpenMyClientDev: () => void
+  onCreateCreditMemo?: () => void
+}) {
   return (
-    <div onClick={(e) => {
-      const target = e.target as HTMLElement
-      if (target.textContent?.includes('Ouvrir')) {
-        onOpenMyClientDev()
-      }
-    }}>
-      <CopilotChat mode="standalone" />
-    </div>
+    <CopilotChat
+      mode="standalone"
+      currentRoute="client"
+      onValidateAndEdit={() => onOpenMyClientDev()}
+      onCreateCreditMemo={onCreateCreditMemo}
+    />
   )
 }

@@ -58,9 +58,9 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
       },
       {
         icon: <Zap size={16} />,
-        title: 'Recommendations',
-        description: 'See recommended actions',
-        prompt: 'Quelles actions recommandez-vous pour ce client?',
+        title: 'Create Credit Memo',
+        description: 'Generate analysis memo',
+        prompt: 'Génère un Credit Memo complet pour ce client',
       },
     ],
   },

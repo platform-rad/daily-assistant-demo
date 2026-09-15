@@ -18,9 +18,11 @@ export interface CopilotChatProps {
   currentRoute?: HostRoute
   /** Callback pour basculer vers MyClientDev pour éditer */
   onValidateAndEdit?: (route: HostRoute) => void
+  /** Callback pour créer un Credit Memo */
+  onCreateCreditMemo?: () => void
 }
 
-export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onValidateAndEdit }: CopilotChatProps) {
+export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onValidateAndEdit, onCreateCreditMemo }: CopilotChatProps) {
   const contextData = CONTEXT_DATA_BY_ROUTE[currentRoute] || CONTEXT_DATA_BY_ROUTE.client
 
   // Mapper la route au contexte pour les suggestions
@@ -176,6 +178,12 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
   }
 
   const handleSkillClick = (skill: string) => {
+    // Si c'est une suggestion de Credit Memo, basculer directement
+    if (skill.toLowerCase().includes('credit memo')) {
+      onCreateCreditMemo?.()
+      return
+    }
+    // Sinon, remplir le champ input comme avant
     setInput(skill)
     inputRef.current?.focus()
   }
