@@ -16,9 +16,11 @@ export interface CopilotChatProps {
   mode?: 'standalone' | 'widget'
   /** Route actuelle pour le contexte */
   currentRoute?: HostRoute
+  /** Callback pour basculer vers MyClientDev pour éditer */
+  onValidateAndEdit?: (route: HostRoute) => void
 }
 
-export function CopilotChat({ mode = 'standalone', currentRoute = 'client' }: CopilotChatProps) {
+export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onValidateAndEdit }: CopilotChatProps) {
   const contextData = CONTEXT_DATA_BY_ROUTE[currentRoute] || CONTEXT_DATA_BY_ROUTE.client
 
   // Mapper la route au contexte pour les suggestions
@@ -156,12 +158,17 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client' }: Co
         id: (Date.now() + 100).toString(),
         role: 'assistant',
         content:
-          'Les opérations ont été complétées avec succès! Vous pouvez maintenant consulter les détails dans les systèmes ou éditer les informations.',
+          'Les opérations ont été complétées avec succès! Cliquez "Valider & Éditer" pour ouvrir le détail dans MyClientDev et continuer à discuter.',
         timestamp: new Date(),
       }
 
       setMessages((prev) => [...prev, confirmMessage])
     }, 2000)
+  }
+
+  const handleValidateAndEdit = () => {
+    // Basculer vers MyClientDev en mode édition (client-edit)
+    onValidateAndEdit?.('client-edit')
   }
 
   const handleOpenTool = (toolId: string) => {
@@ -229,6 +236,7 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client' }: Co
                           action={action}
                           onAuthorize={() => handleAuthorizeAction(message.id, action.id)}
                           onOpenTool={handleOpenTool}
+                          onValidate={handleValidateAndEdit}
                         />
                       ))}
                     </div>

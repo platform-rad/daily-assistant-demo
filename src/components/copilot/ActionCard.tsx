@@ -6,9 +6,10 @@ interface ActionCardProps {
   action: OrchestratedAction
   onAuthorize: () => void
   onOpenTool: (toolId: ToolId) => void
+  onValidate?: () => void
 }
 
-export function ActionCard({ action, onAuthorize, onOpenTool }: ActionCardProps) {
+export function ActionCard({ action, onAuthorize, onOpenTool, onValidate }: ActionCardProps) {
   const tool = TOOLS.find((t) => t.id === action.toolId)
 
   return (
@@ -78,10 +79,13 @@ export function ActionCard({ action, onAuthorize, onOpenTool }: ActionCardProps)
             onClick={() => onOpenTool(action.toolId)}
             className="flex-1 rounded px-2 py-1 text-2xs font-medium border border-slate-300 text-slate-700 hover:bg-slate-100 transition"
           >
-            Ouvrir {tool?.name}
+            Aperçu {tool?.name}
           </button>
-          <button disabled className="flex-1 rounded px-2 py-1 text-2xs font-medium bg-slate-100 text-slate-500">
-            Éditer
+          <button
+            onClick={onValidate}
+            className="flex-1 rounded px-2 py-1 text-2xs font-medium bg-rad-indigo-600 text-white hover:bg-rad-indigo-700 transition"
+          >
+            ✓ Valider & Éditer
           </button>
         </div>
       )}
