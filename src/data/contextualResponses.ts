@@ -7,6 +7,9 @@ export interface ContextualResponse {
   toolsNeeded: string[]
 }
 
+// Note: Les réponses sont préétablies pour chaque client/contexte
+// En production, elles seraient générées dynamiquement avec l'IA
+
 export const CONTEXTUAL_RESPONSES: Record<string, Record<string, ContextualResponse>> = {
   myClientDev: {
     'Fais une analyse complète du portefeuille par secteur et exposition': {
@@ -28,27 +31,76 @@ L'exposition totale est de €847.3M avec un rating moyen de BBB+. Cependant, je
       ],
       toolsNeeded: ['my-client-dev'],
     },
-    'Quels clients sont identifiés comme étant à risque?': {
-      analysis: `Analyse des clients à risque dans votre portefeuille:
+    'Fais une analyse complète de l\'exposition de ce client': {
+      analysis: `Analyse détaillée de TechCorp France:
 
-12 clients sont actuellement identifiés comme à risque, soit 1.4% du portefeuille:
+**Exposition et Structure:**
+- Exposition totale: €10.0M
+- Type: Corporate Client
+- Secteur: Technology
+- Rating: BBB+
+- Statut: Active
+- Nombre de facilities: 1 (RCF)
 
-1. **TechCorp EMEA** - Rating dégradé (BBB- → BB+), exposition €85M
-2. **Manufacturing Ltd** - Baisse de revenue -15%, exposition €42M
-3. **Retail Services** - Covenant breach imminent, exposition €38M
-4. **Construction Group** - Liquidité faible, exposition €28M
-...et 8 autres
+**Analyse du risque:**
+- Profil de risque: Moderate
+- Tendance: Stable
+- Dernière revue: 2026-08-15
+- Prochain review: 2026-11-15
 
-Recommandations:
-- Augmenter la fréquence de monitoring
-- Mettre en place des covenants plus stricts
-- Considérer une réduction d'exposition`,
-      summary: 'Identifier clients à risque',
+**Exposition détaillée:**
+- Revenue: €1.2B (2025)
+- Leverage: 2.1x (acceptable)
+- Interest Coverage: 4.5x (bon)
+- Liquidity: Sufficient
+
+**Recommandations:**
+- Maintenir le monitoring mensuel
+- Revoir les pricing annuellement
+- Aucune action immédiate requise`,
+      summary: 'Analyser l\'exposition du client',
       steps: [
-        'Récupérer les ratings récents',
-        'Analyser les tendances financières',
-        'Vérifier la compliance des covenants',
-        'Classer par niveau de risque',
+        'Récupérer les données du client',
+        'Évaluer l\'exposition et les risques',
+        'Analyser les ratios financiers',
+        'Préparer les recommandations',
+      ],
+      toolsNeeded: ['my-client-dev'],
+    },
+    'Quels risques identifiez-vous pour ce client': {
+      analysis: `Analyse des risques spécifiques pour TechCorp France:
+
+**Profil de Risque: MODÉRÉ**
+
+**Risques identifiés:**
+
+1. **Exposition au secteur Technology** (Volatilité moyenne)
+   - Secteur sujet aux cycles économiques
+   - Dépendance aux tendances technologiques
+
+2. **Taille de l'exposition: €10M** (Acceptable)
+   - Pas de concentration excessive
+   - Diversification appropriée
+
+3. **Rating BBB+** (Stable)
+   - Position de crédit acceptable
+   - Surveillance recommandée
+
+4. **Covenant Compliance** (En bon état)
+   - Tous les covenants respectés
+   - Marges confortables
+
+**Recommandations:**
+- Monitoring mensuel (standard)
+- Review annuelle des covenants
+- Surveiller les news du secteur Technology
+- Pas d'action immédiate requise`,
+      summary: 'Analyser les risques du client',
+      steps: [
+        'Évaluer le secteur et les tendances',
+        'Vérifier les ratios financiers',
+        'Analyser les covenants',
+        'Produire un risk report',
       ],
       toolsNeeded: ['my-client-dev'],
     },
