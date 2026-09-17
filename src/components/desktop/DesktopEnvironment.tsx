@@ -97,7 +97,7 @@ export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: De
         {chatOpen && (
           <FloatingWindow
             title="Copilot"
-            icon="🤖"
+            icon="🧠"
             defaultWidth={900}
             defaultHeight={800}
             defaultX={Math.max(20, window.innerWidth - 920)}

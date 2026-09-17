@@ -2,8 +2,10 @@ import { useCallback, useState, useRef, useEffect } from 'react'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { MyClientDev } from '@/components/host/MyClientDev'
 import { CopilotChat } from '@/components/copilot/CopilotChat'
+import { CopilotSidebar } from '@/components/copilot/CopilotSidebar'
 import { CreditMemoViewer } from '@/components/credit-memo/CreditMemoViewer'
 import { DesktopEnvironment } from '@/components/desktop/DesktopEnvironment'
+import { Brain } from 'lucide-react'
 import type { HostRoute } from '@/data/types'
 
 export type AppMode = 'desktop' | 'legacy' | 'credit-memo'
@@ -107,47 +109,18 @@ export default function App() {
           </div>
         </div>
       ) : (
-        /* Mode Legacy: MyClientDev with optional CopilotChat */
+        /* Mode Legacy: MyClientDev with optional Copilot Sidebar */
         <div className="flex h-screen w-screen overflow-hidden bg-slate-200 relative">
           {/* Application hôte */}
           <main className="min-w-0 flex-1 overflow-hidden">
             <MyClientDev route={route} onNavigate={navigate} compact={false} />
           </main>
 
-          {/* Chat Copilot en side panel - Slide in from right */}
-          <div
-            className={`bg-white flex flex-col shadow-2xl overflow-hidden transition-all duration-300 ${
-              isChatOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}
-            style={{ width: isChatOpen ? '384px' : '0px' }}
-          >
-            {isChatOpen && (
-              <>
-                {/* Header violet */}
-                <div className="h-14 flex items-center px-4" style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}>
-                  <span className="text-white font-semibold text-sm">Daily Assistant</span>
-                </div>
-
-                <div className="flex-1 overflow-auto">
-                  <CopilotChat
-                    mode="widget"
-                    currentRoute={route}
-                    onValidateAndEdit={handleValidateAndEdit}
-                    onCreateCreditMemo={handleCreateCreditMemo}
-                  />
-                </div>
-
-                <div className="border-t border-slate-200 px-4 py-3 bg-slate-50">
-                  <button
-                    onClick={() => setAppMode('desktop')}
-                    className="w-full px-3 py-2 text-2xs rounded bg-slate-200 text-slate-700 hover:bg-slate-300 transition font-medium"
-                  >
-                    ← Retour Desktop
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+          {/* Copilot Sidebar */}
+          <CopilotSidebar
+            isCollapsed={!isChatOpen}
+            onToggleCollapse={() => setIsChatOpen(!isChatOpen)}
+          />
 
           {/* Sticky button - collé à droite, draggable sur axe Y */}
           {!isChatOpen && (
@@ -155,7 +128,7 @@ export default function App() {
               ref={buttonRef}
               onMouseDown={handleMouseDown}
               onClick={() => setIsChatOpen(true)}
-              className="fixed w-14 h-14 flex items-center justify-center text-2xl shadow-2xl hover:shadow-xl transition z-50 cursor-move group"
+              className="fixed w-14 h-14 flex items-center justify-center shadow-2xl hover:shadow-xl transition z-50 cursor-move group"
               style={{
                 background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)',
                 right: '0px',
@@ -165,7 +138,7 @@ export default function App() {
               }}
               title="Ouvrir le chat (draggable)"
             >
-              🤖
+              <Brain size={24} className="text-white" />
             </button>
           )}
         </div>
