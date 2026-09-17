@@ -7,6 +7,7 @@ import { ToolPreview } from './ToolPreview'
 import { SkillSuggestions } from './SkillSuggestions'
 import { ContextualSuggestions } from './ContextualSuggestions'
 import { StandaloneView } from './StandaloneView'
+import { CreditMemoSetup } from './CreditMemoSetup'
 import { CONTEXTUAL_RESPONSES } from '@/data/contextualResponses'
 
 import type { HostRoute } from '@/data/types'
@@ -36,6 +37,7 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
   }
 
   const displayContext = getContextFromRoute(currentRoute)
+  const [showCreditMemoSetup, setShowCreditMemoSetup] = useState(false)
   const [messages, setMessages] = useState<CopilotMessage[]>([
     {
       id: '0',
@@ -185,9 +187,9 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
   }
 
   const handleSkillClick = (skill: string) => {
-    // Si c'est une suggestion de Credit Memo, basculer directement
+    // Si c'est une suggestion de Credit Memo, montrer le wizard d'abord
     if (skill.toLowerCase().includes('credit memo')) {
-      onCreateCreditMemo?.()
+      setShowCreditMemoSetup(true)
       return
     }
     // Sinon, remplir le champ input comme avant
@@ -197,13 +199,26 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
 
   // Si mode standalone, afficher la nouvelle interface avec navigation
   if (mode === 'standalone') {
+    // Montrer le CreditMemoSetup wizard en priorité
+    if (showCreditMemoSetup) {
+      return (
+        <CreditMemoSetup
+          onComplete={() => {
+            setShowCreditMemoSetup(false)
+            onCreateCreditMemo?.()
+          }}
+          onCancel={() => setShowCreditMemoSetup(false)}
+        />
+      )
+    }
+
     return (
       <StandaloneView
         onSelectPrompt={(prompt) => {
           setInput(prompt)
           inputRef.current?.focus()
         }}
-        onCreateCreditMemo={onCreateCreditMemo}
+        onCreateCreditMemo={() => setShowCreditMemoSetup(true)}
       />
     )
   }
