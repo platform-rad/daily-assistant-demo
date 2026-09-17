@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Home, Clock, Star, Zap, Settings, ChevronRight, Brain } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Home, Clock, Star, Zap, Settings, ChevronRight, Sparkles } from 'lucide-react'
 import { HomePage } from './pages/HomePage'
 import { HistoryPage } from './pages/HistoryPage'
 import { FavoritesPage } from './pages/FavoritesPage'
@@ -15,6 +15,29 @@ interface CopilotSidebarProps {
 
 export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt }: CopilotSidebarProps) {
   const [currentView, setCurrentView] = useState<ViewType>('home')
+  const [width, setWidth] = useState(320) // 320px par défaut (w-80)
+  const [isDragging, setIsDragging] = useState(false)
+  const sidebarRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!isDragging) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const newWidth = Math.max(280, Math.min(600, e.clientX))
+      setWidth(newWidth)
+    }
+
+    const handleMouseUp = () => {
+      setIsDragging(false)
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging])
 
   const menuItems = [
     { id: 'home', label: 'Accueil', icon: Home },
@@ -28,12 +51,16 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt }
   }
 
   return (
-    <div className="w-80 border-l border-slate-200 bg-white flex flex-col shadow-2xl overflow-hidden">
+    <div
+      ref={sidebarRef}
+      className="border-l border-slate-200 bg-white flex flex-col shadow-2xl overflow-hidden relative"
+      style={{ width: `${width}px` }}
+    >
       {/* Header */}
       <div className="border-b border-slate-200 bg-white px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}>
-            <Brain size={18} className="text-white" />
+            <Sparkles size={18} className="text-white" />
           </div>
           <span className="font-semibold text-slate-900 text-sm">Copilot</span>
         </div>
@@ -91,6 +118,13 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt }
           <span className="text-sm font-medium">Paramètres</span>
         </button>
       </div>
+
+      {/* Resize Handle */}
+      <div
+        onMouseDown={() => setIsDragging(true)}
+        className="absolute left-0 top-0 w-1 h-full cursor-col-resize hover:bg-purple-500/50 transition"
+        style={{ background: isDragging ? '#7D4FFE' : 'transparent' }}
+      />
     </div>
   )
 }

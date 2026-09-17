@@ -5,7 +5,7 @@ import { CopilotChat } from '@/components/copilot/CopilotChat'
 import { CopilotSidebar } from '@/components/copilot/CopilotSidebar'
 import { CreditMemoViewer } from '@/components/credit-memo/CreditMemoViewer'
 import { DesktopEnvironment } from '@/components/desktop/DesktopEnvironment'
-import { Brain } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 import type { HostRoute } from '@/data/types'
 
 export type AppMode = 'desktop' | 'legacy' | 'credit-memo'
@@ -138,7 +138,7 @@ export default function App() {
               }}
               title="Ouvrir le chat (draggable)"
             >
-              <Brain size={24} className="text-white" />
+              <Sparkles size={24} className="text-white" />
             </button>
           )}
         </div>

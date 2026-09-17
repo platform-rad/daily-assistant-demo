@@ -26,7 +26,7 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-6xl mx-auto px-6 py-6 space-y-6">
+        <div className="mx-auto px-3 py-4 space-y-4">
         {/* What's New - KPIs */}
         <section>
           <div className="flex items-center justify-between mb-4">
@@ -53,7 +53,7 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-3">
             {/* KPI Card 1 - Portfolio Exposure */}
             <div className="relative p-4 rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full">
               {/* Colored Stroke Accent */}
