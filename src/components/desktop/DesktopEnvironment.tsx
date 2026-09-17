@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { MessageSquare } from 'lucide-react'
+import { MessageSquare, Mic } from 'lucide-react'
 import { FloatingWindow } from './FloatingWindow'
 import { Taskbar } from './Taskbar'
 import { CopilotChat } from '@/components/copilot/CopilotChat'
+import { MeenaApp } from '@/components/meena/MeenaApp'
 
 interface DesktopEnvironmentProps {
   onOpenMyClientDev?: () => void
@@ -11,6 +12,7 @@ interface DesktopEnvironmentProps {
 
 export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: DesktopEnvironmentProps) {
   const [chatOpen, setChatOpen] = useState(false)
+  const [meenaOpen, setMeenaOpen] = useState(false)
   const [currentTime, setCurrentTime] = useState('')
 
   useEffect(() => {
@@ -26,6 +28,10 @@ export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: De
   const handleTaskbarClick = (appId: string) => {
     if (appId === 'daily-assistant') {
       setChatOpen(!chatOpen)
+      if (meenaOpen) setMeenaOpen(false)
+    } else if (appId === 'meena') {
+      setMeenaOpen(!meenaOpen)
+      if (chatOpen) setChatOpen(false)
     } else if (appId === 'myclientdev') {
       onOpenMyClientDev?.()
     }
@@ -48,6 +54,13 @@ export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: De
       label: 'Daily Assistant',
       icon: <MessageSquare size={16} />,
       isActive: chatOpen,
+      isMinimized: false,
+    },
+    {
+      id: 'meena',
+      label: 'Meena',
+      icon: <Mic size={16} />,
+      isActive: meenaOpen,
       isMinimized: false,
     },
   ]
@@ -118,11 +131,37 @@ export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: De
         )}
 
         {/* Desktop context menu hint */}
-        {!chatOpen && (
+        {!chatOpen && !meenaOpen && (
           <div className="fixed bottom-20 right-8 bg-black/40 text-white text-xs px-3 py-2 rounded pointer-events-none">
             💡 Double-cliquez MyClientDev ou utilisez la taskbar
           </div>
         )}
+
+        {/* Bottom Assistant Panel */}
+        <div className="fixed bottom-12 right-0 left-0 px-2 py-2 bg-gradient-to-t from-gray-800/20 to-transparent flex gap-2 pointer-events-none">
+          {/* Daily Assistant */}
+          {chatOpen && (
+            <div className="flex-1 max-w-sm h-40 pointer-events-auto rounded-t-lg overflow-hidden bg-white shadow-2xl border border-slate-200">
+              <CopilotChatWrapper
+                onOpenMyClientDev={() => {
+                  setChatOpen(false)
+                  onOpenMyClientDev?.()
+                }}
+                onCreateCreditMemo={() => {
+                  setChatOpen(false)
+                  onCreateCreditMemo?.()
+                }}
+              />
+            </div>
+          )}
+
+          {/* Meena - Meeting Notes */}
+          {meenaOpen && (
+            <div className="flex-1 max-w-sm h-40 pointer-events-auto rounded-t-lg overflow-hidden bg-white shadow-2xl border border-slate-200">
+              <MeenaApp />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Taskbar */}
