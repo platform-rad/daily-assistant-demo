@@ -444,12 +444,12 @@ interface ConversationCardProps {
 
 function ConversationCard({ title, date, snippet }: ConversationCardProps) {
   return (
-    <button className="p-4 rounded-lg border border-slate-200 bg-white hover:border-purple-300 hover:shadow-md transition text-left group">
+    <button className="p-3 rounded-lg border border-slate-200 bg-white hover:border-purple-300 hover:shadow-md transition text-left group">
       <div className="flex items-start justify-between">
-        <h3 className="font-semibold text-slate-900 group-hover:text-purple-700 transition flex-1">{title}</h3>
-        <span className="text-xs text-slate-400 flex-shrink-0 ml-2">{date}</span>
+        <h3 className="font-semibold text-sm text-slate-900 group-hover:text-purple-700 transition flex-1">{title}</h3>
+        <span className="text-2xs text-slate-400 flex-shrink-0 ml-2">{date}</span>
       </div>
-      <p className="text-sm text-slate-600 mt-2 line-clamp-2">{snippet}</p>
+      <p className="text-xs text-slate-600 mt-1.5 line-clamp-2">{snippet}</p>
     </button>
   )
 }
