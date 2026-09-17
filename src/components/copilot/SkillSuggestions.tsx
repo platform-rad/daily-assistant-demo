@@ -19,8 +19,8 @@ const SKILLS_BY_CONTEXT: Record<string, Array<{ icon: React.ReactNode; label: st
     },
     {
       icon: <FileText size={18} />,
-      label: 'Générer doc',
-      prompt: 'Génère un memo d\'analyse pour ce client',
+      label: 'Créer un Credit Memo',
+      prompt: 'Génère un Credit Memo complet pour ce client',
     },
   ],
   myCreditApp: [
