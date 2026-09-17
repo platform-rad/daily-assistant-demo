@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daily Assistant — Prototype (standalone)</title>
+<style>
+  :root{
+    --purple:#7D4FFE; --purple-dark:#6D3BF0; --purple-50:#f5f2ff; --purple-100:#ede6ff; --purple-200:#dccbff;
+    --amber:#d97706; --amber-dark:#b45309; --amber-50:#fffbeb; --amber-100:#fef3c7;
+    --emerald:#059669; --emerald-50:#ecfdf5; --emerald-100:#d1fae5; --emerald-200:#a7f3d0;
+    --slate-900:#0f172a; --slate-700:#334155; --slate-600:#475569; --slate-500:#64748b;
+    --slate-300:#cbd5e1; --slate-200:#e2e8f0; --slate-100:#f1f5f9; --slate-50:#f8fafc;
+    --red:#dc2626; --red-100:#fee2e2;
+    --blue:#2563eb; --blue-50:#eff6ff; --blue-100:#dbeafe;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    color:var(--slate-900);
+    overflow:hidden;
+  }
+  button{font-family:inherit; cursor:pointer;}
+  input,select,textarea{font-family:inherit;}
+  .hidden{display:none !important;}
+
+  /* ===== DESKTOP ===== */
+  #desktop{
+    position:fixed; inset:0;
+    background:linear-gradient(135deg,#1e3c72 0%, #2a5298 50%, #7aa8da 100%);
+    overflow:hidden;
+  }
+  .desktop-icons{position:absolute; top:16px; left:16px; display:flex; flex-direction:column; gap:16px; width:96px;}
+  .desktop-icon{cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px; border-radius:10px; transition:.15s;}
+  .desktop-icon:hover{background:rgba(0,0,0,.25);}
+  .desktop-icon .emoji{font-size:34px;}
+  .desktop-icon .label{color:#fff; font-size:11px; font-weight:600; text-align:center; padding:2px 6px; border-radius:4px;}
+  .desktop-icon:hover .label{background:rgba(0,0,0,.35);}
+
+  .hint{position:fixed; bottom:64px; right:24px; background:rgba(0,0,0,.4); color:#fff; font-size:12px; padding:8px 12px; border-radius:8px; pointer-events:none;}
+
+  /* Taskbar */
+  #taskbar{position:fixed; left:0; right:0; bottom:0; height:48px; background:linear-gradient(90deg,#111827,#1f2937); border-top:1px solid #374151; display:flex; align-items:center; padding:0 8px; gap:4px; z-index:999;}
+  .start-btn{padding:8px 12px; border:none; background:transparent; color:#fff; font-weight:700; border-radius:6px;}
+  .start-btn:hover{background:#374151;}
+  .taskbar-apps{display:flex; gap:4px; flex:1; margin-left:8px;}
+  .taskbar-app{border:none; padding:6px 12px; border-radius:6px; display:flex; align-items:center; gap:8px; color:#fff; font-size:12px; background:#374151;}
+  .taskbar-app:hover{background:#4b5563;}
+  .taskbar-app.active{background:#2563eb; border-top:2px solid #60a5fa;}
+  .systray{display:flex; align-items:center; gap:14px; color:#fff; font-size:12px; padding-right:8px;}
+  .systray .clock{color:#d1d5db;}
+
+  /* ===== FLOATING WINDOW ===== */
+  .floating-window{
+    position:absolute; background:#fff; border-radius:10px; box-shadow:0 25px 60px rgba(0,0,0,.35);
+    display:flex; flex-direction:column; overflow:hidden; border:1px solid rgba(0,0,0,.08);
+  }
+  .window-titlebar{
+    height:40px; flex:none; background:linear-gradient(90deg,#1f2937,#111827); display:flex; align-items:center;
+    padding:0 10px; gap:8px; cursor:move; user-select:none;
+  }
+  .window-titlebar .icon{font-size:16px;}
+  .window-titlebar .title{color:#fff; font-size:13px; font-weight:600; flex:1;}
+  .window-btn{width:22px; height:22px; border-radius:5px; border:none; background:rgba(255,255,255,.08); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px;}
+  .window-btn:hover{background:rgba(255,255,255,.18);}
+  .window-btn.close:hover{background:#dc2626;}
+  .window-body{flex:1; min-height:0; overflow:hidden; display:flex;}
+
+  /* ===== SPLIT SCREEN (Credit memo full screen) ===== */
+  #creditmemo-screen{position:fixed; inset:0; background:#e2e8f0; display:flex; z-index:500;}
+  .cm-main{flex:1; min-width:0; background:#fff; display:flex; flex-direction:column; overflow:hidden; border-right:1px solid var(--slate-200);}
+  .cm-side{width:384px; flex:none; background:#fff; display:flex; flex-direction:column; overflow:hidden; box-shadow:-8px 0 24px rgba(0,0,0,.06);}
+
+  .panel-header{padding:16px 24px; border-bottom:1px solid var(--slate-200); background:linear-gradient(90deg, var(--purple-50), transparent); flex:none;}
+  .panel-header h1{font-size:17px; font-weight:700; margin:0;}
+  .panel-header p{font-size:13px; color:var(--slate-600); margin:4px 0 0;}
+
+  .progress-row{display:flex; gap:8px; padding:14px 24px; background:var(--slate-50); flex:none;}
+  .progress-seg{height:6px; flex:1; border-radius:99px; background:var(--slate-200);}
+  .progress-seg.done{background:var(--purple);}
+
+  .panel-content{flex:1; overflow-y:auto; padding:20px 24px;}
+  .panel-footer{border-top:1px solid var(--slate-200); background:#fff; padding:12px 24px; display:flex; gap:8px; flex-wrap:wrap; flex:none;}
+
+  .field-search{position:relative;}
+  .field-search input{width:100%; padding:10px 14px 10px 36px; border-radius:8px; border:1px solid var(--slate-200); font-size:13px;}
+  .field-search .ico{position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--slate-500);}
+
+  .client-card{width:100%; text-align:left; padding:12px; border-radius:8px; border:2px solid var(--slate-200); background:#fff; margin-top:8px; transition:.15s;}
+  .client-card:hover{border-color:var(--purple-200);}
+  .client-card.selected{border-color:var(--purple); background:var(--purple-50);}
+  .client-card .name{font-weight:600; font-size:14px;}
+  .client-card .meta{font-size:12px; color:var(--slate-500); margin-top:2px;}
+
+  .data-box{background:var(--purple-50); border:1px solid var(--purple-200); border-radius:10px; padding:12px;}
+  .data-box h3{font-size:13px; font-weight:700; margin:0 0 10px;}
+  .field-row{position:relative; padding:10px; border-radius:8px; border:1px solid transparent; display:flex; align-items:center; gap:6px; margin-bottom:6px; transition:.15s; cursor:pointer;}
+  .field-row:hover{border-color:var(--purple-200); background:#fff;}
+  .field-row .field-inner{flex:1; display:flex; flex-direction:column; gap:4px;}
+  .field-row label{font-size:11px; font-weight:600; color:var(--slate-600);}
+  .field-row .field-controls{display:flex; align-items:center; gap:6px;}
+  .field-row input[type=text]{flex:1; padding:6px 8px; border-radius:6px; border:1px solid var(--slate-200); font-size:12px;}
+  .icon-btn{border:none; background:transparent; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex:none;}
+  .icon-btn.focus{background:transparent;}
+  .icon-btn.focus:hover{background:var(--purple-200);}
+  .icon-btn.restart:hover{background:var(--slate-300);}
+  .icon-btn.trash:hover{background:var(--red-100);}
+  .add-field-wrap{position:relative; margin-top:10px;}
+  .btn-dashed{width:100%; padding:8px; border-radius:8px; border:1px dashed var(--purple-200); background:transparent; color:var(--purple); font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px;}
+  .btn-dashed:hover{background:var(--purple-100);}
+  .dropdown-list{position:absolute; top:100%; left:0; right:0; margin-top:4px; background:#fff; border:1px solid var(--slate-200); border-radius:8px; box-shadow:0 10px 24px rgba(0,0,0,.12); max-height:160px; overflow-y:auto; z-index:20;}
+  .dropdown-list button{display:block; width:100%; text-align:left; padding:8px 12px; border:none; background:#fff; font-size:12px; border-bottom:1px solid var(--slate-100);}
+  .dropdown-list button:hover{background:var(--purple-50);}
+
+  .upload-zone{border:2px dashed var(--slate-300); border-radius:10px; padding:28px; text-align:center; background:var(--slate-50); cursor:pointer;}
+  .upload-zone:hover{border-color:var(--purple-200); background:var(--purple-50);}
+  .uploaded-doc{margin-top:12px; background:var(--emerald-50); border:1px solid var(--emerald-200); border-radius:10px; padding:12px; display:flex; align-items:center; gap:10px;}
+
+  .summary-box{background:var(--slate-50); border-radius:10px; padding:14px;}
+  .summary-row{display:flex; justify-content:space-between; font-size:13px; padding:5px 0; border-bottom:1px dashed var(--slate-200);}
+  .summary-row:last-child{border-bottom:none;}
+
+  .btn{padding:9px 16px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid transparent;}
+  .btn-purple{background:var(--purple); color:#fff;}
+  .btn-purple:hover{background:var(--purple-dark);}
+  .btn-outline{background:#fff; border-color:var(--slate-300); color:var(--slate-700);}
+  .btn-outline:hover{background:var(--slate-50);}
+  .btn-emerald{background:var(--emerald); color:#fff;}
+  .btn-emerald:hover{background:#047857;}
+  .btn.grow{flex:1;}
+  .ml-auto{margin-left:auto;}
+
+  /* Chat sidebar */
+  .chat-header{padding:14px 16px; border-bottom:1px solid var(--slate-200); background:linear-gradient(90deg,var(--purple-50),transparent); flex:none;}
+  .chat-header h1{font-size:14px; font-weight:700; margin:0;}
+  .chat-header p{font-size:11px; color:var(--slate-600); margin:4px 0 0;}
+  .chip{display:inline-block; margin-top:8px; padding:3px 8px; background:var(--purple-100); border-radius:6px; font-size:10.5px; color:#5b21b6;}
+  .chat-body{flex:1; overflow-y:auto; padding:16px;}
+  .tip-card{padding:12px; border-radius:8px; font-size:11.5px; margin-bottom:10px;}
+  .tip-card.violet{background:var(--purple-50); border:1px solid var(--purple-200);}
+  .tip-card.blue{background:var(--blue-50); border:1px solid var(--blue-100);}
+  .tip-card.emerald{background:var(--emerald-50); border:1px solid var(--emerald-200);}
+  .tip-card b{display:block; margin-bottom:3px;}
+  .back-link{display:inline-flex; align-items:center; gap:6px; padding:6px 8px; border:none; background:transparent; color:var(--purple); font-size:12px; border-radius:6px; margin-bottom:8px;}
+  .back-link:hover{background:var(--purple-50);}
+  .doc-header{display:flex; align-items:center; gap:8px; margin-bottom:12px;}
+  .doc-header .name{font-size:12px; font-weight:700;}
+  .doc-header .src{font-size:11px; color:var(--slate-500);}
+  .doc-preview{background:var(--slate-100); border:1px solid var(--slate-200); border-radius:10px; aspect-ratio:3/4; padding:14px;}
+  .doc-preview .dh{border-bottom:1px solid var(--slate-300); padding-bottom:8px; margin-bottom:8px;}
+  .doc-preview .dh .t1{font-size:10px; font-weight:800; color:var(--slate-700);}
+  .doc-preview .dh .t2{font-size:9.5px; color:var(--slate-500);}
+  .doc-bar{height:8px; background:var(--slate-300); border-radius:4px; margin-bottom:6px;}
+  .doc-bar.dark{background:var(--slate-400);}
+
+  /* ===== MEENA / DAILY ASSISTANT WINDOW BODY ===== */
+  .app-sidebar{width:200px; flex:none; background:var(--slate-50); border-right:1px solid var(--slate-200); display:flex; flex-direction:column; padding:12px 8px;}
+  .app-sidebar .nav-item{display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; font-size:13px; color:var(--slate-700); border:none; background:transparent; text-align:left; width:100%; margin-bottom:2px;}
+  .app-sidebar .nav-item:hover{background:var(--slate-200);}
+  .app-sidebar .nav-item.active{background:var(--amber-100); color:var(--amber-dark); font-weight:600;}
+  .app-main{flex:1; display:flex; flex-direction:column; min-width:0;}
+  .app-topbar{padding:14px 20px; border-bottom:1px solid var(--slate-200); background:#fff; flex:none;}
+  .app-topbar h1{font-size:16px; margin:0;}
+  .app-content{flex:1; overflow-y:auto; padding:18px 20px;}
+  .card{background:#fff; border:1px solid var(--slate-200); border-radius:10px; padding:16px; margin-bottom:14px;}
+  .card-empty{background:#fff; border:1px solid var(--slate-200); border-radius:10px; padding:24px; text-align:center; color:var(--slate-600); font-size:13px;}
+  .stats-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .stat{background:#fff; border:1px solid var(--slate-200); border-radius:10px; padding:14px;}
+  .stat .num{font-size:26px; font-weight:800;}
+  .stat .lbl{font-size:12px; color:var(--slate-600); margin-top:2px;}
+
+  .meena-chat{border-top:1px solid var(--slate-200); background:#fff; display:flex; flex-direction:column; flex:none; max-height:230px;}
+  .meena-msgs{flex:1; overflow-y:auto; padding:10px 14px; display:flex; flex-direction:column; gap:6px;}
+  .msg-row{display:flex;}
+  .msg-row.user{justify-content:flex-end;}
+  .msg-bubble{max-width:75%; border-radius:10px; padding:7px 10px; font-size:11.5px;}
+  .msg-bubble.user{background:var(--amber-dark); color:#fff;}
+  .msg-bubble.assistant{background:var(--slate-100); color:var(--slate-900);}
+  .meena-input-row{border-top:1px solid var(--slate-200); padding:10px 12px; display:flex; flex-direction:column; gap:8px;}
+  .meena-input-wrap{position:relative; display:flex;}
+  .meena-input-wrap input{flex:1; padding:8px 32px 8px 10px; border-radius:7px; border:1px solid var(--slate-200); font-size:11.5px;}
+  .meena-input-wrap button{position:absolute; right:4px; top:50%; transform:translateY(-50%); border:none; background:transparent; padding:5px; border-radius:5px;}
+  .meena-input-wrap button:hover{background:var(--amber-50);}
+  .btn-amber{background:var(--amber-dark); color:#fff; border:none; border-radius:7px; padding:9px; font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px; width:100%;}
+  .btn-amber:hover{background:#92400e;}
+  .rec-controls{border-bottom:1px solid var(--slate-200); background:var(--slate-50); padding:12px; margin:-18px -20px 16px; padding-left:20px; padding-right:20px;}
+
+  /* svg icon helper */
+  svg.i{width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; display:block;}
+</style>
+</head>
+<body>
+
+<!-- ============ DESKTOP ============ -->
+<div id="desktop">
+  <div class="desktop-icons">
+    <div class="desktop-icon" onclick="alert('MyClientDev — module non inclus dans cette démo standalone.')">
+      <div class="emoji">📊</div><div class="label">MyClientDev</div>
+    </div>
+    <div class="desktop-icon">
+      <div class="emoji">📁</div><div class="label">This PC</div>
+    </div>
+    <div class="desktop-icon">
+      <div class="emoji">🗑️</div><div class="label">Recycle Bin</div>
+    </div>
+  </div>
+
+  <div class="hint" id="desktopHint">💡 Double-cliquez une icône ou utilisez la barre des tâches</div>
+
+  <!-- Daily Assistant floating window -->
+  <div class="floating-window hidden" id="win-assistant" style="width:900px; height:640px; left:calc(100vw - 940px); top:40px;">
+    <div class="window-titlebar" data-drag="win-assistant">
+      <span class="icon">🧠</span><span class="title">Copilot</span>
+      <button class="window-btn close" onclick="closeWindow('win-assistant')">✕</button>
+    </div>
+    <div class="window-body">
+      <div style="flex:1; display:flex; flex-direction:column;">
+        <div class="app-topbar">
+          <h1>Daily Assistant</h1>
+          <p style="font-size:12px;color:var(--slate-600);margin-top:4px;">Comment puis-je vous aider aujourd'hui ?</p>
+        </div>
+        <div class="app-content">
+          <div class="card">
+            <p style="font-size:13px;color:var(--slate-700);margin:0 0 10px;">Décrivez ce dont vous avez besoin, je m'occupe du reste.</p>
+            <button class="btn btn-purple" style="width:100%;" onclick="openCreditMemo()">✨ Créer un Credit Memo</button>
+          </div>
+          <div class="card">
+            <b style="font-size:13px;">Suggestions</b>
+            <div style="margin-top:8px; display:flex; flex-direction:column; gap:8px;">
+              <button class="btn btn-outline" style="text-align:left;" onclick="openCreditMemo()">📄 Créer un Credit Memo pour un client</button>
+              <button class="btn btn-outline" style="text-align:left;" onclick="alert('Fonctionnalité non incluse dans cette démo standalone.')">📊 Consulter le portefeuille client</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meena floating window -->
+  <div class="floating-window hidden" id="win-meena" style="width:900px; height:640px; left:calc(100vw - 1820px); top:40px;">
+    <div class="window-titlebar" data-drag="win-meena">
+      <span class="icon">🎙️</span><span class="title">Meena</span>
+      <button class="window-btn close" onclick="closeWindow('win-meena')">✕</button>
+    </div>
+    <div class="window-body">
+      <div class="app-sidebar">
+        <button class="nav-item active" data-meena-view="home" onclick="setMeenaView('home')">🏠 Home</button>
+        <button class="nav-item" data-meena-view="history" onclick="setMeenaView('history')">🕒 Historique</button>
+        <button class="nav-item" data-meena-view="favorites" onclick="setMeenaView('favorites')">⭐ Favoris</button>
+        <button class="nav-item" data-meena-view="actions" onclick="setMeenaView('actions')">✅ Actions</button>
+      </div>
+      <div class="app-main">
+        <div class="app-topbar"><h1 id="meenaTitle">🎙️ Meeting Notes</h1></div>
+        <div class="app-content">
+          <div id="meena-view-home">
+            <div class="card">
+              <div class="rec-controls" style="margin:0 0 14px; border:1px solid var(--slate-200); border-radius:8px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:40px;height:40px;border-radius:8px;background:var(--amber-100);display:flex;align-items:center;justify-content:center;font-size:18px;">🎙️</div>
+                  <div>
+                    <div style="font-weight:700;font-size:14px;">Start Recording Meeting</div>
+                    <div style="font-size:12px;color:var(--slate-600);">Record, transcribe, and sync to CRM+</div>
+                  </div>
+                </div>
+              </div>
+              <button class="btn-amber" onclick="toggleRecording()" id="recBtn">🎙️ Start Recording</button>
+            </div>
+            <div class="stats-grid">
+              <div class="stat"><div class="num" id="meetCount">0</div><div class="lbl">Meetings Today</div></div>
+              <div class="stat"><div class="num">0</div><div class="lbl">Pending Actions</div></div>
+            </div>
+          </div>
+          <div id="meena-view-history" class="hidden"><div class="card-empty">🕒 Aucune réunion passée</div></div>
+          <div id="meena-view-favorites" class="hidden"><div class="card-empty">Aucune réunion enregistrée</div></div>
+          <div id="meena-view-actions" class="hidden"><div class="card-empty">Aucune action en attente</div></div>
+        </div>
+        <div class="meena-chat">
+          <div class="meena-msgs" id="meenaMsgs">
+            <div class="msg-row"><div class="msg-bubble assistant">Bonjour ! Je suis Meena, votre assistant de notes de réunion. Posez-moi vos questions.</div></div>
+          </div>
+          <div class="meena-input-row">
+            <div class="meena-input-wrap">
+              <input type="text" id="meenaInput" placeholder="Posez une question sur vos notes..." onkeypress="if(event.key==='Enter')sendMeenaMsg()"/>
+              <button onclick="sendMeenaMsg()">➤</button>
+            </div>
+            <button class="btn-amber" style="background:var(--amber-100); color:var(--amber-dark);" onclick="alert('Notes envoyées à CRM+ ✓')">⬆️ Envoyer à CRM+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Taskbar -->
+<div id="taskbar">
+  <button class="start-btn">⊞</button>
+  <div class="taskbar-apps">
+    <button class="taskbar-app" onclick="alert('MyClientDev — module non inclus dans cette démo standalone.')">📊 <span>MyClientDev</span></button>
+    <button class="taskbar-app" id="tb-assistant" onclick="toggleWindow('win-assistant','tb-assistant')">💬 <span>Daily Assistant</span></button>
+    <button class="taskbar-app" id="tb-meena" onclick="toggleWindow('win-meena','tb-meena')">🎙️ <span>Meena</span></button>
+  </div>
+  <div class="systray">
+    <span>🔊 🔌 📶</span>
+    <span class="clock" id="clock">--:--</span>
+  </div>
+</div>
+
+
+<!-- ============ CREDIT MEMO FULL SCREEN ============ -->
+<div id="creditmemo-screen" class="hidden">
+  <div class="cm-main">
+    <div class="panel-header">
+      <h1>Créer un Credit Memo</h1>
+    </div>
+    <div class="progress-row" id="cmProgress">
+      <div class="progress-seg"></div><div class="progress-seg"></div><div class="progress-seg"></div><div class="progress-seg"></div>
+    </div>
+    <div class="panel-content" id="cmContent"><!-- injected by JS --></div>
+    <div class="panel-footer" id="cmFooter"><!-- injected by JS --></div>
+  </div>
+  <div class="cm-side">
+    <div class="chat-header">
+      <h1>Création Credit Memo</h1>
+      <p>Visualisez les sources des données</p>
+      <div id="cmSelectedChip"></div>
+    </div>
+    <div class="chat-body" id="cmChatBody"><!-- injected by JS --></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   VANILLA JS APP — Daily Assistant / Meena / Credit Memo demo
+   Fichier unique, ZÉRO build.
+   ============================================================ */
+
+// ---------- Clock ----------
+function tickClock(){
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+}
+tickClock(); setInterval(tickClock, 30000);
+
+// ---------- Window management ----------
+function toggleWindow(winId, tbId){
+  const win = document.getElementById(winId);
+  const tb = document.getElementById(tbId);
+  const isHidden = win.classList.contains('hidden');
+  win.classList.toggle('hidden');
+  tb.classList.toggle('active', isHidden);
+  document.getElementById('desktopHint').style.display = (isHidden) ? 'none' : '';
+}
+function closeWindow(winId){
+  document.getElementById(winId).classList.add('hidden');
+  const tbMap = {'win-assistant':'tb-assistant','win-meena':'tb-meena'};
+  document.getElementById(tbMap[winId]).classList.remove('active');
+}
+
+// Draggable floating windows
+(function enableDrag(){
+  let dragEl=null, offX=0, offY=0;
+  document.addEventListener('mousedown', (e)=>{
+    const bar = e.target.closest('[data-drag]');
+    if(!bar) return;
+    dragEl = document.getElementById(bar.dataset.drag);
+    const rect = dragEl.getBoundingClientRect();
+    offX = e.clientX - rect.left; offY = e.clientY - rect.top;
+    dragEl.style.zIndex = 200;
+  });
+  document.addEventListener('mousemove', (e)=>{
+    if(!dragEl) return;
+    dragEl.style.left = Math.max(0, e.clientX - offX) + 'px';
+    dragEl.style.top = Math.max(0, e.clientY - offY) + 'px';
+  });
+  document.addEventListener('mouseup', ()=>{ dragEl=null; });
+})();
+
+// ---------- Meena ----------
+function setMeenaView(view){
+  ['home','history','favorites','actions'].forEach(v=>{
+    document.getElementById('meena-view-'+v).classList.toggle('hidden', v!==view);
+    document.querySelector('[data-meena-view="'+v+'"]').classList.toggle('active', v===view);
+  });
+  const titles = {home:'🎙️ Meeting Notes', history:'Meeting History', favorites:'Saved Meetings', actions:'Action Items'};
+  document.getElementById('meenaTitle').textContent = titles[view];
+}
+let recording = false, meetCount = 0;
+function toggleRecording(){
+  recording = !recording;
+  const btn = document.getElementById('recBtn');
+  if(recording){
+    btn.textContent = '⏹ Stop Recording';
+    btn.style.background = 'var(--red)';
+  } else {
+    btn.textContent = '🎙️ Start Recording';
+    btn.style.background = '';
+    meetCount++;
+    document.getElementById('meetCount').textContent = meetCount;
+  }
+}
+function sendMeenaMsg(){
+  const input = document.getElementById('meenaInput');
+  const text = input.value.trim();
+  if(!text) return;
+  const msgs = document.getElementById('meenaMsgs');
+  msgs.insertAdjacentHTML('beforeend', '<div class="msg-row user"><div class="msg-bubble user">'+escapeHtml(text)+'</div></div>');
+  input.value='';
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(()=>{
+    msgs.insertAdjacentHTML('beforeend', '<div class="msg-row"><div class="msg-bubble assistant">J\'ai bien noté. Vous pouvez continuer à discuter ou cliquer sur "Envoyer à CRM+" pour synchroniser vos notes.</div></div>');
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 500);
+}
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+// ============================================================
+// CREDIT MEMO WIZARD
+// ============================================================
+const CLIENTS = [
+  { name:'Financial Services Inc', sector:'Finance', rating:'A-' },
+  { name:'TechCorp France', sector:'Technology', rating:'BBB+' },
+  { name:'Manufacturing Ltd', sector:'Manufacturing', rating:'BBB-' },
+];
+const CLIENT_DATA = {
+  'Financial Services Inc': [
+    { id:'name', label:'Nom du client', value:'Financial Services Inc', original:'Financial Services Inc', src:'D2024-FS-001.pdf - Section Company Overview' },
+    { id:'sector', label:'Secteur', value:'Finance', original:'Finance', src:'Classification_Master.xlsx - Sector Mapping' },
+    { id:'rating', label:'Rating', value:'A-', original:'A-', src:'S&P_Rating_Report_2026.pdf - Page 12' },
+    { id:'exposure', label:'Exposition', value:'€15.2M', original:'€15.2M', src:'Portfolio_Extract_Q3_2026.xlsx - Client Exposure' },
+    { id:'status', label:'Statut', value:'Active', original:'Active', src:'Client_Master_Data.db - Status Table' },
+  ],
+  'TechCorp France': [
+    { id:'name', label:'Nom du client', value:'TechCorp France', original:'TechCorp France', src:'D2024-TC-042.pdf - Company Info' },
+    { id:'sector', label:'Secteur', value:'Technology', original:'Technology', src:'Sector_Classification.xlsx' },
+    { id:'rating', label:'Rating', value:'BBB+', original:'BBB+', src:'Moody_Rating_Report_2026.pdf' },
+    { id:'exposure', label:'Exposition', value:'€10.0M', original:'€10.0M', src:'Portfolio_Extract_Q3_2026.xlsx' },
+    { id:'status', label:'Statut', value:'Active', original:'Active', src:'Master_Data_Table.db' },
+  ],
+  'Manufacturing Ltd': [
+    { id:'name', label:'Nom du client', value:'Manufacturing Ltd', original:'Manufacturing Ltd', src:'D2024-MF-015.pdf' },
+    { id:'sector', label:'Secteur', value:'Manufacturing', original:'Manufacturing', src:'Sector_Classification.xlsx' },
+    { id:'rating', label:'Rating', value:'BBB-', original:'BBB-', src:'Fitch_Rating_Report_2026.pdf' },
+    { id:'exposure', label:'Exposition', value:'€8.5M', original:'€8.5M', src:'Portfolio_Extract_Q3_2026.xlsx' },
+    { id:'status', label:'Statut', value:'Active', original:'Active', src:'Master_Data_Table.db' },
+  ],
+};
+const AVAILABLE_FIELDS = [
+  { id:'contact_person', label:'Personne Contact' },
+  { id:'email', label:'Email' },
+  { id:'phone', label:'Téléphone' },
+  { id:'address', label:'Adresse' },
+  { id:'ceo', label:'PDG' },
+  { id:'employees', label:"Nombre d'employés" },
+  { id:'revenue_2025', label:'Revenue 2025' },
+  { id:'ebitda_2025', label:'EBITDA 2025' },
+  { id:'debt_level', label:'Niveau de dette' },
+  { id:'currency', label:'Devise' },
+];
+const CORE_FIELD_IDS = ['name','sector','rating','exposure','status'];
+const STEPS = ['client-select','data-review','document-upload','summary'];
+
+let cm = {
+  step: 'client-select',
+  searchQuery: '',
+  selectedClient: 'Financial Services Inc',
+  fields: JSON.parse(JSON.stringify(CLIENT_DATA['Financial Services Inc'])),
+  uploadedDoc: null,
+  showAddDropdown: false,
+  selectedFieldLabel: null,
+  sourceDoc: null, // {fieldName, documentName}
+};
+// track modification state separately (value !== original)
+cm.fields.forEach(f => f.isModified = false);
+
+function openCreditMemo(){
+  closeWindow('win-assistant');
+  document.getElementById('creditmemo-screen').classList.remove('hidden');
+  cm.step = 'client-select';
+  renderCM();
+}
+function closeCreditMemo(){
+  document.getElementById('creditmemo-screen').classList.add('hidden');
+}
+
+function cmSetStep(step){ cm.step = step; renderCM(); }
+function cmNext(){
+  const i = STEPS.indexOf(cm.step);
+  if(i < STEPS.length-1){ cm.step = STEPS[i+1]; renderCM(); }
+}
+function cmPrev(){
+  const i = STEPS.indexOf(cm.step);
+  if(i>0){ cm.step = STEPS[i-1]; renderCM(); }
+}
+function cmSelectClient(name){
+  cm.selectedClient = name;
+  cm.fields = JSON.parse(JSON.stringify(CLIENT_DATA[name] || CLIENT_DATA['Financial Services Inc']));
+  cm.fields.forEach(f => f.isModified = false);
+  renderCM();
+}
+function cmFieldChange(id, val){
+  const f = cm.fields.find(x=>x.id===id);
+  if(!f) return;
+  f.value = val;
+  f.isModified = (val !== f.original);
+  renderCM();
+}
+function cmResetField(id){
+  const f = cm.fields.find(x=>x.id===id);
+  if(!f) return;
+  f.value = f.original; f.isModified = false;
+  renderCM();
+}
+function cmDeleteField(id){
+  cm.fields = cm.fields.filter(f=>f.id!==id);
+  renderCM();
+}
+function cmAddField(id,label){
+  if(cm.fields.some(f=>f.id===id)) return;
+  cm.fields.push({id, label, value:'', original:'', isModified:true, src:null});
+  cm.showAddDropdown = false;
+  renderCM();
+}
+function cmToggleAddDropdown(){
+  cm.showAddDropdown = !cm.showAddDropdown;
+  renderCM();
+}
+function cmSimulateUpload(){
+  cm.uploadedDoc = { name:'Financial_Analysis_2026.pdf', size:'2.4 MB' };
+  renderCM();
+}
+function cmRemoveUpload(){
+  cm.uploadedDoc = null;
+  renderCM();
+}
+function cmHoverField(label){
+  cm.selectedFieldLabel = label;
+  renderCMChatHeader();
+}
+function cmViewSource(fieldName, docName){
+  cm.sourceDoc = { fieldName, documentName: docName };
+  renderCMChat();
+}
+function cmCloseSource(){
+  cm.sourceDoc = null;
+  renderCMChat();
+}
+function cmComplete(){
+  alert('✅ Credit Memo créé avec succès pour ' + cm.selectedClient + ' !');
+  closeCreditMemo();
+}
+
+function svgIcon(name){
+  const icons = {
+    search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+    focus:'<circle cx="12" cy="12" r="3"/><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>',
+    restart:'<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>',
+    trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+    plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+    upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
+    file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+    x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+    chevron:'<polyline points="9 18 15 12 9 6"/>',
+    arrowleft:'<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+  };
+  return '<svg class="i" viewBox="0 0 24 24">'+icons[name]+'</svg>';
+}
+
+function renderCM(){
+  renderCMProgress();
+  renderCMContent();
+  renderCMFooter();
+  renderCMChat();
+}
+
+function renderCMProgress(){
+  const idx = STEPS.indexOf(cm.step);
+  document.querySelectorAll('#cmProgress .progress-seg').forEach((el,i)=>{
+    el.classList.toggle('done', i<=idx);
+  });
+}
+
+function renderCMContent(){
+  const el = document.getElementById('cmContent');
+  if(cm.step==='client-select'){
+    const filtered = CLIENTS.filter(c => c.name.toLowerCase().includes(cm.searchQuery.toLowerCase()));
+    el.innerHTML = `
+      <div class="field-search">
+        <span class="ico">${svgIcon('search')}</span>
+        <input type="text" placeholder="Rechercher un client..." value="${escapeHtml(cm.searchQuery)}" oninput="cm.searchQuery=this.value; renderCMContent();"/>
+      </div>
+      <div>
+        ${filtered.map(c => `
+          <button class="client-card ${cm.selectedClient===c.name?'selected':''}" onclick="cmSelectClient('${c.name}')">
+            <div class="name">${c.name}</div>
+            <div class="meta">${c.sector} • Rating: ${c.rating}</div>
+          </button>
+        `).join('')}
+      </div>
+    `;
+  } else if(cm.step==='data-review'){
+    el.innerHTML = `
+      <div class="data-box">
+        <h3>Données pour ${escapeHtml(cm.selectedClient)}</h3>
+        <div>
+          ${cm.fields.map(f => `
+            <div class="field-row" onmouseenter="cmHoverField('${escapeAttr(f.label)}')" onmouseleave="cmHoverField(null)">
+              <div class="field-inner">
+                <label>${escapeHtml(f.label)}</label>
+                <div class="field-controls">
+                  ${(!f.isModified && f.src)
+                    ? `<button class="icon-btn focus" title="Voir la source" onclick="cmViewSource('${escapeAttr(f.label)}','${escapeAttr(f.src)}')" style="color:var(--purple)">${svgIcon('focus')}</button>`
+                    : f.isModified
+                      ? `<button class="icon-btn restart" title="Remettre la valeur d'origine" onclick="cmResetField('${f.id}')" style="color:var(--slate-600)">${svgIcon('restart')}</button>`
+                      : `<span style="width:28px;display:inline-block"></span>`
+                  }
+                  <input type="text" value="${escapeAttr(f.value)}" oninput="cmFieldChange('${f.id}', this.value)"/>
+                  ${!CORE_FIELD_IDS.includes(f.id)
+                    ? `<button class="icon-btn trash" title="Supprimer" onclick="cmDeleteField('${f.id}')" style="color:var(--red)">${svgIcon('trash')}</button>`
+                    : ''
+                  }
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="add-field-wrap">
+          <button class="btn-dashed" onclick="cmToggleAddDropdown()">${svgIcon('plus')} Ajouter un champ</button>
+          ${cm.showAddDropdown ? `
+            <div class="dropdown-list">
+              ${(() => {
+                const existing = cm.fields.map(f=>f.id);
+                const avail = AVAILABLE_FIELDS.filter(f=>!existing.includes(f.id));
+                return avail.length ? avail.map(f=>`<button onclick="cmAddField('${f.id}','${escapeAttr(f.label)}')">${escapeHtml(f.label)}</button>`).join('')
+                  : `<div style="padding:8px 12px;font-size:12px;color:var(--slate-500)">Tous les champs sont ajoutés</div>`;
+              })()}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  } else if(cm.step==='document-upload'){
+    el.innerHTML = `
+      ${!cm.uploadedDoc ? `
+        <p style="font-size:13px;color:var(--slate-600);margin:0 0 12px;">Ajoutez un document pour que l'IA l'analyse (optionnel) :</p>
+        <div class="upload-zone" onclick="cmSimulateUpload()">
+          <div style="color:var(--slate-400);margin-bottom:8px;">${svgIcon('upload')}</div>
+          <div style="font-size:13px;font-weight:600;color:var(--slate-600);">Glissez-déposez ou cliquez</div>
+          <div style="font-size:11px;color:var(--slate-500);margin-top:4px;">PDF, Word, Excel</div>
+        </div>
+      ` : `
+        <div class="uploaded-doc">
+          <span style="color:var(--emerald)">${svgIcon('file')}</span>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;">${escapeHtml(cm.uploadedDoc.name)}</div>
+            <div style="font-size:11px;color:var(--slate-500);">${cm.uploadedDoc.size}</div>
+          </div>
+          <button class="icon-btn" onclick="cmRemoveUpload()" style="color:var(--emerald)">${svgIcon('x')}</button>
+        </div>
+      `}
+    `;
+  } else if(cm.step==='summary'){
+    el.innerHTML = `
+      <div class="summary-box">
+        <h3 style="margin:0 0 10px;font-size:14px;">Résumé du Credit Memo</h3>
+        ${cm.fields.map(f=>`<div class="summary-row"><span style="color:var(--slate-600)">${escapeHtml(f.label)}</span><span style="font-weight:600">${escapeHtml(f.value)}</span></div>`).join('')}
+        ${cm.uploadedDoc ? `<div class="summary-row"><span style="color:var(--slate-600)">Document</span><span style="font-weight:600">${escapeHtml(cm.uploadedDoc.name)}</span></div>` : ''}
+      </div>
+      <p style="font-size:12px;color:var(--slate-600);margin-top:14px;">
+        ✓ Vous êtes prêt à créer le Credit Memo. L'IA analysera toutes les données et générera un document complet.
+      </p>
+    `;
+  }
+}
+
+function renderCMFooter(){
+  const el = document.getElementById('cmFooter');
+  const isFirst = cm.step === STEPS[0];
+  const isLast = cm.step === STEPS[STEPS.length-1];
+  el.innerHTML = `
+    ${!isFirst ? `<button class="btn btn-outline" onclick="cmPrev()">Précédent</button>` : ''}
+    ${!isLast ? `<button class="btn btn-purple" onclick="cmNext()">Suivant ${svgIcon('chevron')}</button>` : `<button class="btn btn-emerald" onclick="cmComplete()">Créer le memo</button>`}
+    <button class="btn btn-outline ml-auto" onclick="closeCreditMemo()">Annuler</button>
+  `;
+}
+
+function renderCMChatHeader(){
+  const chip = document.getElementById('cmSelectedChip');
+  chip.innerHTML = cm.selectedFieldLabel ? `<div class="chip">Champ sélectionné : <b>${escapeHtml(cm.selectedFieldLabel)}</b></div>` : '';
+}
+
+function renderCMChat(){
+  renderCMChatHeader();
+  const body = document.getElementById('cmChatBody');
+  if(cm.sourceDoc){
+    body.innerHTML = `
+      <button class="back-link" onclick="cmCloseSource()">${svgIcon('arrowleft')} Retour</button>
+      <div class="doc-header">
+        <span style="color:var(--purple)">${svgIcon('file')}</span>
+        <div>
+          <div class="name">${escapeHtml(cm.sourceDoc.fieldName)}</div>
+          <div class="src">${escapeHtml(cm.sourceDoc.documentName)}</div>
+        </div>
+      </div>
+      <div class="doc-preview">
+        <div class="dh">
+          <div class="t1">FINANCIAL SERVICES INC.</div>
+          <div class="t2">Client Report - Q3 2026</div>
+        </div>
+        <div class="doc-bar" style="width:75%"></div>
+        <div class="doc-bar" style="width:100%"></div>
+        <div class="doc-bar" style="width:85%"></div>
+        <div style="height:8px"></div>
+        <div class="doc-bar dark" style="width:50%"></div>
+        <div class="doc-bar" style="width:65%"></div>
+        <div class="doc-bar" style="width:75%"></div>
+      </div>
+      <p style="font-size:11px;color:var(--slate-600);margin-top:10px;">Cliquez sur les autres champs pour voir leurs sources</p>
+    `;
+  } else {
+    body.innerHTML = `
+      <div>
+        <h2 style="font-size:14px;font-weight:700;margin:0;">Remplissez les champs</h2>
+        <p style="font-size:11px;color:var(--slate-600);margin:4px 0 14px;">Cliquez sur l'icône Focus pour voir les sources documentaires</p>
+      </div>
+      <div class="tip-card violet"><b>💡 Astuce</b>Survolez les champs à gauche pour les sélectionner</div>
+      <div class="tip-card blue"><b>👁️ Voir la source</b>Cliquez sur l'icône Focus (violet) pour voir le document source</div>
+      <div class="tip-card emerald"><b>✏️ Éditer</b>Modifiez les valeurs. Un bouton Restart apparaîtra pour les restaurer</div>
+    `;
+  }
+}
+
+function escapeAttr(s){
+  if(s===null||s===undefined) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// initial paint
+renderCM();
+</script>
+</body>
+</html>
