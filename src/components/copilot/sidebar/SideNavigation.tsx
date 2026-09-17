@@ -37,12 +37,11 @@ export function SideNavigation({ isOpen, currentView, onViewChange, onToggleSide
         {/* Logo & Brand */}
         <div className="p-4 border-b border-slate-200">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-lg" style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xl" style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}>
               🤖
             </div>
             <div>
-              <span className="font-bold text-slate-900">Copilot</span>
-              <p className="text-xs text-slate-500">Métier BNP</p>
+              <p className="text-xs text-slate-500 font-medium">Métier BNP</p>
             </div>
           </div>
         </div>

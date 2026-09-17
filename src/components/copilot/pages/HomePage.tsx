@@ -84,9 +84,9 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
         <section>
           <h2 className="text-lg font-bold text-slate-900 mb-4">⭐ Top Recommandations pour vous</h2>
 
-          <div className="relative p-5 rounded-lg border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-transparent overflow-hidden">
+          <div className="relative p-5 rounded-lg border-2" style={{ borderColor: '#7D4FFE', background: 'linear-gradient(135deg, rgba(125, 79, 254, 0.08) 0%, transparent 100%)' }} >
             {/* Accent stripe */}
-            <div className="absolute top-0 right-0 w-20 h-20 opacity-5 bg-purple-500 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-20 h-20 opacity-5 rounded-full blur-3xl" style={{ background: '#7D4FFE' }} />
 
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-3">
@@ -97,20 +97,21 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
                     opportunités de restructuration.
                   </p>
                 </div>
-                <div className="p-2 rounded-lg bg-purple-100">
-                  <Zap size={18} className="text-purple-600" />
+                <div className="p-2 rounded-lg" style={{ background: 'rgba(125, 79, 254, 0.1)' }}>
+                  <Zap size={18} style={{ color: '#7D4FFE' }} />
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pt-3 border-t border-purple-200">
+              <div className="flex items-center gap-2 pt-3" style={{ borderTopColor: '#7D4FFE', borderTopWidth: '1px' }}>
                 <button
                   onClick={() => onSelectPrompt?.("Fais une analyse complète de l'exposition de ce client: Manufacturing Ltd")}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-purple-500 text-white hover:bg-purple-600 transition font-medium text-sm"
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-white hover:opacity-90 transition font-medium text-sm"
+                  style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}
                 >
                   <Brain size={16} />
                   Lancer l'analyse
                 </button>
-                <button className="px-3 py-2 rounded-lg border border-purple-300 text-purple-600 hover:bg-purple-50 transition font-medium text-sm">
+                <button className="px-3 py-2 rounded-lg border transition font-medium text-sm" style={{ borderColor: '#7D4FFE', color: '#7D4FFE' }}>
                   Détails
                 </button>
               </div>
