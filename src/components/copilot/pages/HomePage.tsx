@@ -23,25 +23,25 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-slate-900">📊 What's New</h2>
-            <span className="text-xs px-2.5 py-1 rounded-full bg-orange-100 text-orange-700 font-medium">
+            <span className="text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 font-medium">
               Données du jour
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* KPI Card 1 - Portfolio Exposure */}
-            <div className="relative p-4 rounded-lg border border-orange-200 bg-gradient-to-br from-orange-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition">
+            <div className="relative p-4 rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition">
               {/* Colored Stroke Accent */}
-              <div className="absolute top-0 left-0 w-1 h-8 bg-orange-500 rounded-br-lg" />
+              <div className="absolute top-0 left-0 w-1 h-8 bg-purple-500 rounded-br-lg" />
 
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Exposition Portefeuille</p>
                   <p className="text-2xl font-bold text-slate-900 mt-2">€847.3M</p>
-                  <p className="text-xs text-orange-600 font-medium mt-1">↑ +5.2% vs hier</p>
+                  <p className="text-xs text-purple-600 font-medium mt-1">↑ +5.2% vs hier</p>
                 </div>
-                <div className="p-2.5 rounded-lg bg-orange-100/60">
-                  <TrendingUp size={20} className="text-orange-600" />
+                <div className="p-2.5 rounded-lg bg-purple-100/60">
+                  <TrendingUp size={20} className="text-purple-600" />
                 </div>
               </div>
             </div>
@@ -84,9 +84,9 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
         <section>
           <h2 className="text-lg font-bold text-slate-900 mb-4">⭐ Top Recommandations pour vous</h2>
 
-          <div className="relative p-5 rounded-lg border-2 border-orange-300 bg-gradient-to-br from-orange-50 to-transparent overflow-hidden">
+          <div className="relative p-5 rounded-lg border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-transparent overflow-hidden">
             {/* Accent stripe */}
-            <div className="absolute top-0 right-0 w-20 h-20 opacity-5 bg-orange-500 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-20 h-20 opacity-5 bg-purple-500 rounded-full blur-3xl" />
 
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-3">
@@ -97,20 +97,20 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
                     opportunités de restructuration.
                   </p>
                 </div>
-                <div className="p-2 rounded-lg bg-orange-100">
-                  <Zap size={18} className="text-orange-600" />
+                <div className="p-2 rounded-lg bg-purple-100">
+                  <Zap size={18} className="text-purple-600" />
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pt-3 border-t border-orange-200">
+              <div className="flex items-center gap-2 pt-3 border-t border-purple-200">
                 <button
                   onClick={() => onSelectPrompt?.("Fais une analyse complète de l'exposition de ce client: Manufacturing Ltd")}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition font-medium text-sm"
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-purple-500 text-white hover:bg-purple-600 transition font-medium text-sm"
                 >
                   <Brain size={16} />
                   Lancer l'analyse
                 </button>
-                <button className="px-3 py-2 rounded-lg border border-orange-300 text-orange-600 hover:bg-orange-50 transition font-medium text-sm">
+                <button className="px-3 py-2 rounded-lg border border-purple-300 text-purple-600 hover:bg-purple-50 transition font-medium text-sm">
                   Détails
                 </button>
               </div>
@@ -209,13 +209,13 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
               onChange={(e) => setChatInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendChat()}
               placeholder="Posez votre question ou utilisez une action..."
-              className="w-full h-10 rounded-lg border border-slate-200 bg-white pl-3 pr-10 text-sm focus:border-orange-300 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              className="w-full h-10 rounded-lg border border-slate-200 bg-white pl-3 pr-10 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
             />
             <button
               onClick={handleSendChat}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-orange-50 rounded transition"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-purple-50 rounded transition"
             >
-              <Send size={18} className="text-orange-600" />
+              <Send size={18} className="text-purple-600" />
             </button>
           </div>
         </div>
@@ -236,13 +236,13 @@ function ActionCard({ title, description, icon, prompt, onSelect }: ActionCardPr
   return (
     <button
       onClick={() => onSelect?.(prompt)}
-      className="p-4 rounded-lg border border-slate-200 bg-white hover:border-orange-300 hover:shadow-md hover:bg-orange-50/30 transition group text-left"
+      className="p-4 rounded-lg border border-slate-200 bg-white hover:border-purple-300 hover:shadow-md hover:bg-purple-50/30 transition group text-left"
     >
       <div className="flex items-start justify-between mb-2">
-        <div className="p-2 rounded-lg bg-slate-100 group-hover:bg-orange-100 transition">{icon}</div>
+        <div className="p-2 rounded-lg bg-slate-100 group-hover:bg-purple-100 transition">{icon}</div>
         <ArrowRight size={16} className="text-slate-400 opacity-0 group-hover:opacity-100 transition" />
       </div>
-      <h3 className="font-semibold text-slate-900 group-hover:text-orange-700 transition">{title}</h3>
+      <h3 className="font-semibold text-slate-900 group-hover:text-purple-700 transition">{title}</h3>
       <p className="text-xs text-slate-600 mt-1">{description}</p>
     </button>
   )
@@ -256,9 +256,9 @@ interface ConversationCardProps {
 
 function ConversationCard({ title, date, snippet }: ConversationCardProps) {
   return (
-    <button className="p-4 rounded-lg border border-slate-200 bg-white hover:border-orange-300 hover:shadow-md transition text-left group">
+    <button className="p-4 rounded-lg border border-slate-200 bg-white hover:border-purple-300 hover:shadow-md transition text-left group">
       <div className="flex items-start justify-between">
-        <h3 className="font-semibold text-slate-900 group-hover:text-orange-700 transition flex-1">{title}</h3>
+        <h3 className="font-semibold text-slate-900 group-hover:text-purple-700 transition flex-1">{title}</h3>
         <span className="text-xs text-slate-400 flex-shrink-0 ml-2">{date}</span>
       </div>
       <p className="text-sm text-slate-600 mt-2 line-clamp-2">{snippet}</p>

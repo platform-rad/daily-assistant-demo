@@ -37,17 +37,19 @@ export function SideNavigation({ isOpen, currentView, onViewChange, onToggleSide
         {/* Logo & Brand */}
         <div className="p-4 border-b border-slate-200">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-lg">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-lg" style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}>
               🤖
             </div>
-            <span className="font-bold text-slate-900">Copilot</span>
+            <div>
+              <span className="font-bold text-slate-900">Copilot</span>
+              <p className="text-xs text-slate-500">Métier BNP</p>
+            </div>
           </div>
-          <p className="text-xs text-slate-500 mt-1">Métier BNP</p>
         </div>
 
         {/* Create Action Button */}
         <div className="p-4 border-b border-slate-200">
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium hover:from-orange-600 hover:to-orange-700 transition">
+          <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-white font-medium transition hover:opacity-90" style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}>
             <Plus size={18} />
             <span>Nouveau</span>
           </button>
@@ -64,9 +66,10 @@ export function SideNavigation({ isOpen, currentView, onViewChange, onToggleSide
                 onClick={() => onViewChange(item.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition ${
                   isActive
-                    ? 'bg-orange-50 text-orange-700 border border-orange-200'
+                    ? 'text-white border border-purple-300'
                     : 'text-slate-700 hover:bg-slate-100'
                 }`}
+                style={isActive ? { background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' } : {}}
               >
                 <Icon size={18} />
                 <span className="text-sm font-medium">{item.label}</span>
