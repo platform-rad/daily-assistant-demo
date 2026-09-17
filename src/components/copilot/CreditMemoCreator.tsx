@@ -1,11 +1,26 @@
 import { useState } from 'react'
-import { ChevronRight, Search, Upload, X, FileIcon } from 'lucide-react'
+import { ChevronRight, Search, Upload, X, FileIcon, Focus, RotateCcw, Plus, Trash2 } from 'lucide-react'
 
 type Step = 'client-select' | 'data-review' | 'document-upload' | 'summary'
 
 interface UploadedDocument {
   name: string
   size: string
+}
+
+interface DataField {
+  id: string
+  label: string
+  value: string
+  originalValue: string
+  isModified: boolean
+  sourceDocument?: string
+}
+
+interface SourceInfo {
+  isOpen: boolean
+  field?: string
+  document?: string
 }
 
 export function CreditMemoCreator({
@@ -19,15 +34,51 @@ export function CreditMemoCreator({
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedClient, setSelectedClient] = useState('Financial Services Inc')
   const [uploadedDoc, setUploadedDoc] = useState<UploadedDocument | null>(null)
+  const [sourceInfo, setSourceInfo] = useState<SourceInfo>({ isOpen: false })
 
-  // Préchargé données pour Financial Services Inc
-  const [clientData, setClientData] = useState({
-    name: 'Financial Services Inc',
-    sector: 'Finance',
-    rating: 'A-',
-    exposure: '€15.2M',
-    status: 'Active',
-  })
+  // Préchargé données pour Financial Services Inc avec tracking AI
+  const [dataFields, setDataFields] = useState<DataField[]>([
+    {
+      id: 'name',
+      label: 'Nom du client',
+      value: 'Financial Services Inc',
+      originalValue: 'Financial Services Inc',
+      isModified: false,
+      sourceDocument: 'D2024-FS-001.pdf - Section Company Overview',
+    },
+    {
+      id: 'sector',
+      label: 'Secteur',
+      value: 'Finance',
+      originalValue: 'Finance',
+      isModified: false,
+      sourceDocument: 'Classification_Master.xlsx - Sector Mapping',
+    },
+    {
+      id: 'rating',
+      label: 'Rating',
+      value: 'A-',
+      originalValue: 'A-',
+      isModified: false,
+      sourceDocument: 'S&P_Rating_Report_2026.pdf - Page 12',
+    },
+    {
+      id: 'exposure',
+      label: 'Exposition',
+      value: '€15.2M',
+      originalValue: '€15.2M',
+      isModified: false,
+      sourceDocument: 'Portfolio_Extract_Q3_2026.xlsx - Client Exposure',
+    },
+    {
+      id: 'status',
+      label: 'Statut',
+      value: 'Active',
+      originalValue: 'Active',
+      isModified: false,
+      sourceDocument: 'Client_Master_Data.db - Status Table',
+    },
+  ])
 
   const clients = [
     { name: 'TechCorp France', sector: 'Technology', rating: 'BBB+' },
@@ -58,31 +109,174 @@ export function CreditMemoCreator({
   const handleSelectClient = (clientName: string) => {
     setSelectedClient(clientName)
     // Charger les données du client sélectionné
-    if (clientName === 'Financial Services Inc') {
-      setClientData({
-        name: 'Financial Services Inc',
-        sector: 'Finance',
-        rating: 'A-',
-        exposure: '€15.2M',
-        status: 'Active',
-      })
-    } else if (clientName === 'TechCorp France') {
-      setClientData({
-        name: 'TechCorp France',
-        sector: 'Technology',
-        rating: 'BBB+',
-        exposure: '€10.0M',
-        status: 'Active',
-      })
-    } else {
-      setClientData({
-        name: 'Manufacturing Ltd',
-        sector: 'Manufacturing',
-        rating: 'BBB-',
-        exposure: '€8.5M',
-        status: 'Active',
-      })
+    const clientDataMap: { [key: string]: DataField[] } = {
+      'Financial Services Inc': [
+        {
+          id: 'name',
+          label: 'Nom du client',
+          value: 'Financial Services Inc',
+          originalValue: 'Financial Services Inc',
+          isModified: false,
+          sourceDocument: 'D2024-FS-001.pdf - Section Company Overview',
+        },
+        {
+          id: 'sector',
+          label: 'Secteur',
+          value: 'Finance',
+          originalValue: 'Finance',
+          isModified: false,
+          sourceDocument: 'Classification_Master.xlsx - Sector Mapping',
+        },
+        {
+          id: 'rating',
+          label: 'Rating',
+          value: 'A-',
+          originalValue: 'A-',
+          isModified: false,
+          sourceDocument: 'S&P_Rating_Report_2026.pdf - Page 12',
+        },
+        {
+          id: 'exposure',
+          label: 'Exposition',
+          value: '€15.2M',
+          originalValue: '€15.2M',
+          isModified: false,
+          sourceDocument: 'Portfolio_Extract_Q3_2026.xlsx - Client Exposure',
+        },
+        {
+          id: 'status',
+          label: 'Statut',
+          value: 'Active',
+          originalValue: 'Active',
+          isModified: false,
+          sourceDocument: 'Client_Master_Data.db - Status Table',
+        },
+      ],
+      'TechCorp France': [
+        {
+          id: 'name',
+          label: 'Nom du client',
+          value: 'TechCorp France',
+          originalValue: 'TechCorp France',
+          isModified: false,
+          sourceDocument: 'D2024-TC-042.pdf - Company Info',
+        },
+        {
+          id: 'sector',
+          label: 'Secteur',
+          value: 'Technology',
+          originalValue: 'Technology',
+          isModified: false,
+          sourceDocument: 'Sector_Classification.xlsx',
+        },
+        {
+          id: 'rating',
+          label: 'Rating',
+          value: 'BBB+',
+          originalValue: 'BBB+',
+          isModified: false,
+          sourceDocument: 'Moody_Rating_Report_2026.pdf',
+        },
+        {
+          id: 'exposure',
+          label: 'Exposition',
+          value: '€10.0M',
+          originalValue: '€10.0M',
+          isModified: false,
+          sourceDocument: 'Portfolio_Extract_Q3_2026.xlsx',
+        },
+        {
+          id: 'status',
+          label: 'Statut',
+          value: 'Active',
+          originalValue: 'Active',
+          isModified: false,
+          sourceDocument: 'Master_Data_Table.db',
+        },
+      ],
+      'Manufacturing Ltd': [
+        {
+          id: 'name',
+          label: 'Nom du client',
+          value: 'Manufacturing Ltd',
+          originalValue: 'Manufacturing Ltd',
+          isModified: false,
+          sourceDocument: 'D2024-MF-015.pdf',
+        },
+        {
+          id: 'sector',
+          label: 'Secteur',
+          value: 'Manufacturing',
+          originalValue: 'Manufacturing',
+          isModified: false,
+          sourceDocument: 'Sector_Classification.xlsx',
+        },
+        {
+          id: 'rating',
+          label: 'Rating',
+          value: 'BBB-',
+          originalValue: 'BBB-',
+          isModified: false,
+          sourceDocument: 'Fitch_Rating_Report_2026.pdf',
+        },
+        {
+          id: 'exposure',
+          label: 'Exposition',
+          value: '€8.5M',
+          originalValue: '€8.5M',
+          isModified: false,
+          sourceDocument: 'Portfolio_Extract_Q3_2026.xlsx',
+        },
+        {
+          id: 'status',
+          label: 'Statut',
+          value: 'Active',
+          originalValue: 'Active',
+          isModified: false,
+          sourceDocument: 'Master_Data_Table.db',
+        },
+      ],
     }
+    setDataFields(clientDataMap[clientName] || clientDataMap['Financial Services Inc'])
+  }
+
+  const handleFieldChange = (fieldId: string, newValue: string) => {
+    setDataFields(
+      dataFields.map(field =>
+        field.id === fieldId
+          ? { ...field, value: newValue, isModified: newValue !== field.originalValue }
+          : field
+      )
+    )
+  }
+
+  const handleResetField = (fieldId: string) => {
+    setDataFields(
+      dataFields.map(field =>
+        field.id === fieldId
+          ? { ...field, value: field.originalValue, isModified: false }
+          : field
+      )
+    )
+  }
+
+  const handleAddField = () => {
+    const newId = `custom_${Date.now()}`
+    setDataFields([
+      ...dataFields,
+      {
+        id: newId,
+        label: 'Nouveau champ',
+        value: '',
+        originalValue: '',
+        isModified: true,
+        sourceDocument: undefined,
+      },
+    ])
+  }
+
+  const handleDeleteField = (fieldId: string) => {
+    setDataFields(dataFields.filter(field => field.id !== fieldId))
   }
 
   const simulateDocUpload = () => {
@@ -146,57 +340,81 @@ export function CreditMemoCreator({
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
               <h3 className="font-semibold text-slate-900 mb-4">Données pour {selectedClient}</h3>
               <div className="space-y-3">
-                <div>
-                  <label className="text-xs font-medium text-slate-600 block mb-1">Nom du client</label>
-                  <input
-                    type="text"
-                    value={clientData.name}
-                    onChange={(e) => setClientData({ ...clientData, name: e.target.value })}
-                    className="w-full px-3 py-2 rounded border border-slate-200 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-slate-600 block mb-1">Secteur</label>
-                    <input
-                      type="text"
-                      value={clientData.sector}
-                      onChange={(e) => setClientData({ ...clientData, sector: e.target.value })}
-                      className="w-full px-3 py-2 rounded border border-slate-200 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                    />
+                {dataFields.map((field) => (
+                  <div key={field.id} className="relative">
+                    <label className="text-xs font-medium text-slate-600 block mb-1">{field.label}</label>
+                    <div className="flex items-center gap-2">
+                      {/* AI Source Indicator or Restart Button */}
+                      {!field.isModified && field.sourceDocument ? (
+                        <button
+                          onClick={() => setSourceInfo({ isOpen: true, field: field.label, document: field.sourceDocument })}
+                          className="flex-shrink-0 p-2 rounded hover:bg-purple-200 transition"
+                          title="Cliquez pour voir la source"
+                        >
+                          <Focus size={16} className="text-purple-600" />
+                        </button>
+                      ) : field.isModified ? (
+                        <button
+                          onClick={() => handleResetField(field.id)}
+                          className="flex-shrink-0 p-2 rounded hover:bg-slate-300 transition"
+                          title="Remettre la valeur d'origine"
+                        >
+                          <RotateCcw size={16} className="text-slate-600" />
+                        </button>
+                      ) : (
+                        <div className="w-10" />
+                      )}
+
+                      {/* Input Field */}
+                      <input
+                        type="text"
+                        value={field.value}
+                        onChange={(e) => handleFieldChange(field.id, e.target.value)}
+                        className="flex-1 px-3 py-2 rounded border border-slate-200 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                      />
+
+                      {/* Delete Button for Custom Fields */}
+                      {field.id.startsWith('custom_') && (
+                        <button
+                          onClick={() => handleDeleteField(field.id)}
+                          className="flex-shrink-0 p-2 rounded hover:bg-red-100 transition"
+                          title="Supprimer le champ"
+                        >
+                          <Trash2 size={16} className="text-red-600" />
+                        </button>
+                      )}
+                    </div>
                   </div>
+                ))}
+              </div>
+
+              {/* Add Field Button */}
+              <button
+                onClick={handleAddField}
+                className="mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 rounded border border-dashed border-purple-300 text-purple-600 hover:bg-purple-100 transition text-sm"
+              >
+                <Plus size={16} />
+                Ajouter un champ
+              </button>
+            </div>
+
+            {/* Source Info Panel */}
+            {sourceInfo.isOpen && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <div className="flex items-start justify-between gap-3">
                   <div>
-                    <label className="text-xs font-medium text-slate-600 block mb-1">Rating</label>
-                    <input
-                      type="text"
-                      value={clientData.rating}
-                      onChange={(e) => setClientData({ ...clientData, rating: e.target.value })}
-                      className="w-full px-3 py-2 rounded border border-slate-200 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                    />
+                    <p className="text-xs font-medium text-blue-900">Source du champ "{sourceInfo.field}"</p>
+                    <p className="text-xs text-blue-700 mt-1">{sourceInfo.document}</p>
                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-slate-600 block mb-1">Exposition</label>
-                    <input
-                      type="text"
-                      value={clientData.exposure}
-                      onChange={(e) => setClientData({ ...clientData, exposure: e.target.value })}
-                      className="w-full px-3 py-2 rounded border border-slate-200 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-slate-600 block mb-1">Statut</label>
-                    <input
-                      type="text"
-                      value={clientData.status}
-                      onChange={(e) => setClientData({ ...clientData, status: e.target.value })}
-                      className="w-full px-3 py-2 rounded border border-slate-200 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                    />
-                  </div>
+                  <button
+                    onClick={() => setSourceInfo({ isOpen: false })}
+                    className="flex-shrink-0 p-1 rounded hover:bg-blue-100 transition"
+                  >
+                    <X size={16} className="text-blue-600" />
+                  </button>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         )}
 
@@ -243,26 +461,12 @@ export function CreditMemoCreator({
             <div className="bg-slate-50 rounded-lg p-4 space-y-3">
               <h3 className="font-semibold text-slate-900">Résumé du Credit Memo</h3>
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-slate-600">Client:</span>
-                  <span className="font-medium text-slate-900">{clientData.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-600">Secteur:</span>
-                  <span className="font-medium text-slate-900">{clientData.sector}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-600">Rating:</span>
-                  <span className="font-medium text-slate-900">{clientData.rating}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-600">Exposition:</span>
-                  <span className="font-medium text-slate-900">{clientData.exposure}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-600">Statut:</span>
-                  <span className="font-medium text-slate-900">{clientData.status}</span>
-                </div>
+                {dataFields.map((field) => (
+                  <div key={field.id} className="flex justify-between">
+                    <span className="text-slate-600">{field.label}:</span>
+                    <span className="font-medium text-slate-900">{field.value}</span>
+                  </div>
+                ))}
                 {uploadedDoc && (
                   <div className="flex justify-between">
                     <span className="text-slate-600">Document:</span>
