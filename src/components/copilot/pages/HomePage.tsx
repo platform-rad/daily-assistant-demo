@@ -6,11 +6,18 @@ interface HomePageProps {
   onCreateCreditMemo?: () => void
   /** 'compact' for sidebar, 'full' for desktop standalone */
   layout?: 'compact' | 'full'
+  /** Width of the sidebar in pixels (for responsive adjustments) */
+  sidebarWidth?: number
 }
 
-export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact' }: HomePageProps) {
+export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact', sidebarWidth = 320 }: HomePageProps) {
   const [chatInput, setChatInput] = useState('')
   const [selectedDate, setSelectedDate] = useState('today')
+
+  // Responsive breakpoints based on actual width
+  const isVeryNarrow = sidebarWidth < 280
+  const isNarrow = sidebarWidth < 350
+  const isMedium = sidebarWidth >= 350 && sidebarWidth < 500
 
   const dateOptions = [
     { id: 'today', label: "Aujourd'hui", date: new Date() },
@@ -27,13 +34,18 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
   }
 
   const isCompact = layout === 'compact'
-  const px = isCompact ? 'px-2' : 'px-3'
-  const py = isCompact ? 'py-2' : 'py-4'
-  const gap = isCompact ? 'gap-2' : 'gap-3'
-  const spacing = isCompact ? 'space-y-2' : 'space-y-4'
-  const titleSize = isCompact ? 'text-sm' : 'text-lg'
-  const valueSize = isCompact ? 'text-lg' : 'text-2xl'
-  const labelSize = isCompact ? 'text-2xs' : 'text-sm'
+
+  // Dynamic sizing based on width
+  const px = isVeryNarrow ? 'px-1.5' : isNarrow ? 'px-2' : 'px-3'
+  const py = isVeryNarrow ? 'py-1.5' : isNarrow ? 'py-2' : 'py-4'
+  const gap = isVeryNarrow ? 'gap-1.5' : isNarrow ? 'gap-2' : 'gap-3'
+  const spacing = isVeryNarrow ? 'space-y-1.5' : isNarrow ? 'space-y-2' : 'space-y-4'
+  const titleSize = isVeryNarrow ? 'text-xs' : isNarrow ? 'text-sm' : 'text-lg'
+  const valueSize = isVeryNarrow ? 'text-base' : isNarrow ? 'text-lg' : 'text-2xl'
+  const labelSize = isVeryNarrow ? 'text-3xs' : isNarrow ? 'text-2xs' : 'text-sm'
+
+  // Grid columns for action cards
+  const actionGridCols = isMedium ? 'grid-cols-2' : 'grid-cols-1'
 
   return (
     <div className="flex h-full flex-col">
@@ -173,7 +185,7 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
             {isCompact ? '🚀 Nouvelles actions' : '🚀 Commencer une nouvelle action'}
           </h2>
 
-          <div className={`grid ${layout === 'full' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} ${gap}`}>
+          <div className={`grid ${layout === 'full' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : actionGridCols} ${gap}`}>
             {/* Action Card 1 */}
             <ActionCard
               title="Analyser un Client"

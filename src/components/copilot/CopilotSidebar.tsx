@@ -38,19 +38,32 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
     if (!isDragging) return
 
     const handleMouseMove = (e: MouseEvent) => {
-      const newWidth = Math.max(280, Math.min(600, e.clientX))
+      if (!sidebarRef.current) return
+
+      // Get the sidebar's position
+      const sidebarRect = sidebarRef.current.getBoundingClientRect()
+      const sidebarLeft = sidebarRect.left
+
+      // Calculate new width based on mouse position relative to sidebar's left edge
+      const newWidth = Math.max(240, Math.min(800, e.clientX - sidebarLeft))
       setWidth(newWidth)
     }
 
     const handleMouseUp = () => {
       setIsDragging(false)
+      // Remove selection during drag
+      document.body.style.userSelect = 'auto'
     }
 
+    // Prevent text selection while dragging
+    document.body.style.userSelect = 'none'
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseup', handleMouseUp)
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.userSelect = 'auto'
     }
   }, [isDragging])
 
@@ -129,7 +142,7 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
 
       {/* Pages Content */}
       <div className="flex-1 overflow-hidden flex flex-col">
-        {currentView === 'home' && <HomePage onSelectPrompt={handleSelectPrompt} onCreateCreditMemo={() => setShowCreditMemoSetup(true)} layout="compact" />}
+        {currentView === 'home' && <HomePage onSelectPrompt={handleSelectPrompt} onCreateCreditMemo={() => setShowCreditMemoSetup(true)} layout="compact" sidebarWidth={width} />}
         {currentView === 'history' && <HistoryPage />}
         {currentView === 'favorites' && <FavoritesPage onSelectPrompt={handleSelectPrompt} />}
         {currentView === 'active-actions' && <ActiveActionsPage />}
@@ -143,11 +156,18 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
         </button>
       </div>
 
-      {/* Resize Handle */}
+      {/* Resize Handle - Enhanced */}
       <div
+        ref={sidebarRef}
         onMouseDown={() => setIsDragging(true)}
-        className="absolute left-0 top-0 w-1 h-full cursor-col-resize hover:bg-purple-500/50 transition"
-        style={{ background: isDragging ? '#7D4FFE' : 'transparent' }}
+        className={`absolute left-0 top-0 w-1 h-full cursor-col-resize transition-all ${
+          isDragging ? 'bg-purple-500 shadow-lg' : 'hover:bg-purple-400/70 bg-transparent'
+        }`}
+        style={{
+          background: isDragging ? '#7D4FFE' : 'transparent',
+          boxShadow: isDragging ? '0 0 12px rgba(125, 79, 254, 0.4)' : 'none',
+        }}
+        title="Glissez pour redimensionner"
       />
     </div>
   )
