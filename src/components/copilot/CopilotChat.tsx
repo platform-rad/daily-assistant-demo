@@ -203,6 +203,7 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
           setInput(prompt)
           inputRef.current?.focus()
         }}
+        onCreateCreditMemo={onCreateCreditMemo}
       />
     )
   }
