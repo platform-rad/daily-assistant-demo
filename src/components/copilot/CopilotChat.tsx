@@ -4,13 +4,10 @@ import { Button } from '@/components/ui/button'
 import type { CopilotMessage, OrchestratedAction } from '@/data/orchestrator'
 import { ActionCard } from './ActionCard'
 import { ToolPreview } from './ToolPreview'
-import { SkillSuggestions } from './SkillSuggestions'
-import { ContextualSuggestions } from './ContextualSuggestions'
 import { StandaloneView } from './StandaloneView'
 import { CONTEXTUAL_RESPONSES } from '@/data/contextualResponses'
 
 import type { HostRoute } from '@/data/types'
-import { CONTEXT_DATA_BY_ROUTE } from '@/data/contextualData'
 
 export interface CopilotChatProps {
   /** Mode d'affichage: standalone ou widget */
@@ -23,19 +20,7 @@ export interface CopilotChatProps {
   onCreateCreditMemo?: () => void
 }
 
-export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onValidateAndEdit, onCreateCreditMemo }: CopilotChatProps) {
-  const contextData = CONTEXT_DATA_BY_ROUTE[currentRoute] || CONTEXT_DATA_BY_ROUTE.client
-
-  // Mapper la route au contexte pour les suggestions
-  const getContextFromRoute = (route: HostRoute): string => {
-    if (route === 'client' || route === 'client-edit') return 'myClientDev'
-    if (route === 'credit') return 'myCreditApp'
-    if (route === 'portfolio') return 'portfolio'
-    if (route === 'pipeline') return 'pipeline'
-    return 'myClientDev'
-  }
-
-  const displayContext = getContextFromRoute(currentRoute)
+export function CopilotChat({ mode = 'standalone', onValidateAndEdit, onCreateCreditMemo }: CopilotChatProps) {
   const [messages, setMessages] = useState<CopilotMessage[]>([
     {
       id: '0',
@@ -126,7 +111,7 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
         const assistantMessage: CopilotMessage = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: `Je comprends votre demande. Dans le contexte actuel (${displayContext}), je peux vous aider avec l'analyse de portefeuille, l'extraction de données, ou la création de documents. Pouvez-vous préciser ce que vous souhaitez faire?`,
+          content: 'Je comprends votre demande. Je peux vous aider avec l\'analyse de portefeuille, l\'extraction de données, ou la création de documents. Pouvez-vous préciser ce que vous souhaitez faire?',
           timestamp: new Date(),
         }
 
@@ -197,17 +182,6 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
     setSelectedToolId(toolId)
   }
 
-  const handleSkillClick = (skill: string) => {
-    // Si c'est une suggestion de Credit Memo, appeler le callback directement
-    if (skill.toLowerCase().includes('credit memo')) {
-      onCreateCreditMemo?.()
-      return
-    }
-    // Sinon, remplir le champ input comme avant
-    setInput(skill)
-    inputRef.current?.focus()
-  }
-
   // Si mode standalone, afficher la nouvelle interface avec navigation
   if (mode === 'standalone') {
     return (
@@ -240,54 +214,36 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        {messages.length <= 1 ? (
-          <div className="flex flex-col items-start justify-start h-full space-y-4 pb-4">
-            <div>
-              <h2 className="text-base font-semibold text-slate-900">Qu'y a-t-il pour vous?</h2>
-              <p className="text-2xs text-slate-500 mt-1">Basé sur votre contexte actuel</p>
-            </div>
-            {mode === 'widget' ? (
-              <ContextualSuggestions
-                context={displayContext}
-                onActionClick={handleSkillClick}
-                contextData={contextData}
-              />
-            ) : (
-              <SkillSuggestions context={detectedContext} onSkillClick={handleSkillClick} />
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {messages.map((message) => (
-              <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={`max-w-sm rounded-lg px-3 py-2 text-xs ${
-                    message.role === 'user'
-                      ? 'bg-rad-indigo-600 text-white'
-                      : 'bg-slate-100 text-slate-900'
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+        <div className="space-y-3">
+          {messages.map((message) => (
+            <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div
+                className={`max-w-sm rounded-lg px-3 py-2 text-xs ${
+                  message.role === 'user'
+                    ? 'bg-rad-indigo-600 text-white'
+                    : 'bg-slate-100 text-slate-900'
+                }`}
+              >
+                <p className="whitespace-pre-wrap">{message.content}</p>
 
-                  {message.actions && (
-                    <div className="mt-3 space-y-2">
-                      {message.actions.map((action) => (
-                        <ActionCard
-                          key={action.id}
-                          action={action}
-                          onAuthorize={() => handleAuthorizeAction(message.id, action.id)}
-                          onOpenTool={handleOpenTool}
-                          onValidate={handleValidateAndEdit}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
+                {message.actions && (
+                  <div className="mt-3 space-y-2">
+                    {message.actions.map((action) => (
+                      <ActionCard
+                        key={action.id}
+                        action={action}
+                        onAuthorize={() => handleAuthorizeAction(message.id, action.id)}
+                        onOpenTool={handleOpenTool}
+                        onValidate={handleValidateAndEdit}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        )}
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
       {/* Input - Composer style */}
