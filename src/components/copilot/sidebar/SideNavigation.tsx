@@ -34,13 +34,6 @@ export function SideNavigation({ isOpen, currentView, onViewChange, onToggleSide
           isOpen ? 'w-64' : 'w-0'
         } bg-white border-r border-slate-200 transition-all duration-300 overflow-hidden flex flex-col`}
       >
-        {/* Logo & Brand */}
-        <div className="p-4 border-b border-slate-200 flex justify-center">
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}>
-            🤖
-          </div>
-        </div>
-
         {/* Create Action Button */}
         <div className="p-4 border-b border-slate-200">
           <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-white font-medium transition hover:opacity-90" style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}>
