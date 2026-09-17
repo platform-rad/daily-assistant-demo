@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FileText } from 'lucide-react'
+import { FileText, ArrowLeft } from 'lucide-react'
 
 interface CreditMemoChatProps {
   selectedContent?: string
@@ -7,9 +7,10 @@ interface CreditMemoChatProps {
     fieldName: string
     documentName: string
   } | null
+  onCloseSourceDocument?: () => void
 }
 
-export function CreditMemoChat({ selectedContent, sourceDocument }: CreditMemoChatProps) {
+export function CreditMemoChat({ selectedContent, sourceDocument, onCloseSourceDocument }: CreditMemoChatProps) {
   const [selectedField, setSelectedField] = useState<string | null>(selectedContent || null)
 
   useEffect(() => {
@@ -36,6 +37,14 @@ export function CreditMemoChat({ selectedContent, sourceDocument }: CreditMemoCh
         {sourceDocument ? (
           // Document View
           <div className="space-y-3">
+            <button
+              onClick={onCloseSourceDocument}
+              className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-purple-600 hover:bg-purple-50 rounded transition mb-2"
+            >
+              <ArrowLeft size={14} />
+              Retour
+            </button>
+
             <div className="flex items-center gap-2 mb-3">
               <FileText size={18} className="text-purple-600" />
               <div>

@@ -102,6 +102,7 @@ export default function App() {
             <CreditMemoChat
               selectedContent={selectedField || undefined}
               sourceDocument={sourceDocument}
+              onCloseSourceDocument={() => setSourceDocument(null)}
             />
           </div>
         </div>
