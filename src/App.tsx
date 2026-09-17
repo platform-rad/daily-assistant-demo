@@ -6,11 +6,12 @@ import { CopilotSidebar } from '@/components/copilot/CopilotSidebar'
 import { CreditMemoViewer } from '@/components/credit-memo/CreditMemoViewer'
 import { CreditMemoCreator } from '@/components/copilot/CreditMemoCreator'
 import { CreditMemoChat } from '@/components/copilot/CreditMemoChat'
+import { MeenaInterface } from '@/components/meena/MeenaInterface'
 import { DesktopEnvironment } from '@/components/desktop/DesktopEnvironment'
 import { Sparkles, X } from 'lucide-react'
 import type { HostRoute } from '@/data/types'
 
-export type AppMode = 'desktop' | 'legacy' | 'credit-memo-creation' | 'credit-memo'
+export type AppMode = 'desktop' | 'legacy' | 'credit-memo-creation' | 'credit-memo' | 'meena'
 
 export default function App() {
   const [appMode, setAppMode] = useState<AppMode>('desktop')
@@ -81,6 +82,7 @@ export default function App() {
         <DesktopEnvironment
           onOpenMyClientDev={() => setAppMode('legacy')}
           onCreateCreditMemo={handleCreateCreditMemo}
+          onOpenMeena={() => setAppMode('meena')}
         />
       ) : appMode === 'credit-memo-creation' ? (
         /* Mode Credit-Memo-Creation: Creator + CreditMemoChat */
@@ -133,6 +135,21 @@ export default function App() {
                 ← Retour Desktop
               </button>
             </div>
+          </div>
+        </div>
+      ) : appMode === 'meena' ? (
+        /* Mode Meena: Meeting Notes App */
+        <div className="flex h-screen w-screen overflow-hidden bg-slate-200">
+          <main className="min-w-0 flex-1 overflow-hidden">
+            <MeenaInterface />
+          </main>
+          <div className="border-t border-slate-200 px-4 py-3 bg-slate-50 absolute bottom-0 left-0 right-0">
+            <button
+              onClick={() => setAppMode('desktop')}
+              className="w-24 px-3 py-2 text-2xs rounded bg-slate-200 text-slate-700 hover:bg-slate-300 transition font-medium"
+            >
+              ← Retour
+            </button>
           </div>
         </div>
       ) : (

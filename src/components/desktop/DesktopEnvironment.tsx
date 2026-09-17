@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { MessageSquare } from 'lucide-react'
+import { MessageSquare, Mic } from 'lucide-react'
 import { FloatingWindow } from './FloatingWindow'
 import { Taskbar } from './Taskbar'
 import { CopilotChat } from '@/components/copilot/CopilotChat'
@@ -7,9 +7,15 @@ import { CopilotChat } from '@/components/copilot/CopilotChat'
 interface DesktopEnvironmentProps {
   onOpenMyClientDev?: () => void
   onCreateCreditMemo?: () => void
+  onOpenMeena?: () => void
 }
 
-export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: DesktopEnvironmentProps) {
+interface DesktopEnvironmentProps {
+  onOpenMyClientDev?: () => void
+  onCreateCreditMemo?: () => void
+}
+
+export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo, onOpenMeena }: DesktopEnvironmentProps) {
   const [chatOpen, setChatOpen] = useState(false)
   const [currentTime, setCurrentTime] = useState('')
 
@@ -28,6 +34,8 @@ export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: De
       setChatOpen(!chatOpen)
     } else if (appId === 'myclientdev') {
       onOpenMyClientDev?.()
+    } else if (appId === 'meena') {
+      onOpenMeena?.()
     }
   }
 
@@ -48,6 +56,13 @@ export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: De
       label: 'Daily Assistant',
       icon: <MessageSquare size={16} />,
       isActive: chatOpen,
+      isMinimized: false,
+    },
+    {
+      id: 'meena',
+      label: 'Meena',
+      icon: <Mic size={16} />,
+      isActive: false,
       isMinimized: false,
     },
   ]
