@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useRef, useEffect } from 'react'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { MyClientDev } from '@/components/host/MyClientDev'
 import { CopilotChat } from '@/components/copilot/CopilotChat'
@@ -12,6 +12,10 @@ export default function App() {
   const [appMode, setAppMode] = useState<AppMode>('desktop')
   const [route, setRoute] = useState<HostRoute>('client')
   const [isChatOpen, setIsChatOpen] = useState(false)
+  const [buttonY, setButtonY] = useState(50)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState(0)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   const navigate = useCallback(
     (next: HostRoute) => {
@@ -36,6 +40,33 @@ export default function App() {
     },
     []
   )
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true)
+    setDragStart(e.clientY - buttonY)
+  }
+
+  useEffect(() => {
+    if (!isDragging) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const newY = e.clientY - dragStart
+      // Limiter entre 50px du haut et 50px du bas
+      const constrainedY = Math.max(0, Math.min(newY, window.innerHeight - 60))
+      setButtonY(constrainedY)
+    }
+
+    const handleMouseUp = () => {
+      setIsDragging(false)
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging, dragStart])
 
   return (
     <TooltipProvider delayDuration={150}>
@@ -85,19 +116,26 @@ export default function App() {
 
           {/* Chat Copilot en side panel - Slide in from right */}
           <div
-            className={`w-96 border-l border-slate-300 bg-white flex flex-col shadow-2xl transition-all duration-300 ${
-              isChatOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none'
+            className={`bg-white flex flex-col shadow-2xl overflow-hidden transition-all duration-300 ${
+              isChatOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
             style={{ width: isChatOpen ? '384px' : '0px' }}
           >
             {isChatOpen && (
               <>
-                <CopilotChat
-                  mode="widget"
-                  currentRoute={route}
-                  onValidateAndEdit={handleValidateAndEdit}
-                  onCreateCreditMemo={handleCreateCreditMemo}
-                />
+                {/* Header violet */}
+                <div className="h-14 flex items-center px-4" style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}>
+                  <span className="text-white font-semibold text-sm">Daily Assistant</span>
+                </div>
+
+                <div className="flex-1 overflow-auto">
+                  <CopilotChat
+                    mode="widget"
+                    currentRoute={route}
+                    onValidateAndEdit={handleValidateAndEdit}
+                    onCreateCreditMemo={handleCreateCreditMemo}
+                  />
+                </div>
 
                 <div className="border-t border-slate-200 px-4 py-3 bg-slate-50">
                   <button
@@ -111,19 +149,25 @@ export default function App() {
             )}
           </div>
 
-          {/* Floating button to toggle chat */}
-          <button
-            onClick={() => setIsChatOpen(!isChatOpen)}
-            className="fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-2xl hover:shadow-xl transition z-50"
-            style={{
-              background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)',
-              right: isChatOpen ? 'calc(384px + 24px)' : '24px',
-              transition: 'all 0.3s ease',
-            }}
-            title={isChatOpen ? 'Fermer le chat' : 'Ouvrir le chat'}
-          >
-            🤖
-          </button>
+          {/* Sticky button - collé à droite, draggable sur axe Y */}
+          {!isChatOpen && (
+            <button
+              ref={buttonRef}
+              onMouseDown={handleMouseDown}
+              onClick={() => setIsChatOpen(true)}
+              className="fixed w-14 h-14 flex items-center justify-center text-2xl shadow-2xl hover:shadow-xl transition z-50 cursor-move group"
+              style={{
+                background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)',
+                right: '0px',
+                top: `${buttonY}px`,
+                borderRadius: '12px 0 0 12px',
+                border: 'none',
+              }}
+              title="Ouvrir le chat (draggable)"
+            >
+              🤖
+            </button>
+          )}
         </div>
       )}
     </TooltipProvider>
