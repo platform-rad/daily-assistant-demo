@@ -97,11 +97,11 @@ export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: De
         {chatOpen && (
           <FloatingWindow
             title="Daily Assistant"
-            icon="💬"
-            defaultWidth={500}
-            defaultHeight={700}
-            defaultX={300}
-            defaultY={100}
+            icon="🤖"
+            defaultWidth={600}
+            defaultHeight={750}
+            defaultX={Math.max(20, window.innerWidth - 620)}
+            defaultY={Math.max(20, 50)}
             onClose={() => setChatOpen(false)}
           >
             <CopilotChatWrapper

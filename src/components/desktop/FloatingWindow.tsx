@@ -72,23 +72,29 @@ export function FloatingWindow({
     setIsMaximized(!isMaximized)
   }
 
+  // Constraint position to screen bounds
+  const constrainedPosition = {
+    x: Math.max(0, Math.min(position.x, window.innerWidth - size.width)),
+    y: Math.max(0, Math.min(position.y, window.innerHeight - size.height - 20)),
+  }
+
   if (isMinimized) return null
 
   return (
     <div
       ref={windowRef}
-      className="fixed bg-white rounded-lg shadow-2xl flex flex-col border border-gray-300 z-40"
+      className="fixed bg-white rounded-lg shadow-2xl flex flex-col border border-slate-200 z-40"
       style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        width: `${size.width}px`,
-        height: `${size.height}px`,
+        left: `${constrainedPosition.x}px`,
+        top: `${constrainedPosition.y}px`,
+        width: `${Math.max(300, Math.min(size.width, window.innerWidth - 20))}px`,
+        height: `${Math.max(400, Math.min(size.height, window.innerHeight - 60))}px`,
       }}
     >
       {/* Title Bar */}
       <div
         onMouseDown={handleMouseDown}
-        className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 rounded-t-lg flex items-center justify-between cursor-move hover:from-blue-700 hover:to-blue-800 select-none"
+        className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-3 rounded-t-lg flex items-center justify-between cursor-move hover:from-orange-600 hover:to-orange-700 select-none"
       >
         <div className="flex items-center gap-2 flex-1">
           {icon && <span className="text-lg">{icon}</span>}
@@ -97,14 +103,14 @@ export function FloatingWindow({
         <div className="flex gap-2">
           <button
             onClick={() => setIsMinimized(true)}
-            className="p-1 hover:bg-blue-500 rounded text-white transition"
+            className="p-1 hover:bg-orange-400 rounded text-white transition"
             title="Minimiser"
           >
             <Minimize2 size={16} />
           </button>
           <button
             onClick={toggleMaximize}
-            className="p-1 hover:bg-blue-500 rounded text-white transition"
+            className="p-1 hover:bg-orange-400 rounded text-white transition"
             title={isMaximized ? 'Restaurer' : 'Maximiser'}
           >
             <Maximize2 size={16} />

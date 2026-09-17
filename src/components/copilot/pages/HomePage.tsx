@@ -1,13 +1,24 @@
-import { TrendingUp, AlertCircle, Target, Zap, Brain, FileText, BarChart3, ArrowRight } from 'lucide-react'
+import { TrendingUp, AlertCircle, Target, Zap, Brain, FileText, BarChart3, ArrowRight, Send } from 'lucide-react'
+import { useState } from 'react'
 
 interface HomePageProps {
   onSelectPrompt?: (prompt: string) => void
 }
 
 export function HomePage({ onSelectPrompt }: HomePageProps) {
+  const [chatInput, setChatInput] = useState('')
+
+  const handleSendChat = () => {
+    if (chatInput.trim()) {
+      onSelectPrompt?.(chatInput)
+      setChatInput('')
+    }
+  }
+
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="max-w-6xl mx-auto px-6 py-6 space-y-6">
+    <div className="flex h-full flex-col">
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-6xl mx-auto px-6 py-6 space-y-6">
         {/* What's New - KPIs */}
         <section>
           <div className="flex items-center justify-between mb-4">
@@ -185,6 +196,29 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
             />
           </div>
         </section>
+        </div>
+      </div>
+
+      {/* Chat Input Footer */}
+      <div className="border-t border-slate-200 bg-white p-4 flex-shrink-0">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendChat()}
+              placeholder="Posez votre question ou utilisez une action..."
+              className="w-full h-10 rounded-lg border border-slate-200 bg-white pl-3 pr-10 text-sm focus:border-orange-300 focus:outline-none focus:ring-1 focus:ring-orange-500"
+            />
+            <button
+              onClick={handleSendChat}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-orange-50 rounded transition"
+            >
+              <Send size={18} className="text-orange-600" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
