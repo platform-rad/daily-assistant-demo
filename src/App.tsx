@@ -4,11 +4,12 @@ import { MyClientDev } from '@/components/host/MyClientDev'
 import { CopilotChat } from '@/components/copilot/CopilotChat'
 import { CopilotSidebar } from '@/components/copilot/CopilotSidebar'
 import { CreditMemoViewer } from '@/components/credit-memo/CreditMemoViewer'
+import { CreditMemoCreator } from '@/components/copilot/CreditMemoCreator'
 import { DesktopEnvironment } from '@/components/desktop/DesktopEnvironment'
 import { Sparkles, X } from 'lucide-react'
 import type { HostRoute } from '@/data/types'
 
-export type AppMode = 'desktop' | 'legacy' | 'credit-memo'
+export type AppMode = 'desktop' | 'legacy' | 'credit-memo-creation' | 'credit-memo'
 
 export default function App() {
   const [appMode, setAppMode] = useState<AppMode>('desktop')
@@ -37,8 +38,8 @@ export default function App() {
 
   const handleCreateCreditMemo = useCallback(
     () => {
-      // Basculer vers le mode Credit-Memo
-      setAppMode('credit-memo')
+      // Basculer vers le mode Credit-Memo-Creation (wizard)
+      setAppMode('credit-memo-creation')
     },
     []
   )
@@ -78,6 +79,27 @@ export default function App() {
           onOpenMyClientDev={() => setAppMode('legacy')}
           onCreateCreditMemo={handleCreateCreditMemo}
         />
+      ) : appMode === 'credit-memo-creation' ? (
+        /* Mode Credit-Memo-Creation: Creator + CopilotChat Sidebar */
+        <div className="flex h-screen w-screen overflow-hidden bg-slate-200">
+          {/* Credit Memo Creator à gauche */}
+          <main className="min-w-0 flex-1 overflow-hidden border-r border-slate-300 bg-white">
+            <CreditMemoCreator
+              onComplete={() => setAppMode('credit-memo')}
+              onCancel={() => setAppMode('desktop')}
+            />
+          </main>
+
+          {/* Chat Copilot Sidebar à droite */}
+          <div className="w-96 border-l border-slate-300 bg-white flex flex-col shadow-rad-lg overflow-hidden">
+            <CopilotChat
+              mode="widget"
+              currentRoute={route}
+              onValidateAndEdit={handleValidateAndEdit}
+              onCreateCreditMemo={handleCreateCreditMemo}
+            />
+          </div>
+        </div>
       ) : appMode === 'credit-memo' ? (
         /* Mode Credit-Memo: CreditMemoViewer + CopilotChat */
         <div className="flex h-screen w-screen overflow-hidden bg-slate-200">
