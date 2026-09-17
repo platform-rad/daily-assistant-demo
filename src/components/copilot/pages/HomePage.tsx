@@ -330,7 +330,7 @@ function ActionCard({ title, description, icon, prompt, onSelect, onCreateCredit
   // Cohérent avec ContextualSuggestions
   const cardPadding = isCompact ? 'p-2' : 'p-4'
   const iconPadding = isCompact ? 'p-1' : 'p-2'
-  const titleSize = isCompact ? 'text-2xs font-semibold' : 'font-semibold'
+  const titleSize = isCompact ? 'text-2xs font-semibold' : 'text-sm font-semibold'
   const descSize = isCompact ? 'text-2xs' : 'text-xs'
   const arrowSize = isCompact ? 14 : 16
 
