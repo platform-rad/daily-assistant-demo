@@ -2,6 +2,21 @@ import { TrendingUp, AlertCircle, Target, Zap, Brain, FileText, BarChart3, Arrow
 import { useState } from 'react'
 import React from 'react'
 
+export interface ConversationMessage {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: Date
+}
+
+export interface Conversation {
+  id: string
+  title: string
+  messages: ConversationMessage[]
+  createdAt: Date
+  updatedAt: Date
+}
+
 interface HomePageProps {
   onSelectPrompt?: (prompt: string) => void
   onCreateCreditMemo?: () => void
@@ -9,11 +24,51 @@ interface HomePageProps {
   layout?: 'compact' | 'full'
   /** Width of the sidebar in pixels (for responsive adjustments) */
   sidebarWidth?: number
+  /** Current conversation being viewed */
+  currentConversation?: Conversation | null
+  /** Callback when user opens a conversation */
+  onOpenConversation?: (conversation: Conversation) => void
+  /** Callback when user creates a new conversation */
+  onCreateConversation?: (conversation: Conversation) => void
 }
 
-export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact', sidebarWidth = 320 }: HomePageProps) {
+export function HomePage({
+  onSelectPrompt,
+  onCreateCreditMemo,
+  layout = 'compact',
+  sidebarWidth = 320,
+  currentConversation: _currentConversation,
+  onOpenConversation: _onOpenConversation,
+  onCreateConversation
+}: HomePageProps) {
   const [chatInput, setChatInput] = useState('')
   const [selectedDate, setSelectedDate] = useState('today')
+  const [suggestedPlaceholder, setSuggestedPlaceholder] = useState('')
+
+  // Detect keywords for placeholder suggestions
+  const keywords = {
+    'exposition': '€847.3M',
+    'risque': 'Modéré',
+    'rating': 'BBB+',
+    'clients': '12',
+    'portefeuille': '€847.3M',
+  }
+
+  const detectKeyword = (text: string) => {
+    const lowerText = text.toLowerCase().trim()
+    for (const [key, value] of Object.entries(keywords)) {
+      if (lowerText.startsWith(key) && !lowerText.includes(value)) {
+        return `${key} ${value}`
+      }
+    }
+    return ''
+  }
+
+  const handleChatInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setChatInput(value)
+    setSuggestedPlaceholder(detectKeyword(value))
+  }
 
   // Responsive breakpoints based on actual width
   const isVeryNarrow = sidebarWidth < 280
@@ -29,8 +84,35 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
 
   const handleSendChat = () => {
     if (chatInput.trim()) {
-      onSelectPrompt?.(chatInput)
+      // Use suggested placeholder if available
+      const messageContent = suggestedPlaceholder || chatInput
+
+      // Create a new conversation
+      const newConversation: Conversation = {
+        id: Date.now().toString(),
+        title: chatInput.substring(0, 50) + (chatInput.length > 50 ? '...' : ''),
+        messages: [
+          {
+            id: '1',
+            role: 'user',
+            content: messageContent,
+            timestamp: new Date(),
+          },
+          {
+            id: '2',
+            role: 'assistant',
+            content: `Vous avez demandé: "${messageContent}". Je suis en train de traiter votre demande...`,
+            timestamp: new Date(),
+          },
+        ],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+
+      // Call callback to create conversation
+      onCreateConversation?.(newConversation)
       setChatInput('')
+      setSuggestedPlaceholder('')
     }
   }
 
@@ -289,11 +371,16 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
             <input
               type="text"
               value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
+              onChange={handleChatInputChange}
               onKeyPress={(e) => e.key === 'Enter' && handleSendChat()}
               placeholder={isCompact ? "Question..." : "Posez votre question ou utilisez une action..."}
               className={`w-full ${isCompact ? 'h-8' : 'h-10'} rounded-lg border border-slate-200 bg-white pl-3 pr-10 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500`}
             />
+            {suggestedPlaceholder && chatInput && (
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">
+                {suggestedPlaceholder}
+              </span>
+            )}
             <button
               onClick={handleSendChat}
               className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-purple-50 rounded transition"
