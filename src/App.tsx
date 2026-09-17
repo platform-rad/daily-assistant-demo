@@ -124,6 +124,7 @@ export default function App() {
               // Prompts from sidebar suggestions are handled internally
             }}
             onCreateCreditMemo={handleCreateCreditMemo}
+            onMinimize={() => setAppMode('desktop')}
             currentRoute={route}
           />
 

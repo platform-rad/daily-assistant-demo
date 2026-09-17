@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Settings, ChevronRight, Sparkles } from 'lucide-react'
+import { Settings, ChevronRight, Sparkles, X } from 'lucide-react'
 import { HomePage } from './pages/HomePage'
 import { HistoryPage } from './pages/HistoryPage'
 import { FavoritesPage } from './pages/FavoritesPage'
@@ -13,10 +13,11 @@ interface CopilotSidebarProps {
   onToggleCollapse: () => void
   onSelectPrompt?: (prompt: string) => void
   onCreateCreditMemo?: () => void
+  onMinimize?: () => void
   currentRoute?: 'client' | 'client-edit' | 'credit' | 'portfolio' | 'pipeline' | 'dashboard' | 'reporting'
 }
 
-export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, onCreateCreditMemo, currentRoute = 'client' }: CopilotSidebarProps) {
+export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, onCreateCreditMemo, onMinimize, currentRoute = 'client' }: CopilotSidebarProps) {
   const [currentView, setCurrentView] = useState<NavView>('home')
   const [showCreditMemoSetup, setShowCreditMemoSetup] = useState(false)
   const [width, setWidth] = useState(320) // 320px par défaut
@@ -119,13 +120,24 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
           </div>
           <span className="font-semibold text-slate-900 text-sm">Copilot</span>
         </div>
-        <button
-          onClick={onToggleCollapse}
-          className="p-1 hover:bg-slate-100 rounded transition"
-          title="Réduire"
-        >
-          <ChevronRight size={20} className="text-slate-600" />
-        </button>
+        <div className="flex items-center gap-1">
+          {onMinimize && (
+            <button
+              onClick={onMinimize}
+              className="p-1 hover:bg-red-100 rounded transition"
+              title="Réduire au desktop"
+            >
+              <X size={18} className="text-red-500" />
+            </button>
+          )}
+          <button
+            onClick={onToggleCollapse}
+            className="p-1 hover:bg-slate-100 rounded transition"
+            title="Réduire sidebar"
+          >
+            <ChevronRight size={20} className="text-slate-600" />
+          </button>
+        </div>
       </div>
 
       {/* New Navigation Bar with Menu & Tabs */}
