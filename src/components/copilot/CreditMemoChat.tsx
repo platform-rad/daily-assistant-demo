@@ -1,30 +1,16 @@
-import { useState, useRef, useEffect } from 'react'
-import { Send, Sparkles } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import type { CopilotMessage } from '@/data/orchestrator'
+import { useState, useEffect } from 'react'
+import { FileText } from 'lucide-react'
 
 interface CreditMemoChatProps {
   selectedContent?: string
+  sourceDocument?: {
+    fieldName: string
+    documentName: string
+  } | null
 }
 
-export function CreditMemoChat({ selectedContent }: CreditMemoChatProps) {
-  const [messages, setMessages] = useState<CopilotMessage[]>([
-    {
-      id: '0',
-      role: 'assistant',
-      content: 'Bonjour! Je suis votre assistant pour la création du Credit Memo. Je peux vous aider à compléter les données et analyser les documents. Comment puis-je vous assister?',
-      timestamp: new Date(),
-    },
-  ])
-
-  const [input, setInput] = useState('')
+export function CreditMemoChat({ selectedContent, sourceDocument }: CreditMemoChatProps) {
   const [selectedField, setSelectedField] = useState<string | null>(selectedContent || null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
 
   useEffect(() => {
     if (selectedContent) {
@@ -32,68 +18,12 @@ export function CreditMemoChat({ selectedContent }: CreditMemoChatProps) {
     }
   }, [selectedContent])
 
-  const creditMemoSuggestions = [
-    '💼 Analyser les risques du client',
-    '📊 Extraire les données financières',
-    '🔍 Vérifier la cohérence des données',
-    '📄 Générer les recommandations',
-    '✅ Valider les informations',
-    '🎯 Suggérer les termes du facility',
-  ]
-
-  const handleSendMessage = () => {
-    if (!input.trim()) return
-
-    const userMessage: CopilotMessage = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input,
-      timestamp: new Date(),
-    }
-
-    setMessages((prev) => [...prev, userMessage])
-    setInput('')
-
-    setTimeout(() => {
-      const responses: { [key: string]: string } = {
-        'risques': 'Basé sur l\'analyse du client Financial Services Inc (Rating A-, Exposure €15.2M), les risques identifiés sont: (1) Exposition sectorielle élevée au secteur Finance, (2) Volatilité des taux, (3) Concentration géographique. Les mitigation measures recommandées incluent des covenants stricts et un suivi mensuel.',
-        'données': 'Les données financières extraites du document source sont: Revenue €450M (2025), EBITDA €125M, Leverage Ratio 2.8x, Interest Coverage 5.2x. Ces métriques positionnent le client en catégorie investment-grade.',
-        'cohérence': '✓ Les données sont cohérentes. Rating A- align avec les métriques financières. Exposition de €15.2M est proportionnée par rapport à la taille du groupe. Aucune incohérence détectée.',
-        'recommandations': 'Recommendations: (1) Facility amount €12M, (2) Tenor 3 years, (3) Security: first ranking pledge, (4) Covenants: Financial (Leverage <3.5x, Interest Coverage >4x), (5) Pricing: SOFR + 175bps.',
-        'valider': '✓ Tous les champs obligatoires sont complétés et validés. Données approuvées pour la création du Credit Memo final.',
-        'termes': 'Termes suggérés du facility: Revolving Facility de €12M, Secured, 3-year tenor, SOFR + 175bps, avec covenants financiers et operationnels standards.',
-      }
-
-      let response = 'Je peux vous aider avec ça. Pouvez-vous être plus spécifique?'
-      for (const [key, value] of Object.entries(responses)) {
-        if (input.toLowerCase().includes(key)) {
-          response = value
-          break
-        }
-      }
-
-      const assistantMessage: CopilotMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response,
-        timestamp: new Date(),
-      }
-
-      setMessages((prev) => [...prev, assistantMessage])
-    }, 500)
-  }
-
-  const handleSuggestionClick = (suggestion: string) => {
-    setInput(suggestion)
-    inputRef.current?.focus()
-  }
-
   return (
-    <div className="flex h-full flex-col bg-white rounded-lg shadow-rad-lg">
-      {/* Header - Focused on Credit Memo */}
-      <div className="border-b border-slate-200 bg-gradient-to-r from-purple-50 to-transparent px-4 py-3">
+    <div className="flex h-full flex-col bg-white">
+      {/* Header */}
+      <div className="border-b border-slate-200 bg-gradient-to-r from-purple-50 to-transparent px-4 py-3 flex-shrink-0">
         <h1 className="text-sm font-semibold text-slate-900">Création Credit Memo</h1>
-        <p className="text-2xs mt-1 text-slate-600">Assistez-vous avec l'IA pour compléter les données</p>
+        <p className="text-2xs mt-1 text-slate-600">Visualisez les sources des données</p>
         {selectedField && (
           <div className="mt-2 inline-block px-2 py-1 bg-purple-100 rounded text-2xs text-purple-700">
             Champ sélectionné: <span className="font-semibold">{selectedField}</span>
@@ -101,70 +31,79 @@ export function CreditMemoChat({ selectedContent }: CreditMemoChatProps) {
         )}
       </div>
 
-      {/* Messages */}
+      {/* Content Area */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        {messages.length <= 1 ? (
-          <div className="flex flex-col items-start justify-start h-full space-y-4 pb-4">
-            <div>
-              <h2 className="text-sm font-semibold text-slate-900">Suggestions pour le Credit Memo</h2>
-              <p className="text-2xs text-slate-500 mt-0.5">Cliquez sur une suggestion ou tapez votre question</p>
-            </div>
-            <div className="space-y-2 w-full">
-              {creditMemoSuggestions.map((suggestion, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleSuggestionClick(suggestion)}
-                  className="w-full text-left px-3 py-2.5 rounded-lg border border-slate-200 hover:border-purple-300 hover:bg-purple-50 transition text-xs text-slate-700 hover:text-slate-900 font-medium"
-                >
-                  {suggestion}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
+        {sourceDocument ? (
+          // Document View
           <div className="space-y-3">
-            {messages.map((message) => (
-              <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={`max-w-sm rounded-lg px-3 py-2 text-xs ${
-                    message.role === 'user'
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-slate-100 text-slate-900'
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+            <div className="flex items-center gap-2 mb-3">
+              <FileText size={18} className="text-purple-600" />
+              <div>
+                <p className="text-xs font-semibold text-slate-900">{sourceDocument.fieldName}</p>
+                <p className="text-2xs text-slate-600">{sourceDocument.documentName}</p>
+              </div>
+            </div>
+
+            {/* Fake Document Preview */}
+            <div className="bg-slate-100 rounded-lg overflow-hidden border border-slate-200 aspect-[3/4]">
+              <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-100 p-4 space-y-2">
+                {/* Document Header */}
+                <div className="border-b border-slate-300 pb-2">
+                  <p className="text-2xs font-bold text-slate-700">FINANCIAL SERVICES INC.</p>
+                  <p className="text-2xs text-slate-600">Client Report - Q3 2026</p>
+                </div>
+
+                {/* Document Content Simulation */}
+                <div className="space-y-1.5">
+                  <div className="h-2 bg-slate-300 rounded w-3/4"></div>
+                  <div className="h-2 bg-slate-300 rounded w-full"></div>
+                  <div className="h-2 bg-slate-300 rounded w-5/6"></div>
+
+                  <div className="pt-2 space-y-1">
+                    <div className="h-2 bg-slate-400 rounded w-1/2"></div>
+                    <div className="h-2 bg-slate-300 rounded w-2/3"></div>
+                    <div className="h-2 bg-slate-300 rounded w-3/4"></div>
+                  </div>
+
+                  <div className="pt-2 space-y-1">
+                    <div className="h-2 bg-slate-300 rounded w-full"></div>
+                    <div className="h-2 bg-slate-300 rounded w-5/6"></div>
+                    <div className="h-2 bg-slate-400 rounded w-2/3"></div>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="absolute bottom-4 left-4 right-4">
+                  <p className="text-2xs text-slate-500 text-center">Page 1 de 5</p>
                 </div>
               </div>
-            ))}
-            <div ref={messagesEndRef} />
+            </div>
+
+            <p className="text-2xs text-slate-600 mt-3">Cliquez sur les autres champs pour voir leurs sources</p>
+          </div>
+        ) : (
+          // Default View - Suggestions
+          <div className="flex flex-col items-start justify-start h-full space-y-3">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-900">Remplissez les champs</h2>
+              <p className="text-2xs text-slate-600 mt-0.5">Cliquez sur le Focus icon pour voir les sources documentaires</p>
+            </div>
+            <div className="space-y-2 w-full text-2xs">
+              <div className="p-3 rounded-lg bg-purple-50 border border-purple-200">
+                <p className="font-medium text-slate-900">💡 Astuce</p>
+                <p className="text-slate-700 mt-1">Survolez les champs à gauche pour les sélectionner</p>
+              </div>
+              <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
+                <p className="font-medium text-slate-900">👁️ Voir la source</p>
+                <p className="text-slate-700 mt-1">Cliquez sur l'icon Focus (bleu violet) pour voir le document source</p>
+              </div>
+              <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200">
+                <p className="font-medium text-slate-900">✏️ Éditer</p>
+                <p className="text-slate-700 mt-1">Modifiez les valeurs. Un button Restart apparaîtra pour les restaurer</p>
+              </div>
+            </div>
           </div>
         )}
-      </div>
-
-      {/* Input - Composer style */}
-      <div className="shrink-0 border-t border-slate-200 bg-white px-2.5 py-2.5">
-        <div className="flex gap-1.5">
-          <div className="relative flex-1">
-            <Sparkles className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-purple-600" />
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="Demandez à l'IA..."
-              className="h-9 w-full rounded border border-slate-200 bg-white pl-8 pr-2.5 text-xs focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
-            />
-          </div>
-          <Button
-            onClick={handleSendMessage}
-            disabled={!input.trim()}
-            size="sm"
-            className="h-9 bg-purple-600 hover:bg-purple-700 text-white"
-          >
-            <Send size={16} />
-          </Button>
-        </div>
       </div>
     </div>
   )

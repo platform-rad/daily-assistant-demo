@@ -17,26 +17,21 @@ interface DataField {
   sourceDocument?: string
 }
 
-interface SourceInfo {
-  isOpen: boolean
-  field?: string
-  document?: string
-}
-
 export function CreditMemoCreator({
   onComplete,
   onCancel,
   onSelectField,
+  onViewSourceDocument,
 }: {
   onComplete: () => void
   onCancel: () => void
   onSelectField?: (fieldName: string | null) => void
+  onViewSourceDocument?: (fieldName: string, source: string) => void
 }) {
   const [currentStep, setCurrentStep] = useState<Step>('client-select')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedClient, setSelectedClient] = useState('Financial Services Inc')
   const [uploadedDoc, setUploadedDoc] = useState<UploadedDocument | null>(null)
-  const [sourceInfo, setSourceInfo] = useState<SourceInfo>({ isOpen: false })
 
   // Préchargé données pour Financial Services Inc avec tracking AI
   const [dataFields, setDataFields] = useState<DataField[]>([
@@ -354,7 +349,7 @@ export function CreditMemoCreator({
                       {/* AI Source Indicator or Restart Button */}
                       {!field.isModified && field.sourceDocument ? (
                         <button
-                          onClick={() => setSourceInfo({ isOpen: true, field: field.label, document: field.sourceDocument })}
+                          onClick={() => onViewSourceDocument?.(field.label, field.sourceDocument!)}
                           className="flex-shrink-0 p-2 rounded hover:bg-purple-200 transition"
                           title="Cliquez pour voir la source"
                         >
@@ -404,24 +399,6 @@ export function CreditMemoCreator({
                 Ajouter un champ
               </button>
             </div>
-
-            {/* Source Info Panel */}
-            {sourceInfo.isOpen && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-medium text-blue-900">Source du champ "{sourceInfo.field}"</p>
-                    <p className="text-xs text-blue-700 mt-1">{sourceInfo.document}</p>
-                  </div>
-                  <button
-                    onClick={() => setSourceInfo({ isOpen: false })}
-                    className="flex-shrink-0 p-1 rounded hover:bg-blue-100 transition"
-                  >
-                    <X size={16} className="text-blue-600" />
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         )}
 

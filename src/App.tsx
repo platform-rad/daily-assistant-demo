@@ -20,6 +20,7 @@ export default function App() {
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState(0)
   const [selectedField, setSelectedField] = useState<string | null>(null)
+  const [sourceDocument, setSourceDocument] = useState<{ fieldName: string; documentName: string } | null>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const navigate = useCallback(
@@ -90,6 +91,9 @@ export default function App() {
               onComplete={() => setAppMode('credit-memo')}
               onCancel={() => setAppMode('desktop')}
               onSelectField={setSelectedField}
+              onViewSourceDocument={(fieldName, source) =>
+                setSourceDocument({ fieldName, documentName: source })
+              }
             />
           </main>
 
@@ -97,6 +101,7 @@ export default function App() {
           <div className="w-96 border-l border-slate-300 bg-white flex flex-col shadow-rad-lg overflow-hidden">
             <CreditMemoChat
               selectedContent={selectedField || undefined}
+              sourceDocument={sourceDocument}
             />
           </div>
         </div>
