@@ -120,8 +120,8 @@ export default function App() {
           <CopilotSidebar
             isCollapsed={!isChatOpen}
             onToggleCollapse={() => setIsChatOpen(!isChatOpen)}
-            onSelectPrompt={(prompt) => {
-              // TODO: Use prompt in chat
+            onSelectPrompt={() => {
+              // Prompts from sidebar suggestions are handled internally
             }}
             onCreateCreditMemo={handleCreateCreditMemo}
           />
