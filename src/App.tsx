@@ -124,6 +124,7 @@ export default function App() {
               // Prompts from sidebar suggestions are handled internally
             }}
             onCreateCreditMemo={handleCreateCreditMemo}
+            currentRoute={route}
           />
 
           {/* Sticky button - collé à droite, draggable sur axe Y */}
