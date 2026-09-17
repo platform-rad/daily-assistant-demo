@@ -5,7 +5,6 @@ import { HistoryPage } from './pages/HistoryPage'
 import { FavoritesPage } from './pages/FavoritesPage'
 import { ActiveActionsPage } from './pages/ActiveActionsPage'
 import { SidebarNav, type NavView } from './SidebarNav'
-import { CreditMemoSetup } from './CreditMemoSetup'
 import { ContextualActionsPanel } from './ContextualActionsPanel'
 
 interface CopilotSidebarProps {
@@ -18,7 +17,6 @@ interface CopilotSidebarProps {
 
 export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, onCreateCreditMemo, currentRoute = 'client' }: CopilotSidebarProps) {
   const [currentView, setCurrentView] = useState<NavView>('home')
-  const [showCreditMemoSetup, setShowCreditMemoSetup] = useState(false)
   const [width, setWidth] = useState(320) // 320px par défaut
   const [isDragging, setIsDragging] = useState(false)
   const [dragStartX, setDragStartX] = useState(0)
@@ -70,39 +68,14 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
   // Handle onSelectPrompt to detect Credit Memo
   const handleSelectPrompt = (prompt: string) => {
     if (prompt.includes('Credit Memo') || prompt.includes('credit memo')) {
-      setShowCreditMemoSetup(true)
+      onCreateCreditMemo?.()
     } else {
       onSelectPrompt?.(prompt)
     }
   }
 
-  // Handle Credit Memo Setup completion
-  const handleCreditMemoComplete = () => {
-    setShowCreditMemoSetup(false)
-    onCreateCreditMemo?.()
-  }
-
   if (isCollapsed) {
     return null
-  }
-
-  // Show Credit Memo Setup overlay
-  if (showCreditMemoSetup) {
-    return (
-      <div className="border-l border-slate-200 bg-white flex flex-col shadow-2xl overflow-hidden" style={{ width: `${width}px` }}>
-        <CreditMemoSetup
-          onComplete={handleCreditMemoComplete}
-          onCancel={() => setShowCreditMemoSetup(false)}
-        />
-
-        {/* Resize Handle */}
-        <div
-          onMouseDown={() => setIsDragging(true)}
-          className="absolute left-0 top-0 w-1 h-full cursor-col-resize hover:bg-purple-500/50 transition"
-          style={{ background: isDragging ? '#7D4FFE' : 'transparent' }}
-        />
-      </div>
-    )
   }
 
   return (
@@ -142,7 +115,7 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
 
       {/* Pages Content */}
       <div className="flex-1 overflow-hidden flex flex-col">
-        {currentView === 'home' && <HomePage onSelectPrompt={handleSelectPrompt} onCreateCreditMemo={() => setShowCreditMemoSetup(true)} layout="compact" sidebarWidth={width} />}
+        {currentView === 'home' && <HomePage onSelectPrompt={handleSelectPrompt} onCreateCreditMemo={onCreateCreditMemo} layout="compact" sidebarWidth={width} />}
         {currentView === 'history' && <HistoryPage />}
         {currentView === 'favorites' && <FavoritesPage onSelectPrompt={handleSelectPrompt} />}
         {currentView === 'active-actions' && <ActiveActionsPage />}
