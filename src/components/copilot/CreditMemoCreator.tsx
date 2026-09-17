@@ -26,9 +26,11 @@ interface SourceInfo {
 export function CreditMemoCreator({
   onComplete,
   onCancel,
+  onSelectField,
 }: {
   onComplete: () => void
   onCancel: () => void
+  onSelectField?: (fieldName: string | null) => void
 }) {
   const [currentStep, setCurrentStep] = useState<Step>('client-select')
   const [searchQuery, setSearchQuery] = useState('')
@@ -341,8 +343,13 @@ export function CreditMemoCreator({
               <h3 className="font-semibold text-slate-900 mb-4">Données pour {selectedClient}</h3>
               <div className="space-y-3">
                 {dataFields.map((field) => (
-                  <div key={field.id} className="relative">
-                    <label className="text-xs font-medium text-slate-600 block mb-1">{field.label}</label>
+                  <div
+                    key={field.id}
+                    className="relative p-3 rounded-lg border border-transparent hover:border-purple-300 hover:bg-white transition cursor-pointer group"
+                    onMouseEnter={() => onSelectField?.(field.label)}
+                    onMouseLeave={() => onSelectField?.(null)}
+                  >
+                    <label className="text-xs font-medium text-slate-600 block mb-1 group-hover:text-purple-600 transition">{field.label}</label>
                     <div className="flex items-center gap-2">
                       {/* AI Source Indicator or Restart Button */}
                       {!field.isModified && field.sourceDocument ? (
@@ -370,7 +377,7 @@ export function CreditMemoCreator({
                         type="text"
                         value={field.value}
                         onChange={(e) => handleFieldChange(field.id, e.target.value)}
-                        className="flex-1 px-3 py-2 rounded border border-slate-200 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        className="flex-1 px-3 py-2 rounded border border-slate-200 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500 group-hover:bg-purple-50 transition"
                       />
 
                       {/* Delete Button for Custom Fields */}

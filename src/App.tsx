@@ -5,6 +5,7 @@ import { CopilotChat } from '@/components/copilot/CopilotChat'
 import { CopilotSidebar } from '@/components/copilot/CopilotSidebar'
 import { CreditMemoViewer } from '@/components/credit-memo/CreditMemoViewer'
 import { CreditMemoCreator } from '@/components/copilot/CreditMemoCreator'
+import { CreditMemoChat } from '@/components/copilot/CreditMemoChat'
 import { DesktopEnvironment } from '@/components/desktop/DesktopEnvironment'
 import { Sparkles, X } from 'lucide-react'
 import type { HostRoute } from '@/data/types'
@@ -18,6 +19,7 @@ export default function App() {
   const [buttonY, setButtonY] = useState(50)
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState(0)
+  const [selectedField, setSelectedField] = useState<string | null>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const navigate = useCallback(
@@ -80,22 +82,23 @@ export default function App() {
           onCreateCreditMemo={handleCreateCreditMemo}
         />
       ) : appMode === 'credit-memo-creation' ? (
-        /* Mode Credit-Memo-Creation: Creator + CopilotSidebar */
+        /* Mode Credit-Memo-Creation: Creator + CreditMemoChat */
         <div className="flex h-screen w-screen overflow-hidden bg-slate-200">
           {/* Credit Memo Creator à gauche */}
           <main className="min-w-0 flex-1 overflow-hidden border-r border-slate-300 bg-white">
             <CreditMemoCreator
               onComplete={() => setAppMode('credit-memo')}
               onCancel={() => setAppMode('desktop')}
+              onSelectField={setSelectedField}
             />
           </main>
 
-          {/* Copilot Sidebar à droite - comme MyClientDev */}
-          <CopilotSidebar
-            isCollapsed={false}
-            onToggleCollapse={() => {}}
-            currentRoute={route}
-          />
+          {/* Credit Memo Chat Sidebar à droite - Focused on creation */}
+          <div className="w-96 border-l border-slate-300 bg-white flex flex-col shadow-rad-lg overflow-hidden">
+            <CreditMemoChat
+              selectedContent={selectedField || undefined}
+            />
+          </div>
         </div>
       ) : appMode === 'credit-memo' ? (
         /* Mode Credit-Memo: CreditMemoViewer + CopilotChat */
