@@ -111,18 +111,15 @@ export default function App() {
       ) : (
         /* Mode Legacy: MyClientDev with optional Copilot Sidebar */
         <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-200 relative">
-          {/* Top Bar with Minimize Button */}
-          <div className="flex-shrink-0 bg-white border-b border-slate-200 px-4 py-2 flex items-center justify-between">
-            {isChatOpen && (
-              <button
-                onClick={() => setIsChatOpen(false)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-red-100 transition"
-                title="Fermer le Copilot"
-              >
-                <X size={18} className="text-red-500" />
-                <span className="text-sm text-red-600 font-medium">Fermer Copilot</span>
-              </button>
-            )}
+          {/* Top Bar with Close Button */}
+          <div className="flex-shrink-0 bg-white border-b border-slate-200 px-3 py-2 flex items-center gap-3">
+            <button
+              onClick={() => setAppMode('desktop')}
+              className="p-1.5 hover:bg-red-100 rounded-lg transition flex-shrink-0"
+              title="Retour au desktop"
+            >
+              <X size={20} className="text-red-500" />
+            </button>
             <div className="flex-1" />
           </div>
 

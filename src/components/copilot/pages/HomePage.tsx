@@ -1,5 +1,6 @@
 import { TrendingUp, AlertCircle, Target, Zap, Brain, FileText, BarChart3, ArrowRight, Send, Clock } from 'lucide-react'
 import { useState } from 'react'
+import React from 'react'
 
 interface HomePageProps {
   onSelectPrompt?: (prompt: string) => void
@@ -41,16 +42,12 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
   const gap = isCompact ? (isVeryNarrow ? 'gap-1' : isNarrow ? 'gap-1.5' : 'gap-2') : 'gap-3'
   const spacing = isCompact ? (isVeryNarrow ? 'space-y-1' : isNarrow ? 'space-y-1.5' : 'space-y-2') : 'space-y-4'
 
-  // Much more aggressive sizing for sidebar
-  const valueSize = isCompact
-    ? (isVeryNarrow ? 'text-sm' : isNarrow ? 'text-base' : 'text-lg')
-    : 'text-2xl'
-  const labelSize = isCompact
-    ? (isVeryNarrow ? 'text-3xs' : isNarrow ? 'text-3xs' : 'text-2xs')
-    : 'text-sm'
-  const sectionTitleSize = isCompact
-    ? (isVeryNarrow ? 'text-2xs' : isNarrow ? 'text-xs' : 'text-sm')
-    : 'text-lg'
+  // Cohérent avec ContextualSuggestions pour sidebar
+  // Desktop: normal, Sidebar: compact and consistent
+  const valueSize = isCompact ? 'text-sm font-bold' : 'text-2xl'
+  const labelSize = isCompact ? 'text-2xs' : 'text-sm'
+  const sectionTitleSize = isCompact ? 'text-2xs font-semibold' : 'text-lg'
+  const descriptionSize = isCompact ? 'text-2xs' : 'text-xs'
   const actionCardIconSize = isCompact ? 16 : 20
 
   // Grid columns based on width - responsive for cards
@@ -103,9 +100,9 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
 
               <div className="flex items-start justify-between flex-1">
                 <div className="flex-1">
-                  <p className={`${labelSize} font-semibold text-slate-600 uppercase tracking-wide`}>Exposition Portefeuille</p>
-                  <p className={`${valueSize} font-bold text-slate-900 ${isCompact ? 'mt-1' : 'mt-2'}`}>€847.3M</p>
-                  <p className={`${labelSize} text-purple-600 font-medium ${isCompact ? 'mt-0.5' : 'mt-1'}`}>↑ +5.2% vs hier</p>
+                  <p className={`${labelSize} text-slate-600 uppercase tracking-wide`}>Exposition</p>
+                  <p className={`${valueSize} text-slate-900 ${isCompact ? 'mt-0.5' : 'mt-2'}`}>€847.3M</p>
+                  <p className={`${descriptionSize} text-purple-600 ${isCompact ? 'mt-0.5' : 'mt-1'}`}>↑ +5.2%</p>
                 </div>
                 <div className={`${isCompact ? (isNarrow ? 'p-1.5' : 'p-2') : 'p-2.5'} rounded-lg bg-purple-100/60`}>
                   <TrendingUp size={isCompact ? (isNarrow ? 14 : 16) : 20} className="text-purple-600" />
@@ -330,11 +327,12 @@ function ActionCard({ title, description, icon, prompt, onSelect, onCreateCredit
     }
   }
 
+  // Cohérent avec ContextualSuggestions
   const cardPadding = isCompact ? 'p-2' : 'p-4'
   const iconPadding = isCompact ? 'p-1' : 'p-2'
-  const titleSize = isCompact ? 'text-2xs' : 'font-semibold'
-  const descSize = isCompact ? 'text-3xs' : 'text-xs'
-  const arrowSize = isCompact ? 10 : 16
+  const titleSize = isCompact ? 'text-2xs font-semibold' : 'font-semibold'
+  const descSize = isCompact ? 'text-2xs' : 'text-xs'
+  const arrowSize = isCompact ? 14 : 16
 
   return (
     <button
