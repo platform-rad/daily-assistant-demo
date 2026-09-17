@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Mic, Square, Upload, Plus, Trash2, Users, CheckCircle2, FileText } from 'lucide-react'
+import { Mic, Square, Upload, Plus, Trash2, Users, CheckCircle2, FileText, X } from 'lucide-react'
 
 interface MeetingNote {
   id: string
@@ -13,7 +13,7 @@ interface MeetingNote {
   uploadedToCRM: boolean
 }
 
-export function MeenaApp() {
+export function MeenaInterface() {
   const [isRecording, setIsRecording] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
   const [meetings, setMeetings] = useState<MeetingNote[]>([])
@@ -30,7 +30,6 @@ export function MeenaApp() {
       setRecordingTime(prev => prev + 1)
     }, 1000)
 
-    // Créer une nouvelle meeting note
     const newMeeting: MeetingNote = {
       id: `meeting_${Date.now()}`,
       title: `Meeting ${new Date().toLocaleDateString()}`,
@@ -52,7 +51,6 @@ export function MeenaApp() {
       clearInterval(recordingIntervalRef.current)
     }
 
-    // Simuler la transcription et l'analyse
     if (activeMeeting) {
       const mockTranscript = `Discussion about Q4 budget planning and resource allocation. Team reviewed current spending and projected needs for upcoming quarters. Key topics: vendor negotiations, headcount expansion, technology investments.`
 
@@ -112,7 +110,6 @@ export function MeenaApp() {
       uploadedToCRM: true
     } : m))
 
-    // Simuler le succès d'upload
     setTimeout(() => {
       setMeetings(prev => prev.map(m => m.id === activeMeetingId ? {
         ...m,
@@ -135,7 +132,7 @@ export function MeenaApp() {
   }
 
   return (
-    <div className="flex h-full flex-col bg-white rounded-lg shadow-rad-lg overflow-hidden border border-slate-200">
+    <div className="flex h-full flex-col bg-white">
       {/* Header */}
       <div className="border-b border-slate-200 bg-gradient-to-r from-amber-50 to-transparent px-4 py-3">
         <h1 className="text-sm font-semibold text-slate-900">Daily Assistant Meena</h1>
@@ -320,15 +317,5 @@ export function MeenaApp() {
         </div>
       )}
     </div>
-  )
-}
-
-// Placeholder X icon
-function X({ size }: { size: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <line x1="18" y1="6" x2="6" y2="18"></line>
-      <line x1="6" y1="6" x2="18" y2="18"></line>
-    </svg>
   )
 }
