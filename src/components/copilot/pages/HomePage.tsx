@@ -53,7 +53,13 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
     : 'text-lg'
   const actionCardIconSize = isCompact ? 16 : 20
 
-  // Grid columns for action cards
+  // Grid columns based on width - responsive for cards
+  // KPI cards: 1 col if narrow, 2+ cols if wider
+  const kpiGridCols = isCompact
+    ? (isVeryNarrow ? 'grid-cols-1' : isNarrow ? 'grid-cols-1' : isMedium ? 'grid-cols-2' : 'grid-cols-3')
+    : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+
+  // Action cards: 1 col narrow, 2 col wider
   const actionGridCols = isCompact ? 'grid-cols-1' : (isMedium ? 'grid-cols-2' : 'grid-cols-1')
 
   return (
@@ -86,7 +92,7 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
             </div>
           </div>
 
-          <div className={`grid ${layout === 'full' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} ${gap}`}>
+          <div className={`grid ${kpiGridCols} ${gap}`}>
             {/* KPI Card 1 - Portfolio Exposure */}
             <div className={`relative ${isCompact ? (isNarrow ? 'p-2' : 'p-2.5') : 'p-4'} rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full`}>
               {/* Colored Stroke Accent */}
