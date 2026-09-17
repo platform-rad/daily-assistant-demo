@@ -80,7 +80,7 @@ export default function App() {
           onCreateCreditMemo={handleCreateCreditMemo}
         />
       ) : appMode === 'credit-memo-creation' ? (
-        /* Mode Credit-Memo-Creation: Creator + CopilotChat Sidebar */
+        /* Mode Credit-Memo-Creation: Creator + CopilotSidebar */
         <div className="flex h-screen w-screen overflow-hidden bg-slate-200">
           {/* Credit Memo Creator à gauche */}
           <main className="min-w-0 flex-1 overflow-hidden border-r border-slate-300 bg-white">
@@ -90,15 +90,12 @@ export default function App() {
             />
           </main>
 
-          {/* Chat Copilot Sidebar à droite */}
-          <div className="w-96 border-l border-slate-300 bg-white flex flex-col shadow-rad-lg overflow-hidden">
-            <CopilotChat
-              mode="widget"
-              currentRoute={route}
-              onValidateAndEdit={handleValidateAndEdit}
-              onCreateCreditMemo={handleCreateCreditMemo}
-            />
-          </div>
+          {/* Copilot Sidebar à droite - comme MyClientDev */}
+          <CopilotSidebar
+            isCollapsed={false}
+            onToggleCollapse={() => {}}
+            currentRoute={route}
+          />
         </div>
       ) : appMode === 'credit-memo' ? (
         /* Mode Credit-Memo: CreditMemoViewer + CopilotChat */
