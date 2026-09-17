@@ -274,8 +274,9 @@ function ActionCard({ title, description, icon, prompt, onSelect, onCreateCredit
   const handleClick = () => {
     if (title.includes('Credit Memo') && onCreateCreditMemo) {
       onCreateCreditMemo()
-    } else {
-      onSelect?.(prompt)
+    } else if (onSelect) {
+      // Send the prompt to the chat
+      onSelect(prompt)
     }
   }
 
