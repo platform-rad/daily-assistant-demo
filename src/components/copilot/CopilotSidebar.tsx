@@ -19,8 +19,10 @@ interface CopilotSidebarProps {
 export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, onCreateCreditMemo, currentRoute = 'client' }: CopilotSidebarProps) {
   const [currentView, setCurrentView] = useState<NavView>('home')
   const [showCreditMemoSetup, setShowCreditMemoSetup] = useState(false)
-  const [width, setWidth] = useState(320) // 320px par défaut (w-80)
+  const [width, setWidth] = useState(320) // 320px par défaut
   const [isDragging, setIsDragging] = useState(false)
+  const [dragStartX, setDragStartX] = useState(0)
+  const [dragStartWidth, setDragStartWidth] = useState(0)
   const sidebarRef = useRef<HTMLDivElement>(null)
 
   // Get context from route for dynamic suggestions
@@ -38,34 +40,32 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
     if (!isDragging) return
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!sidebarRef.current) return
-
-      // Get the sidebar's position
-      const sidebarRect = sidebarRef.current.getBoundingClientRect()
-      const sidebarLeft = sidebarRect.left
-
-      // Calculate new width based on mouse position relative to sidebar's left edge
-      const newWidth = Math.max(240, Math.min(800, e.clientX - sidebarLeft))
+      // Calculate delta from drag start
+      const delta = e.clientX - dragStartX
+      const newWidth = Math.max(240, Math.min(800, dragStartWidth + delta))
       setWidth(newWidth)
     }
 
     const handleMouseUp = () => {
       setIsDragging(false)
-      // Remove selection during drag
       document.body.style.userSelect = 'auto'
+      document.body.style.cursor = 'auto'
     }
 
     // Prevent text selection while dragging
     document.body.style.userSelect = 'none'
-    window.addEventListener('mousemove', handleMouseMove)
+    document.body.style.cursor = 'col-resize'
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
     window.addEventListener('mouseup', handleMouseUp)
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
       document.body.style.userSelect = 'auto'
+      document.body.style.cursor = 'auto'
     }
-  }, [isDragging])
+  }, [isDragging, dragStartX, dragStartWidth])
 
   // Handle onSelectPrompt to detect Credit Memo
   const handleSelectPrompt = (prompt: string) => {
@@ -159,7 +159,11 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
       {/* Resize Handle - Enhanced */}
       <div
         ref={sidebarRef}
-        onMouseDown={() => setIsDragging(true)}
+        onMouseDown={(e) => {
+          setIsDragging(true)
+          setDragStartX(e.clientX)
+          setDragStartWidth(width)
+        }}
         className={`absolute left-0 top-0 w-1 h-full cursor-col-resize transition-all ${
           isDragging ? 'bg-purple-500 shadow-lg' : 'hover:bg-purple-400/70 bg-transparent'
         }`}
