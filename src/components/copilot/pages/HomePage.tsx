@@ -26,14 +26,23 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
     }
   }
 
+  const isCompact = layout === 'compact'
+  const px = isCompact ? 'px-2' : 'px-3'
+  const py = isCompact ? 'py-2' : 'py-4'
+  const gap = isCompact ? 'gap-2' : 'gap-3'
+  const spacing = isCompact ? 'space-y-2' : 'space-y-4'
+  const titleSize = isCompact ? 'text-sm' : 'text-lg'
+  const valueSize = isCompact ? 'text-lg' : 'text-2xl'
+  const labelSize = isCompact ? 'text-2xs' : 'text-sm'
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto px-3 py-4 space-y-4">
+        <div className={`mx-auto ${px} ${py} ${spacing}`}>
         {/* What's New - KPIs */}
         <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-slate-900">📊 What's New</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className={`${titleSize} font-bold text-slate-900`}>📊 What's New</h2>
 
             {/* Date Selector */}
             <div className="flex items-center gap-2">
@@ -56,61 +65,61 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
             </div>
           </div>
 
-          <div className={`grid ${layout === 'full' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-3`}>
+          <div className={`grid ${layout === 'full' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} ${gap}`}>
             {/* KPI Card 1 - Portfolio Exposure */}
-            <div className="relative p-4 rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full">
+            <div className={`relative ${isCompact ? 'p-3' : 'p-4'} rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full`}>
               {/* Colored Stroke Accent */}
-              <div className="absolute top-0 left-0 w-1 h-8 bg-purple-500 rounded-br-lg" />
+              <div className={`absolute top-0 left-0 w-1 ${isCompact ? 'h-6' : 'h-8'} bg-purple-500 rounded-br-lg`} />
 
               <div className="flex items-start justify-between flex-1">
                 <div className="flex-1">
-                  <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Exposition Portefeuille</p>
-                  <p className="text-2xl font-bold text-slate-900 mt-2">€847.3M</p>
-                  <p className="text-xs text-purple-600 font-medium mt-1">↑ +5.2% vs hier</p>
+                  <p className={`${labelSize} font-semibold text-slate-600 uppercase tracking-wide`}>Exposition Portefeuille</p>
+                  <p className={`${valueSize} font-bold text-slate-900 ${isCompact ? 'mt-1' : 'mt-2'}`}>€847.3M</p>
+                  <p className={`${labelSize} text-purple-600 font-medium ${isCompact ? 'mt-0.5' : 'mt-1'}`}>↑ +5.2% vs hier</p>
                 </div>
-                <div className="p-2.5 rounded-lg bg-purple-100/60">
-                  <TrendingUp size={20} className="text-purple-600" />
+                <div className={`${isCompact ? 'p-2' : 'p-2.5'} rounded-lg bg-purple-100/60`}>
+                  <TrendingUp size={isCompact ? 16 : 20} className="text-purple-600" />
                 </div>
               </div>
-              <button className="w-full text-xs px-2.5 py-1.5 rounded border hover:bg-purple-50 transition mt-4" style={{ borderColor: '#7D4FFE', color: '#7D4FFE' }}>
+              <button className={`w-full ${labelSize} px-2.5 py-1 rounded border hover:bg-purple-50 transition ${isCompact ? 'mt-2' : 'mt-4'}`} style={{ borderColor: '#7D4FFE', color: '#7D4FFE' }}>
                 Voir détails
               </button>
             </div>
 
             {/* KPI Card 2 - At-Risk Clients */}
-            <div className="relative p-4 rounded-lg border border-red-200 bg-gradient-to-br from-red-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full">
-              <div className="absolute top-0 left-0 w-1 h-8 bg-red-500 rounded-br-lg" />
+            <div className={`relative ${isCompact ? 'p-3' : 'p-4'} rounded-lg border border-red-200 bg-gradient-to-br from-red-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full`}>
+              <div className={`absolute top-0 left-0 w-1 ${isCompact ? 'h-6' : 'h-8'} bg-red-500 rounded-br-lg`} />
 
               <div className="flex items-start justify-between flex-1">
                 <div className="flex-1">
-                  <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Clients À Risque</p>
-                  <p className="text-2xl font-bold text-slate-900 mt-2">12</p>
-                  <p className="text-xs text-red-600 font-medium mt-1">↑ +2 vs semaine passée</p>
+                  <p className={`${labelSize} font-semibold text-slate-600 uppercase tracking-wide`}>Clients À Risque</p>
+                  <p className={`${valueSize} font-bold text-slate-900 ${isCompact ? 'mt-1' : 'mt-2'}`}>12</p>
+                  <p className={`${labelSize} text-red-600 font-medium ${isCompact ? 'mt-0.5' : 'mt-1'}`}>↑ +2 vs semaine passée</p>
                 </div>
-                <div className="p-2.5 rounded-lg bg-red-100/60">
-                  <AlertCircle size={20} className="text-red-600" />
+                <div className={`${isCompact ? 'p-2' : 'p-2.5'} rounded-lg bg-red-100/60`}>
+                  <AlertCircle size={isCompact ? 16 : 20} className="text-red-600" />
                 </div>
               </div>
-              <button className="w-full text-xs px-2.5 py-1.5 rounded border hover:bg-red-50 transition mt-4" style={{ borderColor: '#DC2626', color: '#DC2626' }}>
+              <button className={`w-full ${labelSize} px-2.5 py-1 rounded border hover:bg-red-50 transition ${isCompact ? 'mt-2' : 'mt-4'}`} style={{ borderColor: '#DC2626', color: '#DC2626' }}>
                 Voir détails
               </button>
             </div>
 
             {/* KPI Card 3 - Avg Rating */}
-            <div className="relative p-4 rounded-lg border border-green-200 bg-gradient-to-br from-green-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full">
-              <div className="absolute top-0 left-0 w-1 h-8 bg-green-500 rounded-br-lg" />
+            <div className={`relative ${isCompact ? 'p-3' : 'p-4'} rounded-lg border border-green-200 bg-gradient-to-br from-green-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full`}>
+              <div className={`absolute top-0 left-0 w-1 ${isCompact ? 'h-6' : 'h-8'} bg-green-500 rounded-br-lg`} />
 
               <div className="flex items-start justify-between flex-1">
                 <div className="flex-1">
-                  <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Rating Moyen</p>
-                  <p className="text-2xl font-bold text-slate-900 mt-2">BBB+</p>
-                  <p className="text-xs text-green-600 font-medium mt-1">Stable</p>
+                  <p className={`${labelSize} font-semibold text-slate-600 uppercase tracking-wide`}>Rating Moyen</p>
+                  <p className={`${valueSize} font-bold text-slate-900 ${isCompact ? 'mt-1' : 'mt-2'}`}>BBB+</p>
+                  <p className={`${labelSize} text-green-600 font-medium ${isCompact ? 'mt-0.5' : 'mt-1'}`}>Stable</p>
                 </div>
-                <div className="p-2.5 rounded-lg bg-green-100/60">
-                  <Target size={20} className="text-green-600" />
+                <div className={`${isCompact ? 'p-2' : 'p-2.5'} rounded-lg bg-green-100/60`}>
+                  <Target size={isCompact ? 16 : 20} className="text-green-600" />
                 </div>
               </div>
-              <button className="w-full text-xs px-2.5 py-1.5 rounded border hover:bg-green-50 transition mt-4" style={{ borderColor: '#16A34A', color: '#16A34A' }}>
+              <button className={`w-full ${labelSize} px-2.5 py-1 rounded border hover:bg-green-50 transition ${isCompact ? 'mt-2' : 'mt-4'}`} style={{ borderColor: '#16A34A', color: '#16A34A' }}>
                 Voir détails
               </button>
             </div>
@@ -118,6 +127,7 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
         </section>
 
         {/* Top Recommendations */}
+        {!isCompact && (
         <section>
           <h2 className="text-lg font-bold text-slate-900 mb-4">⭐ Top Recommandations pour vous</h2>
 
@@ -155,12 +165,15 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
             </div>
           </div>
         </section>
+        )}
 
         {/* Start From Scratch - Action Categories */}
         <section>
-          <h2 className="text-lg font-bold text-slate-900 mb-4">🚀 Commencer une nouvelle action</h2>
+          <h2 className={`${isCompact ? 'text-sm' : 'text-lg'} font-bold text-slate-900 ${isCompact ? 'mb-2' : 'mb-4'}`}>
+            {isCompact ? '🚀 Nouvelles actions' : '🚀 Commencer une nouvelle action'}
+          </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className={`grid ${layout === 'full' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} ${gap}`}>
             {/* Action Card 1 */}
             <ActionCard
               title="Analyser un Client"
@@ -219,6 +232,7 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
         </section>
 
         {/* Pinned Conversations */}
+        {!isCompact && (
         <section>
           <h2 className="text-lg font-bold text-slate-900 mb-4">📌 Conversations Épinglées</h2>
 
@@ -235,11 +249,12 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
             />
           </div>
         </section>
+        )}
         </div>
       </div>
 
       {/* Chat Input Footer */}
-      <div className="border-t border-slate-200 bg-white p-4 flex-shrink-0">
+      <div className={`border-t border-slate-200 bg-white ${isCompact ? 'p-2' : 'p-4'} flex-shrink-0`}>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <input
@@ -247,14 +262,14 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendChat()}
-              placeholder="Posez votre question ou utilisez une action..."
-              className="w-full h-10 rounded-lg border border-slate-200 bg-white pl-3 pr-10 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
+              placeholder={isCompact ? "Question..." : "Posez votre question ou utilisez une action..."}
+              className={`w-full ${isCompact ? 'h-8' : 'h-10'} rounded-lg border border-slate-200 bg-white pl-3 pr-10 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500`}
             />
             <button
               onClick={handleSendChat}
               className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-purple-50 rounded transition"
             >
-              <Send size={18} className="text-purple-600" />
+              <Send size={isCompact ? 14 : 18} className="text-purple-600" />
             </button>
           </div>
         </div>

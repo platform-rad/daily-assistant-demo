@@ -6,7 +6,7 @@ import { FavoritesPage } from './pages/FavoritesPage'
 import { ActiveActionsPage } from './pages/ActiveActionsPage'
 import { SidebarNav, type NavView } from './SidebarNav'
 import { CreditMemoSetup } from './CreditMemoSetup'
-import { ContextualSuggestions } from './ContextualSuggestions'
+import { ContextualActionsPanel } from './ContextualActionsPanel'
 
 interface CopilotSidebarProps {
   isCollapsed: boolean
@@ -120,14 +120,11 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
 
       {/* Contextual Suggestions (Quick Actions based on current context) */}
       {currentView === 'home' && (
-        <div className="px-3 py-3 border-b border-slate-200 bg-slate-50">
-          <p className="text-2xs font-semibold text-slate-600 uppercase mb-2">Actions rapides</p>
-          <ContextualSuggestions
-            context={displayContext}
-            onActionClick={handleSelectPrompt}
-            contextData={{}}
-          />
-        </div>
+        <ContextualActionsPanel
+          context={displayContext}
+          onActionClick={handleSelectPrompt}
+          initialExpanded={true}
+        />
       )}
 
       {/* Pages Content */}

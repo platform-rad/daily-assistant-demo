@@ -54,13 +54,13 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
         <div className="border-t border-slate-200 bg-slate-50">
           <nav className="px-2 py-2 space-y-1">
             {navItems.map((item) => (
-              <div key={item.id} className="group">
+              <div key={item.id} className="group flex items-center">
                 <button
                   onClick={() => {
                     onViewChange(item.id)
                     setMenuOpen(false)
                   }}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition ${
+                  className={`flex-1 flex items-center gap-3 px-3 py-2.5 rounded-lg transition text-left ${
                     currentView === item.id
                       ? 'text-white'
                       : 'text-slate-700 hover:bg-slate-100'
@@ -71,14 +71,14 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
                       : {}
                   }
                 >
-                  <span>{item.icon}</span>
-                  <span className="text-sm font-medium flex-1">{item.label}</span>
+                  <span className="flex-shrink-0">{item.icon}</span>
+                  <span className="text-sm font-medium">{item.label}</span>
                 </button>
 
-                {/* Pin Button (appears on hover) */}
+                {/* Pin Button - Always visible, at right */}
                 <button
                   onClick={() => togglePin(item.id)}
-                  className="absolute right-3 p-1.5 opacity-0 group-hover:opacity-100 transition hover:bg-slate-200 rounded"
+                  className="p-1.5 opacity-0 group-hover:opacity-100 transition hover:bg-slate-200 rounded flex-shrink-0"
                   title={pinnedTabs.includes(item.id) ? 'Dépingler' : 'Épingler'}
                 >
                   {pinnedTabs.includes(item.id) ? (
