@@ -1,0 +1,10 @@
+/Users/annesophie.leroy/Desktop/Giftproject/daily-assistant/src-tauri/target/debug/deps/cargo_toml-7c7a032d10cafd7f.d: /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/cargo_toml.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/afs.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/error.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/inheritable.rs
+
+/Users/annesophie.leroy/Desktop/Giftproject/daily-assistant/src-tauri/target/debug/deps/libcargo_toml-7c7a032d10cafd7f.rlib: /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/cargo_toml.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/afs.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/error.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/inheritable.rs
+
+/Users/annesophie.leroy/Desktop/Giftproject/daily-assistant/src-tauri/target/debug/deps/libcargo_toml-7c7a032d10cafd7f.rmeta: /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/cargo_toml.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/afs.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/error.rs /Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/inheritable.rs
+
+/Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/cargo_toml.rs:
+/Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/afs.rs:
+/Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/error.rs:
+/Users/annesophie.leroy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo_toml-0.22.3/src/inheritable.rs:

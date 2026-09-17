@@ -18,6 +18,8 @@ export interface OrchestratedAction {
   steps: string[]
   status: ActionStatus
   results?: string
+  /** Destination après validation: 'client-dev', 'credit-app', ou 'credit-memo' */
+  validationDestination?: 'client-dev' | 'credit-app' | 'credit-memo'
 }
 
 export interface CopilotMessage {

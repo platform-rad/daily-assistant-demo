@@ -1,17 +1,26 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, X } from 'lucide-react'
+import { Send, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { CopilotMessage, OrchestratedAction } from '@/data/orchestrator'
-import { DEMO_SCENARIO } from '@/data/orchestrator'
 import { ActionCard } from './ActionCard'
 import { ToolPreview } from './ToolPreview'
+import { StandaloneView } from './StandaloneView'
+import { CONTEXTUAL_RESPONSES } from '@/data/contextualResponses'
+
+import type { HostRoute } from '@/data/types'
 
 export interface CopilotChatProps {
   /** Mode d'affichage: standalone ou widget */
   mode?: 'standalone' | 'widget'
+  /** Route actuelle pour le contexte */
+  currentRoute?: HostRoute
+  /** Callback pour basculer vers MyClientDev pour éditer */
+  onValidateAndEdit?: (route: HostRoute) => void
+  /** Callback pour créer un Credit Memo */
+  onCreateCreditMemo?: () => void
 }
 
-export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
+export function CopilotChat({ mode = 'standalone', onValidateAndEdit, onCreateCreditMemo }: CopilotChatProps) {
   const [messages, setMessages] = useState<CopilotMessage[]>([
     {
       id: '0',
@@ -24,6 +33,7 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
 
   const [input, setInput] = useState('')
   const [selectedToolId, setSelectedToolId] = useState<string | null>(null)
+  const [detectedContext, setDetectedContext] = useState('myClientDev')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -31,10 +41,18 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  // Simuler la détection contextuelle
+  useEffect(() => {
+    const contexts = ['myClientDev', 'myCreditApp', 'dashboard', 'reporting']
+    const interval = setInterval(() => {
+      setDetectedContext(contexts[Math.floor(Math.random() * contexts.length)])
+    }, 30000) // Changer tous les 30 secondes
+    return () => clearInterval(interval)
+  }, [])
+
   const handleSendMessage = () => {
     if (!input.trim()) return
 
-    // Ajouter le message utilisateur
     const userMessage: CopilotMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -45,26 +63,60 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
     setMessages((prev) => [...prev, userMessage])
     setInput('')
 
-    // Simuler une réponse de l'IA avec les actions
     setTimeout(() => {
-      const action: OrchestratedAction = {
-        id: 'action-1',
-        toolId: 'my-client-dev',
-        analysis: DEMO_SCENARIO.aiAnalysis,
-        summary: 'Créer client + facility de crédit',
-        steps: DEMO_SCENARIO.steps,
-        status: 'pending',
+      // Trouver la réponse contextuelle qui match le prompt
+      const contextData = CONTEXTUAL_RESPONSES[detectedContext] || {}
+      let contextualResponse = null
+
+      // Chercher une réponse qui match le contenu du message
+      const inputLower = input.toLowerCase()
+      for (const [key, response] of Object.entries(contextData)) {
+        const keyLower = key.toLowerCase()
+        // Vérifier si le message contient les mots-clés de la clé
+        if (keyLower.split(' ').some(word => inputLower.includes(word.substring(0, 5)))) {
+          contextualResponse = response
+          break
+        }
       }
 
-      const assistantMessage: CopilotMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: action.analysis,
-        timestamp: new Date(),
-        actions: [action],
+      // Si pas trouvée, utiliser la première réponse du contexte
+      if (!contextualResponse) {
+        const responses = Object.values(contextData)
+        contextualResponse = responses.length > 0 ? responses[0] : null
       }
 
-      setMessages((prev) => [...prev, assistantMessage])
+      // Si toujours pas de réponse, afficher un message par défaut
+      if (contextualResponse) {
+        const action: OrchestratedAction = {
+          id: 'action-1',
+          toolId: contextualResponse.toolsNeeded[0] === 'my-credit-app' ? 'my-credit-app' : 'my-client-dev',
+          analysis: contextualResponse.analysis,
+          summary: contextualResponse.summary,
+          steps: contextualResponse.steps,
+          status: 'pending',
+          validationDestination: contextualResponse.validationDestination,
+        }
+
+        const assistantMessage: CopilotMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: action.analysis,
+          timestamp: new Date(),
+          actions: [action],
+        }
+
+        setMessages((prev) => [...prev, assistantMessage])
+      } else {
+        // Message par défaut si aucune réponse contextuelle trouvée
+        const assistantMessage: CopilotMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: 'Je comprends votre demande. Je peux vous aider avec l\'analyse de portefeuille, l\'extraction de données, ou la création de documents. Pouvez-vous préciser ce que vous souhaitez faire?',
+          timestamp: new Date(),
+        }
+
+        setMessages((prev) => [...prev, assistantMessage])
+      }
     }, 500)
   }
 
@@ -83,7 +135,6 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
       })
     )
 
-    // Simuler l'exécution
     setTimeout(() => {
       setMessages((prev) =>
         prev.map((msg) => {
@@ -105,12 +156,11 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
         })
       )
 
-      // Ajouter un message de confirmation
       const confirmMessage: CopilotMessage = {
         id: (Date.now() + 100).toString(),
         role: 'assistant',
         content:
-          'Les opérations ont été complétées avec succès! Vous pouvez maintenant consulter les détails dans les systèmes ou éditer les informations.',
+          'Les opérations ont été complétées avec succès! Cliquez "Valider & Éditer" pour ouvrir le détail dans MyClientDev et continuer à discuter.',
         timestamp: new Date(),
       }
 
@@ -118,75 +168,106 @@ export function CopilotChat({ mode = 'standalone' }: CopilotChatProps) {
     }, 2000)
   }
 
+  const handleValidateAndEdit = (destination?: 'client-dev' | 'credit-app' | 'credit-memo') => {
+    // Router vers la destination appropriée
+    if (destination === 'credit-memo') {
+      onCreateCreditMemo?.()
+    } else {
+      // Par défaut, basculer vers MyClientDev en mode édition
+      onValidateAndEdit?.('client-edit')
+    }
+  }
+
   const handleOpenTool = (toolId: string) => {
     setSelectedToolId(toolId)
   }
 
+  // Si mode standalone, afficher la nouvelle interface avec navigation
+  if (mode === 'standalone') {
+    return (
+      <StandaloneView
+        onSelectPrompt={(prompt) => {
+          setInput(prompt)
+          inputRef.current?.focus()
+        }}
+        onCreateCreditMemo={onCreateCreditMemo}
+      />
+    )
+  }
+
   return (
-    <div className={`flex h-full flex-col bg-white ${mode === 'widget' ? 'rounded-lg shadow-lg' : ''}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between border-b bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-4 text-white">
-        <div>
-          <h1 className="text-lg font-bold">Daily Assistant</h1>
-          <p className="text-xs text-blue-100">Copilot métier</p>
-        </div>
-        {mode === 'widget' && (
-          <button className="rounded p-1 hover:bg-blue-500">
-            <X size={20} />
-          </button>
-        )}
+    <div className={`flex h-full flex-col bg-white ${mode === 'widget' ? 'rounded-lg shadow-rad-lg' : ''}`}>
+      {/* Header - RAD Indigo */}
+      <div className={`border-b px-4 py-3 ${
+        mode === 'widget'
+          ? 'bg-gradient-to-r from-rad-indigo-600 to-rad-indigo-700 text-white border-rad-indigo-700'
+          : 'bg-white border-slate-200'
+      }`}>
+        <h1 className={`text-sm font-semibold ${mode === 'widget' ? 'text-white' : 'text-slate-900'}`}>Daily Assistant</h1>
+        <p className={`text-2xs mt-0.5 ${mode === 'widget' ? 'text-rad-indigo-100' : 'text-slate-500'}`}>
+          {detectedContext === 'myClientDev' && '📊 MyClientDev'}
+          {detectedContext === 'myCreditApp' && '💳 MyCreditApp'}
+          {detectedContext === 'dashboard' && '📈 Dashboard'}
+          {detectedContext === 'reporting' && '📑 Reporting'}
+        </p>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-4 p-4">
-        {messages.map((message) => (
-          <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div
-              className={`max-w-md rounded-lg px-4 py-3 ${
-                message.role === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-900'
-              }`}
-            >
-              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="space-y-3">
+          {messages.map((message) => (
+            <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div
+                className={`max-w-sm rounded-lg px-3 py-2 text-xs ${
+                  message.role === 'user'
+                    ? 'bg-rad-indigo-600 text-white'
+                    : 'bg-slate-100 text-slate-900'
+                }`}
+              >
+                <p className="whitespace-pre-wrap">{message.content}</p>
 
-              {/* Actions */}
-              {message.actions && (
-                <div className="mt-4 space-y-3">
-                  {message.actions.map((action) => (
-                    <ActionCard
-                      key={action.id}
-                      action={action}
-                      onAuthorize={() => handleAuthorizeAction(message.id, action.id)}
-                      onOpenTool={handleOpenTool}
-                    />
-                  ))}
-                </div>
-              )}
+                {message.actions && (
+                  <div className="mt-3 space-y-2">
+                    {message.actions.map((action) => (
+                      <ActionCard
+                        key={action.id}
+                        action={action}
+                        onAuthorize={() => handleAuthorizeAction(message.id, action.id)}
+                        onOpenTool={handleOpenTool}
+                        onValidate={handleValidateAndEdit}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
-      {/* Input */}
-      <div className="border-t bg-gray-50 p-4">
-        <div className="flex gap-3">
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Décrivez ce que vous voulez faire..."
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+      {/* Input - Composer style */}
+      <div className="shrink-0 border-t border-slate-200 bg-white px-2.5 py-2.5">
+        <div className="flex gap-1.5">
+          <div className="relative flex-1">
+            <Sparkles className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-rad-indigo-500" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              placeholder="Décrivez ce que vous voulez faire…"
+              className="h-9 w-full rounded border border-slate-200 bg-white pl-8 pr-2.5 text-xs focus:border-rad-indigo-300 focus:outline-none focus:ring-1 focus:ring-rad-indigo-500"
+            />
+          </div>
           <Button
             onClick={handleSendMessage}
             disabled={!input.trim()}
-            className="bg-blue-600 hover:bg-blue-700"
+            size="sm"
+            className="h-9 bg-rad-indigo-600 hover:bg-rad-indigo-700 text-white"
           >
-            <Send size={20} />
+            <Send size={16} />
           </Button>
         </div>
       </div>

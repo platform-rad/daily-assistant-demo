@@ -1,175 +1,173 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useState, useRef, useEffect } from 'react'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { MyClientDev } from '@/components/host/MyClientDev'
-import { CollapsedPill, DEFAULT_PILL_TOP } from '@/components/assistant/CollapsedPill'
-import {
-  DailyAssistant,
-  type AssistantMode,
-  type AssistantView,
-} from '@/components/assistant/DailyAssistant'
-import { CopilotChat } from '@/components/copilot/CopilotChat'
-import { AGENTS, DEFAULT_PINNED, MAX_PINNED } from '@/data/agents'
-import { BRIEFING_ALERTS } from '@/data/briefing'
-import { ROUTES } from '@/data/hostRoutes'
-import type { BriefingAlert, HostRoute } from '@/data/types'
-import { fakeLatency } from '@/lib/utils'
+import { CopilotSidebar } from '@/components/copilot/CopilotSidebar'
+import { CreditMemoViewer } from '@/components/credit-memo/CreditMemoViewer'
+import { CreditMemoCreator } from '@/components/copilot/CreditMemoCreator'
+import { CreditMemoChat } from '@/components/copilot/CreditMemoChat'
+import { DesktopEnvironment } from '@/components/desktop/DesktopEnvironment'
+import { Sparkles, X } from 'lucide-react'
+import type { HostRoute } from '@/data/types'
 
-const PENDING_COUNT = BRIEFING_ALERTS.filter((a) => a.severity !== 'low').length
-
-export type AppMode = 'standalone' | 'legacy' | 'widget'
+export type AppMode = 'desktop' | 'legacy' | 'credit-memo-creation' | 'credit-memo'
 
 export default function App() {
-  const [appMode, setAppMode] = useState<AppMode>('standalone')
-  const [mode, setMode] = useState<AssistantMode>('widget')
-  const [view, setView] = useState<AssistantView>('home')
-  const [docId, setDocId] = useState<'cbs' | 'memo'>('cbs')
-  const [activeAgentId, setActiveAgentId] = useState('client-market-intel')
-  const [pinned, setPinned] = useState<string[]>(DEFAULT_PINNED)
-  const [generatingTarget, setGeneratingTarget] = useState<string | null>(null)
-  // Position verticale de la pilule réduite — conservée entre deux ouvertures.
-  const [pillTop, setPillTop] = useState(DEFAULT_PILL_TOP)
-  // Écran courant de l'application hôte.
+  const [appMode, setAppMode] = useState<AppMode>('desktop')
   const [route, setRoute] = useState<HostRoute>('client')
+  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [buttonY, setButtonY] = useState(50)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState(0)
+  const [selectedField, setSelectedField] = useState<string | null>(null)
+  const [sourceDocument, setSourceDocument] = useState<{ fieldName: string; documentName: string } | null>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
-  /**
-   * Le changement d'écran hôte réoriente l'agent mis en avant — sauf si
-   * l'utilisateur a choisi son agent à la main, auquel cas on ne le contredit pas.
-   */
-  const agentPickedByUser = useRef(false)
-  useEffect(() => {
-    if (agentPickedByUser.current) return
-    setActiveAgentId(ROUTES[route].suggestedAgentId)
-  }, [route])
-
-  /** Épinglage des favoris, plafonné à 3 priorités. */
-  const togglePin = useCallback((id: string) => {
-    setPinned((current) => {
-      if (current.includes(id)) return current.filter((p) => p !== id)
-      if (current.length >= MAX_PINNED) return [...current.slice(1), id]
-      return [...current, id]
-    })
-  }, [])
-
-  /** Génération simulée d'1 s, puis bascule en Split View sur le document. */
-  const openDocument = useCallback(async (doc: 'cbs' | 'memo', key: string) => {
-    setGeneratingTarget(key)
-    await fakeLatency(1000)
-    setDocId(doc)
-    setView('workspace')
-    setMode('split')
-    setActiveAgentId(doc === 'cbs' ? 'cbs-cap' : 'briefing-memo')
-    agentPickedByUser.current = true
-    setGeneratingTarget(null)
-  }, [])
-
-  const openDocFromAlert = useCallback(
-    (doc: 'cbs' | 'memo', alert: BriefingAlert) => openDocument(doc, `${alert.id}:${doc}`),
-    [openDocument]
-  )
-
-  const openDocFromContext = useCallback(
-    (doc: 'cbs' | 'memo') => openDocument(doc, `context:${doc}`),
-    [openDocument]
-  )
-
-  const selectAgent = useCallback((id: string) => {
-    agentPickedByUser.current = true
-    setActiveAgentId(id)
-    const agent = AGENTS.find((a) => a.id === id)
-    if (agent?.producesDocument) {
-      setDocId(id === 'briefing-memo' ? 'memo' : 'cbs')
-      setView('workspace')
-    } else {
-      setView('home')
-    }
-  }, [])
-
-  /**
-   * Navigation dans l'hôte : l'assistant n'est ni démonté ni réinitialisé.
-   * Si un document est ouvert en co-édition, on le laisse tel quel — changer
-   * d'écran ne doit pas faire perdre les modifications en cours.
-   */
   const navigate = useCallback(
     (next: HostRoute) => {
       setRoute(next)
-      if (view !== 'workspace') agentPickedByUser.current = false
     },
-    [view]
+    []
   )
 
-  /**
-   * Changement d'onglet interne. Revenir à l'accueil recale l'assistant sur
-   * le contexte de l'écran hôte ; entrer en conversation ne le fait pas.
-   */
-  const changeView = useCallback(
-    (next: AssistantView) => {
-      if (next === 'home') {
-        agentPickedByUser.current = false
-        setActiveAgentId(ROUTES[route].suggestedAgentId)
-      }
-      setView(next)
+  const handleCreateCreditMemo = useCallback(
+    () => {
+      // Basculer vers le mode Credit-Memo-Creation (wizard)
+      setAppMode('credit-memo-creation')
     },
-    [route]
+    []
   )
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true)
+    setDragStart(e.clientY - buttonY)
+  }
+
+  useEffect(() => {
+    if (!isDragging) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const newY = e.clientY - dragStart
+      // Limiter entre 50px du haut et 50px du bas
+      const constrainedY = Math.max(0, Math.min(newY, window.innerHeight - 60))
+      setButtonY(constrainedY)
+    }
+
+    const handleMouseUp = () => {
+      setIsDragging(false)
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging, dragStart])
 
   return (
     <TooltipProvider delayDuration={150}>
-      {appMode === 'standalone' ? (
-        /* Mode Standalone: Copilot Chat uniquement */
-        <div className="h-screen w-screen">
-          <CopilotChat mode="standalone" />
-          <div className="fixed bottom-4 left-4 z-40">
-            <button
-              onClick={() => setAppMode('legacy')}
-              className="px-3 py-1 text-xs rounded bg-gray-600 text-white hover:bg-gray-700 opacity-50 hover:opacity-100"
-            >
-              Mode Legacy
-            </button>
+      {appMode === 'desktop' ? (
+        /* Mode Desktop: Simulation d'un environnement Windows */
+        <DesktopEnvironment
+          onOpenMyClientDev={() => setAppMode('legacy')}
+          onCreateCreditMemo={handleCreateCreditMemo}
+        />
+      ) : appMode === 'credit-memo-creation' ? (
+        /* Mode Credit-Memo-Creation: Creator + CreditMemoChat */
+        <div className="flex h-screen w-screen overflow-hidden bg-slate-200">
+          {/* Credit Memo Creator à gauche */}
+          <main className="min-w-0 flex-1 overflow-hidden border-r border-slate-300 bg-white">
+            <CreditMemoCreator
+              onComplete={() => setAppMode('credit-memo')}
+              onCancel={() => setAppMode('desktop')}
+              onSelectField={setSelectedField}
+              onViewSourceDocument={(fieldName, source) =>
+                setSourceDocument({ fieldName, documentName: source })
+              }
+            />
+          </main>
+
+          {/* Credit Memo Chat Sidebar à droite - Focused on creation */}
+          <div className="w-96 border-l border-slate-300 bg-white flex flex-col shadow-rad-lg overflow-hidden">
+            <CreditMemoChat
+              selectedContent={selectedField || undefined}
+              sourceDocument={sourceDocument}
+              onCloseSourceDocument={() => setSourceDocument(null)}
+            />
+          </div>
+        </div>
+      ) : appMode === 'credit-memo' ? (
+        /* Mode Credit-Memo: CreditMemoViewer + CreditMemoChat */
+        <div className="flex h-screen w-screen overflow-hidden bg-slate-200">
+          {/* Credit Memo Editor à gauche */}
+          <main className="min-w-0 flex-1 overflow-hidden">
+            <CreditMemoViewer
+              clientName="TechCorp France"
+              onClose={() => setAppMode('desktop')}
+            />
+          </main>
+
+          {/* Credit Memo Chat Sidebar à droite - Pour discuter du memo */}
+          <div className="w-96 border-l border-slate-300 bg-white flex flex-col shadow-rad-lg overflow-hidden">
+            <CreditMemoChat
+              selectedContent={selectedField || undefined}
+              sourceDocument={sourceDocument}
+              onCloseSourceDocument={() => setSourceDocument(null)}
+            />
           </div>
         </div>
       ) : (
-        /* Mode Legacy: MyClientDev + DailyAssistant */
-        <div className="flex h-screen w-screen overflow-hidden bg-slate-200">
-          {/* Application hôte — se resserre à 50 % en Split View */}
-          <main className="min-w-0 flex-1 overflow-hidden">
-            <MyClientDev route={route} onNavigate={navigate} compact={mode === 'split'} />
-          </main>
-
-          {/* Compagnon ancré à droite, persistant d'un écran hôte à l'autre */}
-          {mode === 'collapsed' ? (
-            <CollapsedPill
-              count={PENDING_COUNT}
-              onOpen={() => setMode('widget')}
-              top={pillTop}
-              onTopChange={setPillTop}
-            />
-          ) : (
-            <DailyAssistant
-              mode={mode}
-              view={view}
-              docId={docId}
-              activeAgentId={activeAgentId}
-              pinned={pinned}
-              generatingTarget={generatingTarget}
-              route={route}
-              onViewChange={changeView}
-              onContextAction={openDocFromContext}
-              onSelectAgent={selectAgent}
-              onTogglePin={togglePin}
-              onToggleMode={() => setMode((m) => (m === 'split' ? 'widget' : 'split'))}
-              onCollapse={() => setMode('collapsed')}
-              onOpenDoc={openDocFromAlert}
-              onSwitchDoc={setDocId}
-            />
-          )}
-
-          <div className="fixed bottom-4 right-4 z-40">
+        /* Mode Legacy: MyClientDev with optional Copilot Sidebar */
+        <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-200 relative">
+          {/* Top Bar with Close Button */}
+          <div className="flex-shrink-0 bg-white border-b border-slate-200 px-3 py-2 flex items-center gap-3">
             <button
-              onClick={() => setAppMode('standalone')}
-              className="px-3 py-1 text-xs rounded bg-gray-600 text-white hover:bg-gray-700 opacity-50 hover:opacity-100"
+              onClick={() => setAppMode('desktop')}
+              className="p-1.5 hover:bg-red-100 rounded-lg transition flex-shrink-0"
+              title="Retour au desktop"
             >
-              Mode Standalone
+              <X size={20} className="text-red-500" />
             </button>
+            <div className="flex-1" />
+          </div>
+
+          {/* Main Content Area */}
+          <div className="flex flex-1 min-w-0 overflow-hidden">
+            {/* Application hôte */}
+            <main className="min-w-0 flex-1 overflow-hidden">
+              <MyClientDev route={route} onNavigate={navigate} compact={false} />
+            </main>
+
+            {/* Copilot Sidebar */}
+            <CopilotSidebar
+              isCollapsed={!isChatOpen}
+              onToggleCollapse={() => setIsChatOpen(!isChatOpen)}
+              onSelectPrompt={() => {
+                // Prompts from sidebar suggestions are handled internally
+              }}
+              onCreateCreditMemo={handleCreateCreditMemo}
+              currentRoute={route}
+            />
+
+            {/* Sticky button - collé à droite, draggable sur axe Y */}
+            {!isChatOpen && (
+              <button
+                ref={buttonRef}
+                onMouseDown={handleMouseDown}
+                onClick={() => setIsChatOpen(true)}
+                className="fixed w-14 h-14 flex items-center justify-center shadow-2xl hover:shadow-xl transition z-50 cursor-move group"
+                style={{
+                  background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)',
+                  right: '0px',
+                  top: `${buttonY}px`,
+                  borderRadius: '12px 0 0 12px',
+                  border: 'none',
+                }}
+                title="Ouvrir le chat (draggable)"
+              >
+                <Sparkles size={24} className="text-white" />
+              </button>
+            )}
           </div>
         </div>
       )}

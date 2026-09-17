@@ -1,5 +1,7 @@
 export { CopilotChat } from './CopilotChat'
 export { ActionCard } from './ActionCard'
 export { ToolPreview } from './ToolPreview'
+export { SkillSuggestions } from './SkillSuggestions'
+export { ContextualSuggestions } from './ContextualSuggestions'
 export { MyClientDevPreview } from './previews/MyClientDevPreview'
 export { MyCreditAppPreview } from './previews/MyCreditAppPreview'
