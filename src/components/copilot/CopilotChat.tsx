@@ -85,10 +85,12 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
       const contextData = CONTEXTUAL_RESPONSES[detectedContext] || {}
       let contextualResponse = null
 
-      // Chercher une réponse exacte ou approximative
+      // Chercher une réponse qui match le contenu du message
+      const inputLower = input.toLowerCase()
       for (const [key, response] of Object.entries(contextData)) {
-        if (key.toLowerCase().includes(input.toLowerCase().substring(0, 20)) ||
-            input.toLowerCase().includes(key.toLowerCase().substring(0, 15))) {
+        const keyLower = key.toLowerCase()
+        // Vérifier si le message contient les mots-clés de la clé
+        if (keyLower.split(' ').some(word => inputLower.includes(word.substring(0, 5)))) {
           contextualResponse = response
           break
         }
@@ -100,6 +102,7 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
         contextualResponse = responses.length > 0 ? responses[0] : null
       }
 
+      // Si toujours pas de réponse, afficher un message par défaut
       if (contextualResponse) {
         const action: OrchestratedAction = {
           id: 'action-1',
@@ -117,6 +120,16 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
           content: action.analysis,
           timestamp: new Date(),
           actions: [action],
+        }
+
+        setMessages((prev) => [...prev, assistantMessage])
+      } else {
+        // Message par défaut si aucune réponse contextuelle trouvée
+        const assistantMessage: CopilotMessage = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: `Je comprends votre demande. Dans le contexte actuel (${displayContext}), je peux vous aider avec l'analyse de portefeuille, l'extraction de données, ou la création de documents. Pouvez-vous préciser ce que vous souhaitez faire?`,
+          timestamp: new Date(),
         }
 
         setMessages((prev) => [...prev, assistantMessage])

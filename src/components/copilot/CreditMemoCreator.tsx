@@ -17,6 +17,19 @@ interface DataField {
   sourceDocument?: string
 }
 
+const AVAILABLE_FIELDS = [
+  { id: 'contact_person', label: 'Personne Contact' },
+  { id: 'email', label: 'Email' },
+  { id: 'phone', label: 'Téléphone' },
+  { id: 'address', label: 'Adresse' },
+  { id: 'ceo', label: 'PDG' },
+  { id: 'employees', label: 'Nombre d\'employés' },
+  { id: 'revenue_2025', label: 'Revenue 2025' },
+  { id: 'ebitda_2025', label: 'EBITDA 2025' },
+  { id: 'debt_level', label: 'Niveau de dette' },
+  { id: 'currency', label: 'Devise' },
+]
+
 export function CreditMemoCreator({
   onComplete,
   onCancel,
@@ -32,6 +45,7 @@ export function CreditMemoCreator({
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedClient, setSelectedClient] = useState('Financial Services Inc')
   const [uploadedDoc, setUploadedDoc] = useState<UploadedDocument | null>(null)
+  const [showAddFieldDropdown, setShowAddFieldDropdown] = useState(false)
 
   // Préchargé données pour Financial Services Inc avec tracking AI
   const [dataFields, setDataFields] = useState<DataField[]>([
@@ -257,19 +271,29 @@ export function CreditMemoCreator({
     )
   }
 
-  const handleAddField = () => {
-    const newId = `custom_${Date.now()}`
+  const handleAddField = (fieldTemplate: typeof AVAILABLE_FIELDS[0]) => {
+    // Check if field already exists
+    if (dataFields.some(f => f.id === fieldTemplate.id)) {
+      return
+    }
+    const newId = fieldTemplate.id
     setDataFields([
       ...dataFields,
       {
         id: newId,
-        label: 'Nouveau champ',
+        label: fieldTemplate.label,
         value: '',
         originalValue: '',
         isModified: true,
         sourceDocument: undefined,
       },
     ])
+    setShowAddFieldDropdown(false)
+  }
+
+  const getAvailableFields = () => {
+    const existingIds = dataFields.map(f => f.id)
+    return AVAILABLE_FIELDS.filter(f => !existingIds.includes(f.id))
   }
 
   const handleDeleteField = (fieldId: string) => {
@@ -333,38 +357,38 @@ export function CreditMemoCreator({
 
         {/* Step 2: Data Review & Edit */}
         {currentStep === 'data-review' && (
-          <div className="space-y-4">
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-              <h3 className="font-semibold text-slate-900 mb-4">Données pour {selectedClient}</h3>
-              <div className="space-y-3">
+          <div className="space-y-3">
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+              <h3 className="font-semibold text-slate-900 mb-2.5 text-sm">Données pour {selectedClient}</h3>
+              <div className="space-y-2">
                 {dataFields.map((field) => (
                   <div
                     key={field.id}
-                    className="relative p-3 rounded-lg border border-transparent hover:border-purple-300 hover:bg-white transition cursor-pointer group"
+                    className="relative p-2.5 rounded border border-transparent hover:border-purple-300 hover:bg-white transition cursor-pointer group"
                     onMouseEnter={() => onSelectField?.(field.label)}
                     onMouseLeave={() => onSelectField?.(null)}
                   >
                     <label className="text-xs font-medium text-slate-600 block mb-1 group-hover:text-purple-600 transition">{field.label}</label>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       {/* AI Source Indicator or Restart Button */}
                       {!field.isModified && field.sourceDocument ? (
                         <button
                           onClick={() => onViewSourceDocument?.(field.label, field.sourceDocument!)}
-                          className="flex-shrink-0 p-2 rounded hover:bg-purple-200 transition"
+                          className="flex-shrink-0 p-1.5 rounded hover:bg-purple-200 transition"
                           title="Cliquez pour voir la source"
                         >
-                          <Focus size={16} className="text-purple-600" />
+                          <Focus size={14} className="text-purple-600" />
                         </button>
                       ) : field.isModified ? (
                         <button
                           onClick={() => handleResetField(field.id)}
-                          className="flex-shrink-0 p-2 rounded hover:bg-slate-300 transition"
+                          className="flex-shrink-0 p-1.5 rounded hover:bg-slate-300 transition"
                           title="Remettre la valeur d'origine"
                         >
-                          <RotateCcw size={16} className="text-slate-600" />
+                          <RotateCcw size={14} className="text-slate-600" />
                         </button>
                       ) : (
-                        <div className="w-10" />
+                        <div className="w-7" />
                       )}
 
                       {/* Input Field */}
@@ -372,17 +396,17 @@ export function CreditMemoCreator({
                         type="text"
                         value={field.value}
                         onChange={(e) => handleFieldChange(field.id, e.target.value)}
-                        className="flex-1 px-3 py-2 rounded border border-slate-200 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500 group-hover:bg-purple-50 transition"
+                        className="flex-1 px-2.5 py-1.5 rounded border border-slate-200 text-xs focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500 group-hover:bg-purple-50 transition"
                       />
 
                       {/* Delete Button for Custom Fields */}
-                      {field.id.startsWith('custom_') && (
+                      {!['name', 'sector', 'rating', 'exposure', 'status'].includes(field.id) && (
                         <button
                           onClick={() => handleDeleteField(field.id)}
-                          className="flex-shrink-0 p-2 rounded hover:bg-red-100 transition"
+                          className="flex-shrink-0 p-1.5 rounded hover:bg-red-100 transition"
                           title="Supprimer le champ"
                         >
-                          <Trash2 size={16} className="text-red-600" />
+                          <Trash2 size={14} className="text-red-600" />
                         </button>
                       )}
                     </div>
@@ -390,14 +414,35 @@ export function CreditMemoCreator({
                 ))}
               </div>
 
-              {/* Add Field Button */}
-              <button
-                onClick={handleAddField}
-                className="mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 rounded border border-dashed border-purple-300 text-purple-600 hover:bg-purple-100 transition text-sm"
-              >
-                <Plus size={16} />
-                Ajouter un champ
-              </button>
+              {/* Add Field Button with Dropdown */}
+              <div className="mt-2.5 relative">
+                <button
+                  onClick={() => setShowAddFieldDropdown(!showAddFieldDropdown)}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded border border-dashed border-purple-300 text-purple-600 hover:bg-purple-100 transition text-xs font-medium"
+                >
+                  <Plus size={14} />
+                  Ajouter un champ
+                </button>
+
+                {/* Dropdown List */}
+                {showAddFieldDropdown && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10 max-h-40 overflow-y-auto">
+                    {getAvailableFields().length > 0 ? (
+                      getAvailableFields().map((field) => (
+                        <button
+                          key={field.id}
+                          onClick={() => handleAddField(field)}
+                          className="w-full text-left px-3 py-2 text-xs hover:bg-purple-50 transition border-b border-slate-100 last:border-b-0"
+                        >
+                          {field.label}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-xs text-slate-500">Tous les champs sont ajoutés</div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
