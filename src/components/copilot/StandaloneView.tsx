@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Settings } from 'lucide-react'
 import { SideNavigation } from './sidebar/SideNavigation'
 import { HomePage } from './pages/HomePage'
 import { HistoryPage } from './pages/HistoryPage'
@@ -31,14 +30,11 @@ export function StandaloneView({ onSelectPrompt }: StandaloneViewProps) {
         {/* Header */}
         <div className="border-b border-slate-200 bg-white px-6 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-slate-900">
-            {currentView === 'home' && 'Daily Assistant'}
+            {currentView === 'home' && 'Accueil'}
             {currentView === 'history' && 'Historique'}
             {currentView === 'favorites' && 'Prompts Favoris'}
             {currentView === 'active-actions' && 'Actions en Cours'}
           </h1>
-          <button className="p-2 hover:bg-slate-100 rounded-lg transition">
-            <Settings size={20} className="text-slate-600" />
-          </button>
         </div>
 
         {/* Content Area */}

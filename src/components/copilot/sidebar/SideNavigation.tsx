@@ -1,4 +1,4 @@
-import { Home, Clock, Star, Menu, Plus, Zap, Pin, MessageSquare } from 'lucide-react'
+import { Home, Clock, Star, Menu, Plus, Zap, Pin, MessageSquare, Settings } from 'lucide-react'
 
 interface SideNavigationProps {
   isOpen: boolean
@@ -40,16 +40,16 @@ export function SideNavigation({ isOpen, currentView, onViewChange, onToggleSide
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-lg">
               🤖
             </div>
-            <span className="font-bold text-slate-900">Daily Assistant</span>
+            <span className="font-bold text-slate-900">Copilot</span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">Copilot Métier BNP</p>
+          <p className="text-xs text-slate-500 mt-1">Métier BNP</p>
         </div>
 
         {/* Create Action Button */}
         <div className="p-4 border-b border-slate-200">
           <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium hover:from-orange-600 hover:to-orange-700 transition">
             <Plus size={18} />
-            <span>+ Nouveau</span>
+            <span>Nouveau</span>
           </button>
         </div>
 
@@ -116,12 +116,12 @@ export function SideNavigation({ isOpen, currentView, onViewChange, onToggleSide
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-slate-200 p-4 bg-slate-50">
-          <div className="text-xs text-slate-500 space-y-1">
-            <p>💡 Conseil du jour:</p>
-            <p className="text-2xs">"Utilisez les prompts favoris pour accélérer vos analyses"</p>
-          </div>
+        {/* Settings Footer */}
+        <div className="border-t border-slate-200 px-3 py-4 bg-white">
+          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition">
+            <Settings size={18} />
+            <span className="text-sm font-medium">Paramètres</span>
+          </button>
         </div>
       </div>
 

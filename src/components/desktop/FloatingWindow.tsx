@@ -94,7 +94,7 @@ export function FloatingWindow({
       {/* Title Bar */}
       <div
         onMouseDown={handleMouseDown}
-        className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-3 rounded-t-lg flex items-center justify-between cursor-move hover:from-orange-600 hover:to-orange-700 select-none"
+        className="bg-gradient-to-r from-orange-500/90 to-orange-600/90 text-white px-4 py-3 rounded-t-lg flex items-center justify-between cursor-move hover:from-orange-600/95 hover:to-orange-700/95 select-none transition"
       >
         <div className="flex items-center gap-2 flex-1">
           {icon && <span className="text-lg">{icon}</span>}
