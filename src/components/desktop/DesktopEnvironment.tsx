@@ -3,20 +3,16 @@ import { MessageSquare, Mic } from 'lucide-react'
 import { FloatingWindow } from './FloatingWindow'
 import { Taskbar } from './Taskbar'
 import { CopilotChat } from '@/components/copilot/CopilotChat'
-
-interface DesktopEnvironmentProps {
-  onOpenMyClientDev?: () => void
-  onCreateCreditMemo?: () => void
-  onOpenMeena?: () => void
-}
+import { MeenaInterface } from '@/components/meena/MeenaInterface'
 
 interface DesktopEnvironmentProps {
   onOpenMyClientDev?: () => void
   onCreateCreditMemo?: () => void
 }
 
-export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo, onOpenMeena }: DesktopEnvironmentProps) {
+export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: DesktopEnvironmentProps) {
   const [chatOpen, setChatOpen] = useState(false)
+  const [meenaOpen, setMeenaOpen] = useState(false)
   const [currentTime, setCurrentTime] = useState('')
 
   useEffect(() => {
@@ -35,7 +31,7 @@ export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo, onOp
     } else if (appId === 'myclientdev') {
       onOpenMyClientDev?.()
     } else if (appId === 'meena') {
-      onOpenMeena?.()
+      setMeenaOpen(!meenaOpen)
     }
   }
 
@@ -132,8 +128,23 @@ export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo, onOp
           </FloatingWindow>
         )}
 
+        {/* Meena Window */}
+        {meenaOpen && (
+          <FloatingWindow
+            title="Meena"
+            icon="🎙️"
+            defaultWidth={900}
+            defaultHeight={800}
+            defaultX={Math.max(20, window.innerWidth - 1820)}
+            defaultY={Math.max(20, 40)}
+            onClose={() => setMeenaOpen(false)}
+          >
+            <MeenaInterface />
+          </FloatingWindow>
+        )}
+
         {/* Desktop context menu hint */}
-        {!chatOpen && (
+        {!chatOpen && !meenaOpen && (
           <div className="fixed bottom-20 right-8 bg-black/40 text-white text-xs px-3 py-2 rounded pointer-events-none">
             💡 Double-cliquez MyClientDev ou utilisez la taskbar
           </div>
