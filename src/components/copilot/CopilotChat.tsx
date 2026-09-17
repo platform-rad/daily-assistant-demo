@@ -6,6 +6,7 @@ import { ActionCard } from './ActionCard'
 import { ToolPreview } from './ToolPreview'
 import { SkillSuggestions } from './SkillSuggestions'
 import { ContextualSuggestions } from './ContextualSuggestions'
+import { StandaloneView } from './StandaloneView'
 import { CONTEXTUAL_RESPONSES } from '@/data/contextualResponses'
 
 import type { HostRoute } from '@/data/types'
@@ -192,6 +193,18 @@ export function CopilotChat({ mode = 'standalone', currentRoute = 'client', onVa
     // Sinon, remplir le champ input comme avant
     setInput(skill)
     inputRef.current?.focus()
+  }
+
+  // Si mode standalone, afficher la nouvelle interface avec navigation
+  if (mode === 'standalone') {
+    return (
+      <StandaloneView
+        onSelectPrompt={(prompt) => {
+          setInput(prompt)
+          inputRef.current?.focus()
+        }}
+      />
+    )
   }
 
   return (
