@@ -55,11 +55,11 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* KPI Card 1 - Portfolio Exposure */}
-            <div className="relative p-4 rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition">
+            <div className="relative p-4 rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full">
               {/* Colored Stroke Accent */}
               <div className="absolute top-0 left-0 w-1 h-8 bg-purple-500 rounded-br-lg" />
 
-              <div className="flex items-start justify-between mb-3">
+              <div className="flex items-start justify-between flex-1">
                 <div className="flex-1">
                   <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Exposition Portefeuille</p>
                   <p className="text-2xl font-bold text-slate-900 mt-2">€847.3M</p>
@@ -69,16 +69,16 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
                   <TrendingUp size={20} className="text-purple-600" />
                 </div>
               </div>
-              <button className="w-full text-xs px-2.5 py-1.5 rounded border hover:bg-purple-50 transition" style={{ borderColor: '#7D4FFE', color: '#7D4FFE' }}>
+              <button className="w-full text-xs px-2.5 py-1.5 rounded border hover:bg-purple-50 transition mt-4" style={{ borderColor: '#7D4FFE', color: '#7D4FFE' }}>
                 Voir détails
               </button>
             </div>
 
             {/* KPI Card 2 - At-Risk Clients */}
-            <div className="relative p-4 rounded-lg border border-red-200 bg-gradient-to-br from-red-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition">
+            <div className="relative p-4 rounded-lg border border-red-200 bg-gradient-to-br from-red-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full">
               <div className="absolute top-0 left-0 w-1 h-8 bg-red-500 rounded-br-lg" />
 
-              <div className="flex items-start justify-between mb-3">
+              <div className="flex items-start justify-between flex-1">
                 <div className="flex-1">
                   <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Clients À Risque</p>
                   <p className="text-2xl font-bold text-slate-900 mt-2">12</p>
@@ -88,16 +88,16 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
                   <AlertCircle size={20} className="text-red-600" />
                 </div>
               </div>
-              <button className="w-full text-xs px-2.5 py-1.5 rounded border hover:bg-red-50 transition" style={{ borderColor: '#DC2626', color: '#DC2626' }}>
+              <button className="w-full text-xs px-2.5 py-1.5 rounded border hover:bg-red-50 transition mt-4" style={{ borderColor: '#DC2626', color: '#DC2626' }}>
                 Voir détails
               </button>
             </div>
 
             {/* KPI Card 3 - Avg Rating */}
-            <div className="relative p-4 rounded-lg border border-green-200 bg-gradient-to-br from-green-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition">
+            <div className="relative p-4 rounded-lg border border-green-200 bg-gradient-to-br from-green-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full">
               <div className="absolute top-0 left-0 w-1 h-8 bg-green-500 rounded-br-lg" />
 
-              <div className="flex items-start justify-between mb-3">
+              <div className="flex items-start justify-between flex-1">
                 <div className="flex-1">
                   <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Rating Moyen</p>
                   <p className="text-2xl font-bold text-slate-900 mt-2">BBB+</p>
@@ -107,7 +107,7 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
                   <Target size={20} className="text-green-600" />
                 </div>
               </div>
-              <button className="w-full text-xs px-2.5 py-1.5 rounded border hover:bg-green-50 transition" style={{ borderColor: '#16A34A', color: '#16A34A' }}>
+              <button className="w-full text-xs px-2.5 py-1.5 rounded border hover:bg-green-50 transition mt-4" style={{ borderColor: '#16A34A', color: '#16A34A' }}>
                 Voir détails
               </button>
             </div>
