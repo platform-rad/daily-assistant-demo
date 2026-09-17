@@ -35,14 +35,9 @@ export function SideNavigation({ isOpen, currentView, onViewChange, onToggleSide
         } bg-white border-r border-slate-200 transition-all duration-300 overflow-hidden flex flex-col`}
       >
         {/* Logo & Brand */}
-        <div className="p-4 border-b border-slate-200">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xl" style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}>
-              🤖
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 font-medium">Métier BNP</p>
-            </div>
+        <div className="p-4 border-b border-slate-200 flex justify-center">
+          <div className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}>
+            🤖
           </div>
         </div>
 

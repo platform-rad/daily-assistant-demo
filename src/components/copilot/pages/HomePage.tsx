@@ -1,4 +1,4 @@
-import { TrendingUp, AlertCircle, Target, Zap, Brain, FileText, BarChart3, ArrowRight, Send } from 'lucide-react'
+import { TrendingUp, AlertCircle, Target, Zap, Brain, FileText, BarChart3, ArrowRight, Send, Clock } from 'lucide-react'
 import { useState } from 'react'
 
 interface HomePageProps {
@@ -7,6 +7,14 @@ interface HomePageProps {
 
 export function HomePage({ onSelectPrompt }: HomePageProps) {
   const [chatInput, setChatInput] = useState('')
+  const [selectedDate, setSelectedDate] = useState('today')
+
+  const dateOptions = [
+    { id: 'today', label: "Aujourd'hui", date: new Date() },
+    { id: 'yesterday', label: 'Hier', date: new Date(Date.now() - 86400000) },
+    { id: '3days', label: 'Il y a 3j', date: new Date(Date.now() - 3 * 86400000) },
+    { id: 'week', label: 'Semaine', date: new Date(Date.now() - 7 * 86400000) },
+  ]
 
   const handleSendChat = () => {
     if (chatInput.trim()) {
@@ -23,9 +31,26 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-slate-900">📊 What's New</h2>
-            <span className="text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 font-medium">
-              Données du jour
-            </span>
+
+            {/* Date Selector */}
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+                {dateOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => setSelectedDate(option.id)}
+                    className={`px-2.5 py-1 rounded text-xs font-medium transition ${
+                      selectedDate === option.id
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              <Clock size={16} className="text-slate-400" />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -34,8 +59,8 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
               {/* Colored Stroke Accent */}
               <div className="absolute top-0 left-0 w-1 h-8 bg-purple-500 rounded-br-lg" />
 
-              <div className="flex items-start justify-between">
-                <div>
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1">
                   <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Exposition Portefeuille</p>
                   <p className="text-2xl font-bold text-slate-900 mt-2">€847.3M</p>
                   <p className="text-xs text-purple-600 font-medium mt-1">↑ +5.2% vs hier</p>
@@ -44,14 +69,17 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
                   <TrendingUp size={20} className="text-purple-600" />
                 </div>
               </div>
+              <button className="w-full text-xs px-2.5 py-1.5 rounded border hover:bg-purple-50 transition" style={{ borderColor: '#7D4FFE', color: '#7D4FFE' }}>
+                Voir détails
+              </button>
             </div>
 
             {/* KPI Card 2 - At-Risk Clients */}
             <div className="relative p-4 rounded-lg border border-red-200 bg-gradient-to-br from-red-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition">
               <div className="absolute top-0 left-0 w-1 h-8 bg-red-500 rounded-br-lg" />
 
-              <div className="flex items-start justify-between">
-                <div>
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1">
                   <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Clients À Risque</p>
                   <p className="text-2xl font-bold text-slate-900 mt-2">12</p>
                   <p className="text-xs text-red-600 font-medium mt-1">↑ +2 vs semaine passée</p>
@@ -60,14 +88,17 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
                   <AlertCircle size={20} className="text-red-600" />
                 </div>
               </div>
+              <button className="w-full text-xs px-2.5 py-1.5 rounded border hover:bg-red-50 transition" style={{ borderColor: '#DC2626', color: '#DC2626' }}>
+                Voir détails
+              </button>
             </div>
 
             {/* KPI Card 3 - Avg Rating */}
             <div className="relative p-4 rounded-lg border border-green-200 bg-gradient-to-br from-green-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition">
               <div className="absolute top-0 left-0 w-1 h-8 bg-green-500 rounded-br-lg" />
 
-              <div className="flex items-start justify-between">
-                <div>
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1">
                   <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Rating Moyen</p>
                   <p className="text-2xl font-bold text-slate-900 mt-2">BBB+</p>
                   <p className="text-xs text-green-600 font-medium mt-1">Stable</p>
@@ -76,6 +107,9 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
                   <Target size={20} className="text-green-600" />
                 </div>
               </div>
+              <button className="w-full text-xs px-2.5 py-1.5 rounded border hover:bg-green-50 transition" style={{ borderColor: '#16A34A', color: '#16A34A' }}>
+                Voir détails
+              </button>
             </div>
           </div>
         </section>
