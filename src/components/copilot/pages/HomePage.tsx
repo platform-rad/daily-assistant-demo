@@ -35,17 +35,26 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
 
   const isCompact = layout === 'compact'
 
-  // Dynamic sizing based on width
-  const px = isVeryNarrow ? 'px-1.5' : isNarrow ? 'px-2' : 'px-3'
-  const py = isVeryNarrow ? 'py-1.5' : isNarrow ? 'py-2' : 'py-4'
-  const gap = isVeryNarrow ? 'gap-1.5' : isNarrow ? 'gap-2' : 'gap-3'
-  const spacing = isVeryNarrow ? 'space-y-1.5' : isNarrow ? 'space-y-2' : 'space-y-4'
-  const titleSize = isVeryNarrow ? 'text-xs' : isNarrow ? 'text-sm' : 'text-lg'
-  const valueSize = isVeryNarrow ? 'text-base' : isNarrow ? 'text-lg' : 'text-2xl'
-  const labelSize = isVeryNarrow ? 'text-3xs' : isNarrow ? 'text-2xs' : 'text-sm'
+  // Dynamic sizing based on width - aggressively compact for sidebar
+  const px = isCompact ? (isVeryNarrow ? 'px-1.5' : isNarrow ? 'px-2' : 'px-2') : 'px-3'
+  const py = isCompact ? (isVeryNarrow ? 'py-1' : isNarrow ? 'py-1.5' : 'py-2') : 'py-4'
+  const gap = isCompact ? (isVeryNarrow ? 'gap-1' : isNarrow ? 'gap-1.5' : 'gap-2') : 'gap-3'
+  const spacing = isCompact ? (isVeryNarrow ? 'space-y-1' : isNarrow ? 'space-y-1.5' : 'space-y-2') : 'space-y-4'
+
+  // Much more aggressive sizing for sidebar
+  const valueSize = isCompact
+    ? (isVeryNarrow ? 'text-sm' : isNarrow ? 'text-base' : 'text-lg')
+    : 'text-2xl'
+  const labelSize = isCompact
+    ? (isVeryNarrow ? 'text-3xs' : isNarrow ? 'text-3xs' : 'text-2xs')
+    : 'text-sm'
+  const sectionTitleSize = isCompact
+    ? (isVeryNarrow ? 'text-2xs' : isNarrow ? 'text-xs' : 'text-sm')
+    : 'text-lg'
+  const actionCardIconSize = isCompact ? 16 : 20
 
   // Grid columns for action cards
-  const actionGridCols = isMedium ? 'grid-cols-2' : 'grid-cols-1'
+  const actionGridCols = isCompact ? 'grid-cols-1' : (isMedium ? 'grid-cols-2' : 'grid-cols-1')
 
   return (
     <div className="flex h-full flex-col">
@@ -53,8 +62,8 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
         <div className={`mx-auto ${px} ${py} ${spacing}`}>
         {/* What's New - KPIs */}
         <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className={`${titleSize} font-bold text-slate-900`}>📊 What's New</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className={`${sectionTitleSize} font-bold text-slate-900`}>📊 What's New</h2>
 
             {/* Date Selector */}
             <div className="flex items-center gap-2">
@@ -79,7 +88,7 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
 
           <div className={`grid ${layout === 'full' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} ${gap}`}>
             {/* KPI Card 1 - Portfolio Exposure */}
-            <div className={`relative ${isCompact ? 'p-3' : 'p-4'} rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full`}>
+            <div className={`relative ${isCompact ? (isNarrow ? 'p-2' : 'p-2.5') : 'p-4'} rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full`}>
               {/* Colored Stroke Accent */}
               <div className={`absolute top-0 left-0 w-1 ${isCompact ? 'h-6' : 'h-8'} bg-purple-500 rounded-br-lg`} />
 
@@ -89,17 +98,17 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
                   <p className={`${valueSize} font-bold text-slate-900 ${isCompact ? 'mt-1' : 'mt-2'}`}>€847.3M</p>
                   <p className={`${labelSize} text-purple-600 font-medium ${isCompact ? 'mt-0.5' : 'mt-1'}`}>↑ +5.2% vs hier</p>
                 </div>
-                <div className={`${isCompact ? 'p-2' : 'p-2.5'} rounded-lg bg-purple-100/60`}>
-                  <TrendingUp size={isCompact ? 16 : 20} className="text-purple-600" />
+                <div className={`${isCompact ? (isNarrow ? 'p-1.5' : 'p-2') : 'p-2.5'} rounded-lg bg-purple-100/60`}>
+                  <TrendingUp size={isCompact ? (isNarrow ? 14 : 16) : 20} className="text-purple-600" />
                 </div>
               </div>
-              <button className={`w-full ${labelSize} px-2.5 py-1 rounded border hover:bg-purple-50 transition ${isCompact ? 'mt-2' : 'mt-4'}`} style={{ borderColor: '#7D4FFE', color: '#7D4FFE' }}>
-                Voir détails
+              <button className={`w-full ${labelSize} px-2 py-0.5 rounded border hover:bg-purple-50 transition ${isCompact ? 'mt-1.5' : 'mt-4'}`} style={{ borderColor: '#7D4FFE', color: '#7D4FFE' }}>
+                {isCompact ? 'Détails' : 'Voir détails'}
               </button>
             </div>
 
             {/* KPI Card 2 - At-Risk Clients */}
-            <div className={`relative ${isCompact ? 'p-3' : 'p-4'} rounded-lg border border-red-200 bg-gradient-to-br from-red-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full`}>
+            <div className={`relative ${isCompact ? (isNarrow ? 'p-2' : 'p-2.5') : 'p-4'} rounded-lg border border-red-200 bg-gradient-to-br from-red-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full`}>
               <div className={`absolute top-0 left-0 w-1 ${isCompact ? 'h-6' : 'h-8'} bg-red-500 rounded-br-lg`} />
 
               <div className="flex items-start justify-between flex-1">
@@ -108,8 +117,8 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
                   <p className={`${valueSize} font-bold text-slate-900 ${isCompact ? 'mt-1' : 'mt-2'}`}>12</p>
                   <p className={`${labelSize} text-red-600 font-medium ${isCompact ? 'mt-0.5' : 'mt-1'}`}>↑ +2 vs semaine passée</p>
                 </div>
-                <div className={`${isCompact ? 'p-2' : 'p-2.5'} rounded-lg bg-red-100/60`}>
-                  <AlertCircle size={isCompact ? 16 : 20} className="text-red-600" />
+                <div className={`${isCompact ? (isNarrow ? 'p-1.5' : 'p-2') : 'p-2.5'} rounded-lg bg-red-100/60`}>
+                  <AlertCircle size={isCompact ? (isNarrow ? 14 : 16) : 20} className="text-red-600" />
                 </div>
               </div>
               <button className={`w-full ${labelSize} px-2.5 py-1 rounded border hover:bg-red-50 transition ${isCompact ? 'mt-2' : 'mt-4'}`} style={{ borderColor: '#DC2626', color: '#DC2626' }}>
@@ -118,7 +127,7 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
             </div>
 
             {/* KPI Card 3 - Avg Rating */}
-            <div className={`relative ${isCompact ? 'p-3' : 'p-4'} rounded-lg border border-green-200 bg-gradient-to-br from-green-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full`}>
+            <div className={`relative ${isCompact ? (isNarrow ? 'p-2' : 'p-2.5') : 'p-4'} rounded-lg border border-green-200 bg-gradient-to-br from-green-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full`}>
               <div className={`absolute top-0 left-0 w-1 ${isCompact ? 'h-6' : 'h-8'} bg-green-500 rounded-br-lg`} />
 
               <div className="flex items-start justify-between flex-1">
@@ -127,8 +136,8 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
                   <p className={`${valueSize} font-bold text-slate-900 ${isCompact ? 'mt-1' : 'mt-2'}`}>BBB+</p>
                   <p className={`${labelSize} text-green-600 font-medium ${isCompact ? 'mt-0.5' : 'mt-1'}`}>Stable</p>
                 </div>
-                <div className={`${isCompact ? 'p-2' : 'p-2.5'} rounded-lg bg-green-100/60`}>
-                  <Target size={isCompact ? 16 : 20} className="text-green-600" />
+                <div className={`${isCompact ? (isNarrow ? 'p-1.5' : 'p-2') : 'p-2.5'} rounded-lg bg-green-100/60`}>
+                  <Target size={isCompact ? (isNarrow ? 14 : 16) : 20} className="text-green-600" />
                 </div>
               </div>
               <button className={`w-full ${labelSize} px-2.5 py-1 rounded border hover:bg-green-50 transition ${isCompact ? 'mt-2' : 'mt-4'}`} style={{ borderColor: '#16A34A', color: '#16A34A' }}>
@@ -181,8 +190,8 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
 
         {/* Start From Scratch - Action Categories */}
         <section>
-          <h2 className={`${isCompact ? 'text-sm' : 'text-lg'} font-bold text-slate-900 ${isCompact ? 'mb-2' : 'mb-4'}`}>
-            {isCompact ? '🚀 Nouvelles actions' : '🚀 Commencer une nouvelle action'}
+          <h2 className={`${sectionTitleSize} font-bold text-slate-900 ${isCompact ? 'mb-1.5' : 'mb-4'}`}>
+            {isCompact ? '🚀 Actions' : '🚀 Commencer une nouvelle action'}
           </h2>
 
           <div className={`grid ${layout === 'full' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : actionGridCols} ${gap}`}>
@@ -190,19 +199,21 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
             <ActionCard
               title="Analyser un Client"
               description="Analyse complète d'un client : exposition, risques, recommandations"
-              icon={<Brain size={20} />}
+              icon={<Brain size={actionCardIconSize} />}
               prompt="Fais une analyse complète de l'exposition de ce client"
               onSelect={onSelectPrompt}
+              isCompact={isCompact}
             />
 
             {/* Action Card 2 */}
             <ActionCard
               title="Créer un Credit Memo"
               description="Génère un memo de crédit détaillé avec tous les éléments"
-              icon={<FileText size={20} />}
+              icon={<FileText size={actionCardIconSize} />}
               prompt="Génère un Credit Memo complet pour ce client"
               onSelect={onSelectPrompt}
               onCreateCreditMemo={onCreateCreditMemo}
+              isCompact={isCompact}
             />
 
             {/* Action Card 3 */}
@@ -297,9 +308,10 @@ interface ActionCardProps {
   prompt: string
   onSelect?: (prompt: string) => void
   onCreateCreditMemo?: () => void
+  isCompact?: boolean
 }
 
-function ActionCard({ title, description, icon, prompt, onSelect, onCreateCreditMemo }: ActionCardProps) {
+function ActionCard({ title, description, icon, prompt, onSelect, onCreateCreditMemo, isCompact = false }: ActionCardProps) {
   const handleClick = () => {
     if (title.includes('Credit Memo') && onCreateCreditMemo) {
       onCreateCreditMemo()
@@ -309,17 +321,23 @@ function ActionCard({ title, description, icon, prompt, onSelect, onCreateCredit
     }
   }
 
+  const cardPadding = isCompact ? 'p-2.5' : 'p-4'
+  const iconPadding = isCompact ? 'p-1.5' : 'p-2'
+  const titleSize = isCompact ? 'text-xs' : 'font-semibold'
+  const descSize = isCompact ? 'text-2xs' : 'text-xs'
+  const arrowSize = isCompact ? 12 : 16
+
   return (
     <button
       onClick={handleClick}
-      className="p-4 rounded-lg border border-slate-200 bg-white hover:border-purple-300 hover:shadow-md hover:bg-purple-50/30 transition group text-left"
+      className={`${cardPadding} rounded-lg border border-slate-200 bg-white hover:border-purple-300 hover:shadow-md hover:bg-purple-50/30 transition group text-left`}
     >
-      <div className="flex items-start justify-between mb-2">
-        <div className="p-2 rounded-lg bg-slate-100 group-hover:bg-purple-100 transition">{icon}</div>
-        <ArrowRight size={16} className="text-slate-400 opacity-0 group-hover:opacity-100 transition" />
+      <div className="flex items-start justify-between mb-1">
+        <div className={`${iconPadding} rounded-lg bg-slate-100 group-hover:bg-purple-100 transition`}>{icon}</div>
+        <ArrowRight size={arrowSize} className="text-slate-400 opacity-0 group-hover:opacity-100 transition" />
       </div>
-      <h3 className="font-semibold text-slate-900 group-hover:text-purple-700 transition">{title}</h3>
-      <p className="text-xs text-slate-600 mt-1">{description}</p>
+      <h3 className={`${titleSize} text-slate-900 group-hover:text-purple-700 transition`}>{title}</h3>
+      <p className={`${descSize} text-slate-600 ${isCompact ? 'mt-0.5' : 'mt-1'}`}>{description}</p>
     </button>
   )
 }
