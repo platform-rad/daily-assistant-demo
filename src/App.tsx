@@ -1,7 +1,6 @@
 import { useCallback, useState, useRef, useEffect } from 'react'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { MyClientDev } from '@/components/host/MyClientDev'
-import { CopilotChat } from '@/components/copilot/CopilotChat'
 import { CopilotSidebar } from '@/components/copilot/CopilotSidebar'
 import { CreditMemoViewer } from '@/components/credit-memo/CreditMemoViewer'
 import { CreditMemoCreator } from '@/components/copilot/CreditMemoCreator'
@@ -26,15 +25,6 @@ export default function App() {
   const navigate = useCallback(
     (next: HostRoute) => {
       setRoute(next)
-    },
-    []
-  )
-
-  const handleValidateAndEdit = useCallback(
-    (route: HostRoute) => {
-      // Basculer vers MyClientDev et ouvrir la page d'édition
-      setAppMode('legacy')
-      setRoute(route)
     },
     []
   )
@@ -107,7 +97,7 @@ export default function App() {
           </div>
         </div>
       ) : appMode === 'credit-memo' ? (
-        /* Mode Credit-Memo: CreditMemoViewer + CopilotChat */
+        /* Mode Credit-Memo: CreditMemoViewer + CreditMemoChat */
         <div className="flex h-screen w-screen overflow-hidden bg-slate-200">
           {/* Credit Memo Editor à gauche */}
           <main className="min-w-0 flex-1 overflow-hidden">
@@ -117,23 +107,13 @@ export default function App() {
             />
           </main>
 
-          {/* Chat Copilot en side panel */}
-          <div className="w-96 border-l border-slate-300 bg-white flex flex-col shadow-rad-lg">
-            <CopilotChat
-              mode="widget"
-              currentRoute={route}
-              onValidateAndEdit={handleValidateAndEdit}
-              onCreateCreditMemo={handleCreateCreditMemo}
+          {/* Credit Memo Chat Sidebar à droite - Pour discuter du memo */}
+          <div className="w-96 border-l border-slate-300 bg-white flex flex-col shadow-rad-lg overflow-hidden">
+            <CreditMemoChat
+              selectedContent={selectedField || undefined}
+              sourceDocument={sourceDocument}
+              onCloseSourceDocument={() => setSourceDocument(null)}
             />
-
-            <div className="border-t border-slate-200 px-4 py-3 bg-slate-50">
-              <button
-                onClick={() => setAppMode('desktop')}
-                className="w-full px-3 py-2 text-2xs rounded bg-slate-200 text-slate-700 hover:bg-slate-300 transition font-medium"
-              >
-                ← Retour Desktop
-              </button>
-            </div>
           </div>
         </div>
       ) : (
