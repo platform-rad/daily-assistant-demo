@@ -3,7 +3,7 @@ import { MessageSquare, Mic } from 'lucide-react'
 import { FloatingWindow } from './FloatingWindow'
 import { Taskbar } from './Taskbar'
 import { CopilotChat } from '@/components/copilot/CopilotChat'
-import { MeenaInterface } from '@/components/meena/MeenaInterface'
+import { MeenaApp } from '@/components/meena/MeenaApp'
 
 interface DesktopEnvironmentProps {
   onOpenMyClientDev?: () => void
@@ -139,7 +139,7 @@ export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: De
             defaultY={Math.max(20, 40)}
             onClose={() => setMeenaOpen(false)}
           >
-            <MeenaInterface />
+            <MeenaApp />
           </FloatingWindow>
         )}
 
