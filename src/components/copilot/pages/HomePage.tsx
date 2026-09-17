@@ -59,8 +59,11 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact
     ? (isVeryNarrow ? 'grid-cols-1' : isNarrow ? 'grid-cols-1' : isMedium ? 'grid-cols-2' : 'grid-cols-3')
     : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
 
-  // Action cards: 1 col narrow, 2 col wider
-  const actionGridCols = isCompact ? 'grid-cols-1' : (isMedium ? 'grid-cols-2' : 'grid-cols-1')
+  // Action cards: responsive layout
+  // Narrow: 1 col, Medium: 2 cols, Wide: 3 cols
+  const actionGridCols = isCompact
+    ? (isVeryNarrow ? 'grid-cols-1' : isNarrow ? 'grid-cols-1' : isMedium ? 'grid-cols-2' : 'grid-cols-3')
+    : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
 
   return (
     <div className="flex h-full flex-col">
@@ -327,23 +330,23 @@ function ActionCard({ title, description, icon, prompt, onSelect, onCreateCredit
     }
   }
 
-  const cardPadding = isCompact ? 'p-2.5' : 'p-4'
-  const iconPadding = isCompact ? 'p-1.5' : 'p-2'
-  const titleSize = isCompact ? 'text-xs' : 'font-semibold'
-  const descSize = isCompact ? 'text-2xs' : 'text-xs'
-  const arrowSize = isCompact ? 12 : 16
+  const cardPadding = isCompact ? 'p-2' : 'p-4'
+  const iconPadding = isCompact ? 'p-1' : 'p-2'
+  const titleSize = isCompact ? 'text-2xs' : 'font-semibold'
+  const descSize = isCompact ? 'text-3xs' : 'text-xs'
+  const arrowSize = isCompact ? 10 : 16
 
   return (
     <button
       onClick={handleClick}
       className={`${cardPadding} rounded-lg border border-slate-200 bg-white hover:border-purple-300 hover:shadow-md hover:bg-purple-50/30 transition group text-left`}
     >
-      <div className="flex items-start justify-between mb-1">
-        <div className={`${iconPadding} rounded-lg bg-slate-100 group-hover:bg-purple-100 transition`}>{icon}</div>
-        <ArrowRight size={arrowSize} className="text-slate-400 opacity-0 group-hover:opacity-100 transition" />
+      <div className="flex items-start justify-between mb-0.5">
+        <div className={`${iconPadding} rounded-lg bg-slate-100 group-hover:bg-purple-100 transition flex-shrink-0`}>{icon}</div>
+        <ArrowRight size={arrowSize} className="text-slate-400 opacity-0 group-hover:opacity-100 transition flex-shrink-0 ml-1" />
       </div>
       <h3 className={`${titleSize} text-slate-900 group-hover:text-purple-700 transition`}>{title}</h3>
-      <p className={`${descSize} text-slate-600 ${isCompact ? 'mt-0.5' : 'mt-1'}`}>{description}</p>
+      <p className={`${descSize} text-slate-600 ${isCompact ? 'mt-0.5' : 'mt-1'} line-clamp-2`}>{description}</p>
     </button>
   )
 }

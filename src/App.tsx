@@ -5,7 +5,7 @@ import { CopilotChat } from '@/components/copilot/CopilotChat'
 import { CopilotSidebar } from '@/components/copilot/CopilotSidebar'
 import { CreditMemoViewer } from '@/components/credit-memo/CreditMemoViewer'
 import { DesktopEnvironment } from '@/components/desktop/DesktopEnvironment'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, X } from 'lucide-react'
 import type { HostRoute } from '@/data/types'
 
 export type AppMode = 'desktop' | 'legacy' | 'credit-memo'
@@ -110,43 +110,60 @@ export default function App() {
         </div>
       ) : (
         /* Mode Legacy: MyClientDev with optional Copilot Sidebar */
-        <div className="flex h-screen w-screen overflow-hidden bg-slate-200 relative">
-          {/* Application hôte */}
-          <main className="min-w-0 flex-1 overflow-hidden">
-            <MyClientDev route={route} onNavigate={navigate} compact={false} />
-          </main>
+        <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-200 relative">
+          {/* Top Bar with Minimize Button */}
+          <div className="flex-shrink-0 bg-white border-b border-slate-200 px-4 py-2 flex items-center justify-between">
+            {isChatOpen && (
+              <button
+                onClick={() => setIsChatOpen(false)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-red-100 transition"
+                title="Fermer le Copilot"
+              >
+                <X size={18} className="text-red-500" />
+                <span className="text-sm text-red-600 font-medium">Fermer Copilot</span>
+              </button>
+            )}
+            <div className="flex-1" />
+          </div>
 
-          {/* Copilot Sidebar */}
-          <CopilotSidebar
-            isCollapsed={!isChatOpen}
-            onToggleCollapse={() => setIsChatOpen(!isChatOpen)}
-            onSelectPrompt={() => {
-              // Prompts from sidebar suggestions are handled internally
-            }}
-            onCreateCreditMemo={handleCreateCreditMemo}
-            onMinimize={() => setAppMode('desktop')}
-            currentRoute={route}
-          />
+          {/* Main Content Area */}
+          <div className="flex flex-1 min-w-0 overflow-hidden">
+            {/* Application hôte */}
+            <main className="min-w-0 flex-1 overflow-hidden">
+              <MyClientDev route={route} onNavigate={navigate} compact={false} />
+            </main>
 
-          {/* Sticky button - collé à droite, draggable sur axe Y */}
-          {!isChatOpen && (
-            <button
-              ref={buttonRef}
-              onMouseDown={handleMouseDown}
-              onClick={() => setIsChatOpen(true)}
-              className="fixed w-14 h-14 flex items-center justify-center shadow-2xl hover:shadow-xl transition z-50 cursor-move group"
-              style={{
-                background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)',
-                right: '0px',
-                top: `${buttonY}px`,
-                borderRadius: '12px 0 0 12px',
-                border: 'none',
+            {/* Copilot Sidebar */}
+            <CopilotSidebar
+              isCollapsed={!isChatOpen}
+              onToggleCollapse={() => setIsChatOpen(!isChatOpen)}
+              onSelectPrompt={() => {
+                // Prompts from sidebar suggestions are handled internally
               }}
-              title="Ouvrir le chat (draggable)"
-            >
-              <Sparkles size={24} className="text-white" />
-            </button>
-          )}
+              onCreateCreditMemo={handleCreateCreditMemo}
+              currentRoute={route}
+            />
+
+            {/* Sticky button - collé à droite, draggable sur axe Y */}
+            {!isChatOpen && (
+              <button
+                ref={buttonRef}
+                onMouseDown={handleMouseDown}
+                onClick={() => setIsChatOpen(true)}
+                className="fixed w-14 h-14 flex items-center justify-center shadow-2xl hover:shadow-xl transition z-50 cursor-move group"
+                style={{
+                  background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)',
+                  right: '0px',
+                  top: `${buttonY}px`,
+                  borderRadius: '12px 0 0 12px',
+                  border: 'none',
+                }}
+                title="Ouvrir le chat (draggable)"
+              >
+                <Sparkles size={24} className="text-white" />
+              </button>
+            )}
+          </div>
         </div>
       )}
     </TooltipProvider>
