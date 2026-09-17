@@ -366,7 +366,12 @@ export function HomePage({
 
       {/* Chat Input Footer */}
       <div className={`border-t border-slate-200 bg-white ${isCompact ? 'p-2' : 'p-4'} flex-shrink-0`}>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2">
+          {suggestedPlaceholder && chatInput && (
+            <div className="px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-200">
+              <p className="text-2xs text-slate-600">Suggestion: <span className="text-purple-700 font-semibold">{suggestedPlaceholder}</span></p>
+            </div>
+          )}
           <div className="relative flex-1">
             <input
               type="text"
@@ -376,11 +381,6 @@ export function HomePage({
               placeholder={isCompact ? "Question..." : "Posez votre question ou utilisez une action..."}
               className={`w-full ${isCompact ? 'h-8' : 'h-10'} rounded-lg border border-slate-200 bg-white pl-3 pr-10 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500`}
             />
-            {suggestedPlaceholder && chatInput && (
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">
-                {suggestedPlaceholder}
-              </span>
-            )}
             <button
               onClick={handleSendChat}
               className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-purple-50 rounded transition"
