@@ -11,9 +11,10 @@ interface CopilotSidebarProps {
   isCollapsed: boolean
   onToggleCollapse: () => void
   onSelectPrompt?: (prompt: string) => void
+  onCreateCreditMemo?: () => void
 }
 
-export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt }: CopilotSidebarProps) {
+export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, onCreateCreditMemo }: CopilotSidebarProps) {
   const [currentView, setCurrentView] = useState<ViewType>('home')
   const [width, setWidth] = useState(320) // 320px par défaut (w-80)
   const [isDragging, setIsDragging] = useState(false)
@@ -105,7 +106,7 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt }
 
       {/* Pages Content */}
       <div className="flex-1 overflow-hidden flex flex-col">
-        {currentView === 'home' && <HomePage onSelectPrompt={onSelectPrompt} />}
+        {currentView === 'home' && <HomePage onSelectPrompt={onSelectPrompt} onCreateCreditMemo={onCreateCreditMemo} />}
         {currentView === 'history' && <HistoryPage />}
         {currentView === 'favorites' && <FavoritesPage onSelectPrompt={onSelectPrompt} />}
         {currentView === 'active-actions' && <ActiveActionsPage />}

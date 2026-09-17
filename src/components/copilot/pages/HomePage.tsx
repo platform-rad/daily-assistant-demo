@@ -3,9 +3,10 @@ import { useState } from 'react'
 
 interface HomePageProps {
   onSelectPrompt?: (prompt: string) => void
+  onCreateCreditMemo?: () => void
 }
 
-export function HomePage({ onSelectPrompt }: HomePageProps) {
+export function HomePage({ onSelectPrompt, onCreateCreditMemo }: HomePageProps) {
   const [chatInput, setChatInput] = useState('')
   const [selectedDate, setSelectedDate] = useState('today')
 
@@ -174,6 +175,7 @@ export function HomePage({ onSelectPrompt }: HomePageProps) {
               icon={<FileText size={20} />}
               prompt="Génère un Credit Memo complet pour ce client"
               onSelect={onSelectPrompt}
+              onCreateCreditMemo={onCreateCreditMemo}
             />
 
             {/* Action Card 3 */}
@@ -265,12 +267,21 @@ interface ActionCardProps {
   icon: React.ReactNode
   prompt: string
   onSelect?: (prompt: string) => void
+  onCreateCreditMemo?: () => void
 }
 
-function ActionCard({ title, description, icon, prompt, onSelect }: ActionCardProps) {
+function ActionCard({ title, description, icon, prompt, onSelect, onCreateCreditMemo }: ActionCardProps) {
+  const handleClick = () => {
+    if (title.includes('Credit Memo') && onCreateCreditMemo) {
+      onCreateCreditMemo()
+    } else {
+      onSelect?.(prompt)
+    }
+  }
+
   return (
     <button
-      onClick={() => onSelect?.(prompt)}
+      onClick={handleClick}
       className="p-4 rounded-lg border border-slate-200 bg-white hover:border-purple-300 hover:shadow-md hover:bg-purple-50/30 transition group text-left"
     >
       <div className="flex items-start justify-between mb-2">

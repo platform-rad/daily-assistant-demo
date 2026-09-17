@@ -120,6 +120,10 @@ export default function App() {
           <CopilotSidebar
             isCollapsed={!isChatOpen}
             onToggleCollapse={() => setIsChatOpen(!isChatOpen)}
+            onSelectPrompt={(prompt) => {
+              // TODO: Use prompt in chat
+            }}
+            onCreateCreditMemo={handleCreateCreditMemo}
           />
 
           {/* Sticky button - collé à droite, draggable sur axe Y */}
