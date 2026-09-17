@@ -40,7 +40,7 @@ export function StandaloneView({ onSelectPrompt, onCreateCreditMemo }: Standalon
 
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto">
-          {currentView === 'home' && <HomePage onSelectPrompt={onSelectPrompt} onCreateCreditMemo={onCreateCreditMemo} />}
+          {currentView === 'home' && <HomePage onSelectPrompt={onSelectPrompt} onCreateCreditMemo={onCreateCreditMemo} layout="full" />}
           {currentView === 'history' && <HistoryPage />}
           {currentView === 'favorites' && <FavoritesPage onSelectPrompt={onSelectPrompt} />}
           {currentView === 'active-actions' && <ActiveActionsPage />}

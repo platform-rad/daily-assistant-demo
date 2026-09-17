@@ -4,9 +4,11 @@ import { useState } from 'react'
 interface HomePageProps {
   onSelectPrompt?: (prompt: string) => void
   onCreateCreditMemo?: () => void
+  /** 'compact' for sidebar, 'full' for desktop standalone */
+  layout?: 'compact' | 'full'
 }
 
-export function HomePage({ onSelectPrompt, onCreateCreditMemo }: HomePageProps) {
+export function HomePage({ onSelectPrompt, onCreateCreditMemo, layout = 'compact' }: HomePageProps) {
   const [chatInput, setChatInput] = useState('')
   const [selectedDate, setSelectedDate] = useState('today')
 
@@ -54,7 +56,7 @@ export function HomePage({ onSelectPrompt, onCreateCreditMemo }: HomePageProps) 
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-3">
+          <div className={`grid ${layout === 'full' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-3`}>
             {/* KPI Card 1 - Portfolio Exposure */}
             <div className="relative p-4 rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full">
               {/* Colored Stroke Accent */}
