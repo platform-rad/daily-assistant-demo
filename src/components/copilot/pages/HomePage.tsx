@@ -20,6 +20,8 @@ export interface Conversation {
 interface HomePageProps {
   onSelectPrompt?: (prompt: string) => void
   onCreateCreditMemo?: () => void
+  /** Callback pour ouvrir MyClientDev avec le sidepanel assistant (cohérence de navigation) */
+  onOpenMyClientDev?: () => void
   /** 'compact' for sidebar, 'full' for desktop standalone */
   layout?: 'compact' | 'full'
   /** Width of the sidebar in pixels (for responsive adjustments) */
@@ -35,6 +37,7 @@ interface HomePageProps {
 export function HomePage({
   onSelectPrompt,
   onCreateCreditMemo,
+  onOpenMyClientDev,
   layout = 'compact',
   sidebarWidth = 320,
   currentConversation: _currentConversation,
@@ -286,10 +289,11 @@ export function HomePage({
             {/* Action Card 1 */}
             <ActionCard
               title="Analyser un Client"
-              description="Analyse complète d'un client : exposition, risques, recommandations"
+              description="Ouvre MyClientDev avec l'assistant en side panel pour analyser exposition, risques et recommandations"
               icon={<Brain size={actionCardIconSize} />}
               prompt="Fais une analyse complète de l'exposition de ce client"
               onSelect={onSelectPrompt}
+              onOpenMyClientDev={onOpenMyClientDev}
               isCompact={isCompact}
             />
 
@@ -401,13 +405,16 @@ interface ActionCardProps {
   prompt: string
   onSelect?: (prompt: string) => void
   onCreateCreditMemo?: () => void
+  onOpenMyClientDev?: () => void
   isCompact?: boolean
 }
 
-function ActionCard({ title, description, icon, prompt, onSelect, onCreateCreditMemo, isCompact = false }: ActionCardProps) {
+function ActionCard({ title, description, icon, prompt, onSelect, onCreateCreditMemo, onOpenMyClientDev, isCompact = false }: ActionCardProps) {
   const handleClick = () => {
     if (title.includes('Credit Memo') && onCreateCreditMemo) {
       onCreateCreditMemo()
+    } else if (title.includes('Analyser un Client') && onOpenMyClientDev) {
+      onOpenMyClientDev()
     } else if (onSelect) {
       // Send the prompt to the chat
       onSelect(prompt)

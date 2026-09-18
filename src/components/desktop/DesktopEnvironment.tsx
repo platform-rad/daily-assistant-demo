@@ -139,7 +139,7 @@ export function DesktopEnvironment({ onOpenMyClientDev, onCreateCreditMemo }: De
             defaultY={Math.max(20, 40)}
             onClose={() => setMeenaOpen(false)}
           >
-            <MeenaApp />
+            {({ isDocked }) => <MeenaApp isDocked={isDocked} />}
           </FloatingWindow>
         )}
 

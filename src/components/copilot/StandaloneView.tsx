@@ -10,9 +10,10 @@ type ViewType = 'home' | 'history' | 'favorites' | 'active-actions'
 interface StandaloneViewProps {
   onSelectPrompt?: (prompt: string) => void
   onCreateCreditMemo?: () => void
+  onOpenMyClientDev?: () => void
 }
 
-export function StandaloneView({ onSelectPrompt, onCreateCreditMemo }: StandaloneViewProps) {
+export function StandaloneView({ onSelectPrompt, onCreateCreditMemo, onOpenMyClientDev }: StandaloneViewProps) {
   const [currentView, setCurrentView] = useState<ViewType>('home')
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
@@ -40,7 +41,7 @@ export function StandaloneView({ onSelectPrompt, onCreateCreditMemo }: Standalon
 
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto">
-          {currentView === 'home' && <HomePage onSelectPrompt={onSelectPrompt} onCreateCreditMemo={onCreateCreditMemo} layout="full" />}
+          {currentView === 'home' && <HomePage onSelectPrompt={onSelectPrompt} onCreateCreditMemo={onCreateCreditMemo} onOpenMyClientDev={onOpenMyClientDev} layout="full" />}
           {currentView === 'history' && <HistoryPage />}
           {currentView === 'favorites' && <FavoritesPage onSelectPrompt={onSelectPrompt} />}
           {currentView === 'active-actions' && <ActiveActionsPage />}

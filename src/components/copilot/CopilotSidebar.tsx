@@ -17,7 +17,7 @@ interface CopilotSidebarProps {
 
 export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, onCreateCreditMemo, currentRoute = 'client' }: CopilotSidebarProps) {
   const [currentView, setCurrentView] = useState<NavView>('home')
-  const [width, setWidth] = useState(320) // 320px par défaut
+  const [width, setWidth] = useState(590) // 590px par défaut
   const [isDragging, setIsDragging] = useState(false)
   const [dragStartX, setDragStartX] = useState(0)
   const [dragStartWidth, setDragStartWidth] = useState(0)

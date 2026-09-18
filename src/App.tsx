@@ -69,7 +69,11 @@ export default function App() {
       {appMode === 'desktop' ? (
         /* Mode Desktop: Simulation d'un environnement Windows */
         <DesktopEnvironment
-          onOpenMyClientDev={() => setAppMode('legacy')}
+          onOpenMyClientDev={() => {
+            // Cohérence : arriver sur MyClientDev avec le sidepanel assistant déjà ouvert
+            setIsChatOpen(true)
+            setAppMode('legacy')
+          }}
           onCreateCreditMemo={handleCreateCreditMemo}
         />
       ) : appMode === 'credit-memo-creation' ? (

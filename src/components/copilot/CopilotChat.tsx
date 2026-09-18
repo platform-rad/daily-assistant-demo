@@ -191,6 +191,7 @@ export function CopilotChat({ mode = 'standalone', onValidateAndEdit, onCreateCr
           inputRef.current?.focus()
         }}
         onCreateCreditMemo={onCreateCreditMemo}
+        onOpenMyClientDev={() => onValidateAndEdit?.('client-edit')}
       />
     )
   }
