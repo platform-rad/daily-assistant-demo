@@ -1,5 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import { TopNav } from './TopNav'
+import { CapCbsPage } from './pages/CapCbsPage'
 import { ClientEditPage } from './pages/ClientEditPage'
 import { ClientOverviewPage } from './pages/ClientOverviewPage'
 import { CreditPage } from './pages/CreditPage'
@@ -45,6 +46,7 @@ export function MyClientDev({ route, onNavigate, compact = false }: Props) {
             <ClientOverviewPage compact={compact} onEdit={() => onNavigate('client-edit')} />
           )}
           {route === 'client-edit' && <ClientEditPage onCancel={() => onNavigate('client')} />}
+          {route === 'cap-cbs' && <CapCbsPage />}
           {route === 'pipeline' && <PipelinePage />}
           {route === 'credit' && <CreditPage />}
         </div>

@@ -6,16 +6,21 @@ import { FavoritesPage } from './pages/FavoritesPage'
 import { ActiveActionsPage } from './pages/ActiveActionsPage'
 import { SidebarNav, type NavView } from './SidebarNav'
 import { ContextualActionsPanel } from './ContextualActionsPanel'
+import type { HostRoute } from '@/data/types'
 
 interface CopilotSidebarProps {
   isCollapsed: boolean
   onToggleCollapse: () => void
   onSelectPrompt?: (prompt: string) => void
   onCreateCreditMemo?: () => void
-  currentRoute?: 'client' | 'client-edit' | 'credit' | 'portfolio' | 'pipeline' | 'dashboard' | 'reporting'
+  /** Change de route SANS relancer le mode hôte (on est déjà dans Daily Assistant). */
+  onNavigate?: (route: HostRoute) => void
+  /** Ouvre Meena (agent CRM+) en fenêtre flottante, quel que soit le mode courant. */
+  onOpenMeena?: () => void
+  currentRoute?: HostRoute
 }
 
-export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, onCreateCreditMemo, currentRoute = 'client' }: CopilotSidebarProps) {
+export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, onCreateCreditMemo, onNavigate, onOpenMeena, currentRoute = 'client' }: CopilotSidebarProps) {
   const [currentView, setCurrentView] = useState<NavView>('home')
   const [width, setWidth] = useState(590) // 590px par défaut
   const [isDragging, setIsDragging] = useState(false)
@@ -115,7 +120,16 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
 
       {/* Pages Content */}
       <div className="flex-1 overflow-hidden flex flex-col">
-        {currentView === 'home' && <HomePage onSelectPrompt={handleSelectPrompt} onCreateCreditMemo={onCreateCreditMemo} layout="compact" sidebarWidth={width} />}
+        {currentView === 'home' && (
+          <HomePage
+            onSelectPrompt={handleSelectPrompt}
+            onCreateCreditMemo={onCreateCreditMemo}
+            onNavigate={onNavigate}
+            onOpenMeena={onOpenMeena}
+            layout="compact"
+            sidebarWidth={width}
+          />
+        )}
         {currentView === 'history' && <HistoryPage />}
         {currentView === 'favorites' && <FavoritesPage onSelectPrompt={handleSelectPrompt} />}
         {currentView === 'active-actions' && <ActiveActionsPage />}

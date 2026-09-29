@@ -41,11 +41,12 @@ export interface Agent {
 
 export type AlertSeverity = 'high' | 'medium' | 'low'
 
-/** Écrans simulés de l'application hôte MyClientDev. */
+/** Écrans simulés de l'application hôte Daily Assistant. */
 export type HostRoute =
   | 'portfolio'
   | 'client'
   | 'client-edit'
+  | 'cap-cbs'
   | 'pipeline'
   | 'credit'
 

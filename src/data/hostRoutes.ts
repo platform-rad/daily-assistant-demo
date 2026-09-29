@@ -46,6 +46,16 @@ export const ROUTES: Record<HostRoute, RouteMeta> = {
       'Vous éditez la fiche : je peux pré-remplir la stratégie et le plan d’action depuis le CBS/CAP en cours.',
     contextAction: { label: 'Ouvrir le CBS/CAP', target: 'cbs' },
   },
+  'cap-cbs': {
+    id: 'cap-cbs',
+    navLabel: 'CAP/CBS',
+    breadcrumb: ['CAP/CBS', 'AeroDynamics Group', 'Cycle 2026–2027'],
+    contextLabel: 'CAP/CBS en cours — Complétion CBS',
+    suggestedAgentId: 'cbs-cap',
+    contextHint:
+      'Vous êtes dans le CBS/CAP : je peux pré-remplir les axes depuis les données disponibles et suivre la contribution des équipes pays.',
+    contextAction: { label: 'Voir le Briefing Memo', target: 'memo' },
+  },
   pipeline: {
     id: 'pipeline',
     navLabel: 'Pipeline',
@@ -69,4 +79,4 @@ export const ROUTES: Record<HostRoute, RouteMeta> = {
 }
 
 /** Ordre des entrées de la navigation supérieure. */
-export const NAV_ORDER: HostRoute[] = ['portfolio', 'client', 'pipeline', 'credit']
+export const NAV_ORDER: HostRoute[] = ['portfolio', 'client', 'cap-cbs', 'pipeline', 'credit']

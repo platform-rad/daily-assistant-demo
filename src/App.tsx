@@ -6,6 +6,8 @@ import { CreditMemoViewer } from '@/components/credit-memo/CreditMemoViewer'
 import { CreditMemoCreator } from '@/components/copilot/CreditMemoCreator'
 import { CreditMemoChat } from '@/components/copilot/CreditMemoChat'
 import { DesktopEnvironment } from '@/components/desktop/DesktopEnvironment'
+import { FloatingWindow } from '@/components/desktop/FloatingWindow'
+import { MeenaApp } from '@/components/meena/MeenaApp'
 import { Sparkles, X } from 'lucide-react'
 import type { HostRoute } from '@/data/types'
 
@@ -20,6 +22,9 @@ export default function App() {
   const [dragStart, setDragStart] = useState(0)
   const [selectedField, setSelectedField] = useState<string | null>(null)
   const [sourceDocument, setSourceDocument] = useState<{ fieldName: string; documentName: string } | null>(null)
+  // Meena vit au niveau racine : elle peut flotter par-dessus n'importe quel mode
+  // (Desktop, Daily Assistant, Credit Memo) — "une seule et même appli".
+  const [meenaOpen, setMeenaOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const navigate = useCallback(
@@ -64,17 +69,24 @@ export default function App() {
     }
   }, [isDragging, dragStart])
 
+  const openDailyAssistant = useCallback(
+    (targetRoute?: HostRoute) => {
+      // Cohérence : arriver sur Daily Assistant avec le sidepanel assistant déjà ouvert
+      if (targetRoute) setRoute(targetRoute)
+      setIsChatOpen(true)
+      setAppMode('legacy')
+    },
+    []
+  )
+
   return (
     <TooltipProvider delayDuration={150}>
       {appMode === 'desktop' ? (
         /* Mode Desktop: Simulation d'un environnement Windows */
         <DesktopEnvironment
-          onOpenMyClientDev={() => {
-            // Cohérence : arriver sur MyClientDev avec le sidepanel assistant déjà ouvert
-            setIsChatOpen(true)
-            setAppMode('legacy')
-          }}
-          onCreateCreditMemo={handleCreateCreditMemo}
+          onOpenMyClientDev={() => openDailyAssistant()}
+          onToggleMeena={() => setMeenaOpen((o) => !o)}
+          meenaOpen={meenaOpen}
         />
       ) : appMode === 'credit-memo-creation' ? (
         /* Mode Credit-Memo-Creation: Creator + CreditMemoChat */
@@ -150,6 +162,8 @@ export default function App() {
                 // Prompts from sidebar suggestions are handled internally
               }}
               onCreateCreditMemo={handleCreateCreditMemo}
+              onNavigate={navigate}
+              onOpenMeena={() => setMeenaOpen(true)}
               currentRoute={route}
             />
 
@@ -174,6 +188,21 @@ export default function App() {
             )}
           </div>
         </div>
+      )}
+
+      {/* Meena flotte au-dessus de n'importe quel mode — agent CRM+ toujours accessible */}
+      {meenaOpen && (
+        <FloatingWindow
+          title="Meena"
+          icon="🎙️"
+          defaultWidth={900}
+          defaultHeight={800}
+          defaultX={Math.max(20, window.innerWidth - 940)}
+          defaultY={Math.max(20, 40)}
+          onClose={() => setMeenaOpen(false)}
+        >
+          {({ isDocked }) => <MeenaApp isDocked={isDocked} />}
+        </FloatingWindow>
       )}
     </TooltipProvider>
   )

@@ -18,10 +18,10 @@ export function TopNav({ route, onNavigate, compact = false }: Props) {
         {/* Marque — logotype neutralisé (charte alternative Slate/Indigo) */}
         <div className="flex shrink-0 items-center gap-2.5">
           <div className="flex h-7 w-7 items-center justify-center rounded bg-rad-indigo-600 text-xs font-bold text-white">
-            M
+            D
           </div>
           <div className="leading-tight">
-            <div className="text-sm font-semibold tracking-tight text-white">MyClientDev</div>
+            <div className="text-sm font-semibold tracking-tight text-white">Daily Assistant</div>
             {!compact && (
               <div className="text-2xs text-slate-400">Corporate Coverage — EMEA</div>
             )}

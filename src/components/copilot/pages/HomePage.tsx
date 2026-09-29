@@ -1,6 +1,8 @@
-import { TrendingUp, AlertCircle, Target, Zap, Brain, FileText, BarChart3, ArrowRight, Send, Clock } from 'lucide-react'
-import { useState } from 'react'
+import { TrendingUp, AlertCircle, Target, Zap, Brain, FileText, BarChart3, ArrowRight, Send, Clock, Mic, ClipboardList } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
 import React from 'react'
+import type { HostRoute } from '@/data/types'
+import { DigestCard } from './DigestCard'
 
 export interface ConversationMessage {
   id: string
@@ -20,8 +22,12 @@ export interface Conversation {
 interface HomePageProps {
   onSelectPrompt?: (prompt: string) => void
   onCreateCreditMemo?: () => void
-  /** Callback pour ouvrir MyClientDev avec le sidepanel assistant (cohérence de navigation) */
-  onOpenMyClientDev?: () => void
+  /** Callback pour ouvrir Daily Assistant avec le sidepanel assistant (cohérence de navigation) */
+  onOpenMyClientDev?: (route?: HostRoute) => void
+  /** Change de route SANS relancer le mode hôte (on est déjà dans Daily Assistant). */
+  onNavigate?: (route: HostRoute) => void
+  /** Ouvre Meena (agent CRM+ — notes de réunion) en fenêtre flottante. */
+  onOpenMeena?: () => void
   /** 'compact' for sidebar, 'full' for desktop standalone */
   layout?: 'compact' | 'full'
   /** Width of the sidebar in pixels (for responsive adjustments) */
@@ -38,15 +44,29 @@ export function HomePage({
   onSelectPrompt,
   onCreateCreditMemo,
   onOpenMyClientDev,
+  onNavigate,
+  onOpenMeena,
   layout = 'compact',
   sidebarWidth = 320,
   currentConversation: _currentConversation,
   onOpenConversation: _onOpenConversation,
-  onCreateConversation
+  onCreateConversation: _onCreateConversation,
 }: HomePageProps) {
   const [chatInput, setChatInput] = useState('')
   const [selectedDate, setSelectedDate] = useState('today')
   const [suggestedPlaceholder, setSuggestedPlaceholder] = useState('')
+  const [chatMessages, setChatMessages] = useState<ConversationMessage[]>([])
+  const chatEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [chatMessages])
+
+  /** Navigue vers un plan de travail : en place si on est déjà dans Daily Assistant, sinon on l'ouvre. */
+  const openWorkPlan = (route: HostRoute) => {
+    if (onNavigate) onNavigate(route)
+    else onOpenMyClientDev?.(route)
+  }
 
   // Detect keywords for placeholder suggestions
   const keywords = {
@@ -85,38 +105,50 @@ export function HomePage({
     { id: 'week', label: 'Semaine', date: new Date(Date.now() - 7 * 86400000) },
   ]
 
-  const handleSendChat = () => {
-    if (chatInput.trim()) {
-      // Use suggested placeholder if available
-      const messageContent = suggestedPlaceholder || chatInput
-
-      // Create a new conversation
-      const newConversation: Conversation = {
-        id: Date.now().toString(),
-        title: chatInput.substring(0, 50) + (chatInput.length > 50 ? '...' : ''),
-        messages: [
-          {
-            id: '1',
-            role: 'user',
-            content: messageContent,
-            timestamp: new Date(),
-          },
-          {
-            id: '2',
-            role: 'assistant',
-            content: `Vous avez demandé: "${messageContent}". Je suis en train de traiter votre demande...`,
-            timestamp: new Date(),
-          },
-        ],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
-
-      // Call callback to create conversation
-      onCreateConversation?.(newConversation)
-      setChatInput('')
-      setSuggestedPlaceholder('')
+  /** Réponse contextuelle simulée — suffisant pour un prototype conversationnel crédible. */
+  const generateAssistantReply = (question: string): string => {
+    const q = question.toLowerCase()
+    if (q.includes('credit memo')) {
+      return 'Je peux générer un Credit Memo complet. Cliquez sur la carte "Créer un Credit Memo" ci-dessous pour démarrer : je pré-remplirai les données disponibles.'
     }
+    if (q.includes('cbs') || q.includes('cap')) {
+      return 'Le CBS/CAP de ce client est en cours de complétion. Ouvrez le plan de travail "CAP / CBS" ci-dessous pour éditer les 5 axes stratégiques ou suivre les actions du plan.'
+    }
+    if (q.includes('digest') || q.includes('actualit') || q.includes('news')) {
+      return 'Votre digest du jour couvre JP Morgan, Goldman Sachs, Morgan Stanley et Macquarie. Dépliez les sections ci-dessus pour le détail par thème.'
+    }
+    if (q.includes('exposition') || q.includes('risque') || q.includes('rating') || q.includes('portefeuille')) {
+      return "D'après les derniers KPIs : exposition €847.3M (+5.2%), 12 clients à risque, rating moyen BBB+. Voulez-vous que je lance une analyse détaillée sur un client en particulier ?"
+    }
+    if (q.includes('meena') || q.includes('réunion') || q.includes('notes')) {
+      return 'Meena peut enregistrer vos notes de réunion à la voix et les synchroniser avec CRM+. Ouvrez-la depuis le plan de travail "CRM+ Agent" ci-dessous.'
+    }
+    return `J'ai bien noté : "${question}". Je peux analyser un client, générer un Credit Memo, ouvrir le CBS/CAP ou synchroniser vos notes de réunion via Meena — précisez votre besoin.`
+  }
+
+  const handleSendChat = () => {
+    if (!chatInput.trim()) return
+    const messageContent = suggestedPlaceholder || chatInput
+
+    const userMessage: ConversationMessage = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: messageContent,
+      timestamp: new Date(),
+    }
+    setChatMessages((prev) => [...prev, userMessage])
+    setChatInput('')
+    setSuggestedPlaceholder('')
+
+    setTimeout(() => {
+      const assistantMessage: ConversationMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: generateAssistantReply(messageContent),
+        timestamp: new Date(),
+      }
+      setChatMessages((prev) => [...prev, assistantMessage])
+    }, 500)
   }
 
   const isCompact = layout === 'compact'
@@ -151,6 +183,11 @@ export function HomePage({
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-y-auto">
         <div className={`mx-auto ${px} ${py} ${spacing}`}>
+        {/* Digest personnalisé */}
+        <section>
+          <DigestCard />
+        </section>
+
         {/* What's New - KPIs */}
         <section>
           <div className="flex items-center justify-between mb-2">
@@ -289,11 +326,11 @@ export function HomePage({
             {/* Action Card 1 */}
             <ActionCard
               title="Analyser un Client"
-              description="Ouvre MyClientDev avec l'assistant en side panel pour analyser exposition, risques et recommandations"
+              description="Ouvre Daily Assistant avec l'assistant en side panel pour analyser exposition, risques et recommandations"
               icon={<Brain size={actionCardIconSize} />}
               prompt="Fais une analyse complète de l'exposition de ce client"
               onSelect={onSelectPrompt}
-              onOpenMyClientDev={onOpenMyClientDev}
+              onOpenMyClientDev={() => openWorkPlan('client')}
               isCompact={isCompact}
             />
 
@@ -346,6 +383,31 @@ export function HomePage({
           </div>
         </section>
 
+        {/* Vos plans de travail — autres espaces accessibles via l'IA */}
+        <section>
+          <h2 className={`${sectionTitleSize} font-bold text-slate-900 ${isCompact ? 'mb-1.5' : 'mb-4'}`}>
+            🗂️ Vos plans de travail
+          </h2>
+          <div className={`grid ${isCompact ? (isVeryNarrow || isNarrow ? 'grid-cols-1' : 'grid-cols-2') : 'grid-cols-1 md:grid-cols-2'} ${gap}`}>
+            <WorkPlanCard
+              title="CRM+ Agent · Meena"
+              description="Rédigez vos notes de réunion à la voix et synchronisez-les avec CRM+"
+              icon={<Mic size={actionCardIconSize} />}
+              onSelect={() => onOpenMeena?.()}
+              isCompact={isCompact}
+              accent="amber"
+            />
+            <WorkPlanCard
+              title="CAP / CBS"
+              description="Stratégie commerciale client : 5 axes CBS, plan d'action CAP et validation"
+              icon={<ClipboardList size={actionCardIconSize} />}
+              onSelect={() => openWorkPlan('cap-cbs')}
+              isCompact={isCompact}
+              accent="purple"
+            />
+          </div>
+        </section>
+
         {/* Pinned Conversations */}
         {!isCompact && (
         <section>
@@ -367,6 +429,26 @@ export function HomePage({
         )}
         </div>
       </div>
+
+      {/* Fil de conversation — n'apparaît qu'une fois la discussion démarrée */}
+      {chatMessages.length > 0 && (
+        <div className={`border-t border-slate-200 bg-slate-50 overflow-y-auto flex-shrink-0 ${isCompact ? 'max-h-40' : 'max-h-56'}`}>
+          <div className={`space-y-1.5 ${isCompact ? 'p-2' : 'p-3'}`}>
+            {chatMessages.map((msg) => (
+              <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  className={`max-w-[85%] rounded-lg px-2.5 py-1.5 text-2xs leading-snug ${
+                    msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-white border border-slate-200 text-slate-900'
+                  }`}
+                >
+                  {msg.content}
+                </div>
+              </div>
+            ))}
+            <div ref={chatEndRef} />
+          </div>
+        </div>
+      )}
 
       {/* Chat Input Footer */}
       <div className={`border-t border-slate-200 bg-white ${isCompact ? 'p-2' : 'p-4'} flex-shrink-0`}>
@@ -438,6 +520,53 @@ function ActionCard({ title, description, icon, prompt, onSelect, onCreateCredit
         <ArrowRight size={arrowSize} className="text-slate-400 opacity-0 group-hover:opacity-100 transition flex-shrink-0 ml-1" />
       </div>
       <h3 className={`${titleSize} text-slate-900 group-hover:text-purple-700 transition`}>{title}</h3>
+      <p className={`${descSize} text-slate-600 ${isCompact ? 'mt-0.5' : 'mt-1'} line-clamp-2`}>{description}</p>
+    </button>
+  )
+}
+
+interface WorkPlanCardProps {
+  title: string
+  description: string
+  icon: React.ReactNode
+  onSelect: () => void
+  isCompact?: boolean
+  accent: 'purple' | 'amber'
+}
+
+const WORK_PLAN_ACCENTS = {
+  purple: {
+    border: 'hover:border-purple-300',
+    bg: 'hover:bg-purple-50/30',
+    iconBg: 'bg-purple-100 group-hover:bg-purple-200',
+    iconColor: 'text-purple-600',
+    title: 'group-hover:text-purple-700',
+  },
+  amber: {
+    border: 'hover:border-amber-300',
+    bg: 'hover:bg-amber-50/30',
+    iconBg: 'bg-amber-100 group-hover:bg-amber-200',
+    iconColor: 'text-amber-600',
+    title: 'group-hover:text-amber-700',
+  },
+} as const
+
+function WorkPlanCard({ title, description, icon, onSelect, isCompact = false, accent }: WorkPlanCardProps) {
+  const cardPadding = isCompact ? 'p-2' : 'p-4'
+  const iconPadding = isCompact ? 'p-1' : 'p-2'
+  const titleSize = isCompact ? 'text-2xs font-semibold' : 'text-sm font-semibold'
+  const descSize = isCompact ? 'text-2xs' : 'text-xs'
+  const tone = WORK_PLAN_ACCENTS[accent]
+
+  return (
+    <button
+      onClick={onSelect}
+      className={`${cardPadding} rounded-lg border border-slate-200 bg-white ${tone.border} hover:shadow-md ${tone.bg} transition group text-left`}
+    >
+      <div className={`${iconPadding} rounded-lg ${tone.iconBg} transition flex-shrink-0 inline-flex mb-0.5`}>
+        <span className={tone.iconColor}>{icon}</span>
+      </div>
+      <h3 className={`${titleSize} text-slate-900 ${tone.title} transition`}>{title}</h3>
       <p className={`${descSize} text-slate-600 ${isCompact ? 'mt-0.5' : 'mt-1'} line-clamp-2`}>{description}</p>
     </button>
   )
