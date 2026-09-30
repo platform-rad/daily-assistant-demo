@@ -97,11 +97,8 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
       className="border-l border-slate-200 bg-white flex flex-col shadow-2xl overflow-hidden relative"
       style={{ width: `${width}px` }}
     >
-      {/* Header */}
-      <div
-        className="px-4 py-3 flex items-center justify-between"
-        style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}
-      >
+      {/* Header — même bleu que l'icône "D" de Daily Assistant (rad-indigo-600) */}
+      <div className="px-4 py-3 flex items-center justify-between bg-rad-indigo-600">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/15">
             <Sparkles size={18} className="text-white" />
