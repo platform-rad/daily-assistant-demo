@@ -21,6 +21,9 @@ interface CopilotSidebarProps {
   onCreateCreditMemo?: () => void
   /** Change de route SANS relancer le mode hôte (on est déjà dans Daily Assistant). */
   onNavigate?: (route: HostRoute) => void
+  /** Ouvre la fiche d'un client précis (route 'client' + sélection) — utilisé par les deep-links
+   *  du panneau droit qui doivent pointer vers UN client donné, pas juste changer de route. */
+  onNavigateToClient?: (clientName: string) => void
   /** Ouvre Meena (agent CRM+) en fenêtre flottante, quel que soit le mode courant. */
   onOpenMeena?: () => void
   currentRoute?: HostRoute
@@ -40,6 +43,7 @@ export function CopilotSidebar({
   onSelectPrompt,
   onCreateCreditMemo,
   onNavigate,
+  onNavigateToClient,
   onOpenMeena,
   currentRoute = 'client',
   capCbsDossiers,
@@ -184,7 +188,7 @@ export function CopilotSidebar({
         {currentView === 'crm-agent' && (
           <CrmAgentPage
             onOpenMeena={onOpenMeena}
-            onNavigate={onNavigate}
+            onReviewOnClientPage={onNavigateToClient}
             currentClientName={currentClientName}
             notes={crmNotes}
             onAddNote={onAddCrmNote}

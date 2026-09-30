@@ -35,6 +35,21 @@ export default function App() {
   const [capCbsDossiers, setCapCbsDossiers] = useState<CapCbsDossier[]>(INITIAL_CAP_CBS_DOSSIERS)
   const [crmNotes, setCrmNotes] = useState<CrmNote[]>(INITIAL_CRM_NOTES)
 
+  // Quel client la fiche "client" affiche actuellement — pas de paramètre de route dans ce
+  // prototype (HostRoute est une simple union de chaînes), donc c'est un état à part que la
+  // navigation vers 'client' consulte. Permet aux deep-links (ex : "Review on X's page" depuis
+  // CRM+ Agent) de pointer vers le bon client au lieu de toujours retomber sur AeroDynamics Group.
+  const [activeClientName, setActiveClientName] = useState('AeroDynamics Group')
+
+  const selectClient = useCallback((name: string) => {
+    setActiveClientName(name)
+  }, [])
+
+  const openClientFiche = useCallback((name: string) => {
+    setActiveClientName(name)
+    setRoute('client')
+  }, [])
+
   const updateCapCbsDossier = useCallback((id: string, patch: Partial<CapCbsDossier>) => {
     setCapCbsDossiers((prev) => prev.map((d) => (d.id === id ? { ...d, ...patch } : d)))
   }, [])
@@ -188,6 +203,8 @@ export default function App() {
                 onUpdateCapCbsDossier={updateCapCbsDossier}
                 crmNotes={crmNotes}
                 onApproveCrmNote={(id) => updateCrmNote(id, { status: 'Synced', updatedAt: 'just now' })}
+                activeClientName={activeClientName}
+                onSelectClient={selectClient}
               />
             </main>
 
@@ -200,6 +217,7 @@ export default function App() {
               }}
               onCreateCreditMemo={handleCreateCreditMemo}
               onNavigate={navigate}
+              onNavigateToClient={openClientFiche}
               onOpenMeena={() => setMeenaOpen(true)}
               currentRoute={route}
               capCbsDossiers={capCbsDossiers}

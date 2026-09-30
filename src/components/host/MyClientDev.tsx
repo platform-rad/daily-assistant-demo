@@ -11,7 +11,6 @@ import { ROUTES } from '@/data/hostRoutes'
 import type { HostRoute } from '@/data/types'
 import type { CapCbsDossier } from '@/data/capCbsDossiers'
 import type { CrmNote } from '@/data/crmNotes'
-import { CLIENT } from '@/data/client'
 
 interface Props {
   route: HostRoute
@@ -25,6 +24,10 @@ interface Props {
   onUpdateCapCbsDossier: (id: string, patch: Partial<CapCbsDossier>) => void
   crmNotes: CrmNote[]
   onApproveCrmNote: (id: string) => void
+  /** Quel client la fiche 'client' affiche actuellement — porté par App.tsx pour que les
+   *  deep-links (portefeuille, CAP/CBS, CRM+) pointent tous vers le bon client. */
+  activeClientName: string
+  onSelectClient: (name: string) => void
 }
 
 /**
@@ -40,11 +43,12 @@ export function MyClientDev({
   onUpdateCapCbsDossier,
   crmNotes,
   onApproveCrmNote,
+  activeClientName,
+  onSelectClient,
 }: Props) {
   const meta = ROUTES[route]
-  // Prototype : un seul client est réellement modélisé (AeroDynamics Group).
-  const clientCapCbsDossier = capCbsDossiers.find((d) => d.client === CLIENT.name)
-  const clientCrmNotes = crmNotes.filter((n) => n.client === CLIENT.name)
+  const clientCapCbsDossier = capCbsDossiers.find((d) => d.client === activeClientName)
+  const clientCrmNotes = crmNotes.filter((n) => n.client === activeClientName)
 
   return (
     <div className="flex h-full flex-col bg-background">
@@ -64,10 +68,18 @@ export function MyClientDev({
         </div>
 
         <div className="px-5 pb-16">
-          {route === 'portfolio' && <PortfolioPage onOpenClient={() => onNavigate('client')} />}
+          {route === 'portfolio' && (
+            <PortfolioPage
+              onOpenClient={(name) => {
+                onSelectClient(name)
+                onNavigate('client')
+              }}
+            />
+          )}
           {route === 'client' && (
             <ClientOverviewPage
               compact={compact}
+              clientName={activeClientName}
               onEdit={() => onNavigate('client-edit')}
               onOpenCapCbs={() => onNavigate('cap-cbs-detail')}
               onOpenMeena={onOpenMeena}
@@ -78,7 +90,13 @@ export function MyClientDev({
           )}
           {route === 'client-edit' && <ClientEditPage onCancel={() => onNavigate('client')} />}
           {route === 'cap-cbs' && (
-            <CapCbsDashboardPage dossiers={capCbsDossiers} onOpenDetail={() => onNavigate('cap-cbs-detail')} />
+            <CapCbsDashboardPage
+              dossiers={capCbsDossiers}
+              onOpenDetail={(client) => {
+                onSelectClient(client)
+                onNavigate('cap-cbs-detail')
+              }}
+            />
           )}
           {route === 'cap-cbs-detail' && clientCapCbsDossier && (
             <CapCbsPage

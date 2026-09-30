@@ -62,7 +62,7 @@ function NeedsAttentionBanner() {
   )
 }
 
-function PortfolioView({ onOpenClient }: { onOpenClient: () => void }) {
+function PortfolioView({ onOpenClient }: { onOpenClient: (clientName: string) => void }) {
   return (
     <div className="space-y-4">
       <NeedsAttentionBanner />
@@ -70,7 +70,7 @@ function PortfolioView({ onOpenClient }: { onOpenClient: () => void }) {
       <DataTable
         columns={['Groupe', 'Secteur', 'Notation', 'Exposition', 'PNB YTD', 'Signaux', 'Prochaine échéance']}
         highlightRow={0}
-        onRowClick={(i) => i === 0 && onOpenClient()}
+        onRowClick={(i) => onOpenClient(PORTFOLIO_CLIENTS[i].name)}
         rows={PORTFOLIO_CLIENTS.map((c) => {
           const Icon = TREND[c.trend]
           const tone =
@@ -99,7 +99,7 @@ function PortfolioView({ onOpenClient }: { onOpenClient: () => void }) {
       />
 
       <p className="text-2xs text-slate-400">
-        Cliquez sur AeroDynamics Group pour ouvrir la fiche client.
+        Cliquez sur un groupe pour ouvrir sa fiche client.
       </p>
     </div>
   )
@@ -229,7 +229,7 @@ function DigestView() {
   )
 }
 
-export function PortfolioPage({ onOpenClient }: { onOpenClient: () => void }) {
+export function PortfolioPage({ onOpenClient }: { onOpenClient: (clientName: string) => void }) {
   return (
     <div className="space-y-4">
       <div>

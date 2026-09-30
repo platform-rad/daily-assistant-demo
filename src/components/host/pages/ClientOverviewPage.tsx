@@ -17,10 +17,37 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CLIENT, CLIENT_FACILITIES, CLIENT_METRICS, CLIENT_PIPELINE } from '@/data/client'
+import { PORTFOLIO_CLIENTS } from '@/data/portfolio'
 import type { CapCbsDossier } from '@/data/capCbsDossiers'
 import type { CrmNote } from '@/data/crmNotes'
 import { cn } from '@/lib/utils'
 import { DataTable } from '../DataTable'
+
+/* AeroDynamics Group est le seul client entièrement modélisé dans ce prototype (métriques,
+   engagements, pipeline, contacts, documents). Pour tout autre client (ouvert depuis le
+   portefeuille, un dossier CAP/CBS ou une note CRM+), on affiche honnêtement ce qui est réel —
+   son nom, son secteur/sa notation si connus du portefeuille, et ses actions IA (CAP/CBS, CRM+,
+   déjà multi-client) — plutôt que de retomber silencieusement sur les données d'AeroDynamics. */
+const AERO_CONTACTS = [
+  { name: 'Marc Ferrand', role: 'Group CFO', entity: 'AeroDynamics Group SA', lastContact: '18 août 2026' },
+  { name: 'Sonia Kessler', role: 'Group Treasurer', entity: 'AeroDynamics Group SA', lastContact: '12 août 2026' },
+  { name: 'Ivan Petrescu', role: 'Head of M&A', entity: 'AeroDynamics Holding NV', lastContact: '4 juin 2026' },
+  { name: 'Claire Nguyen', role: 'Directrice des achats groupe', entity: 'AeroDynamics Group SA', lastContact: '—' },
+]
+
+const AERO_DOCUMENTS = [
+  { name: 'CBS-2026-ADYN-004', type: 'CBS / CAP', updatedAt: '2 septembre 2026', author: 'É. Mercier' },
+  { name: 'MEMO-2026-ADYN-017', type: 'Briefing Memo', updatedAt: '2 septembre 2026', author: 'É. Mercier' },
+  { name: 'CR-2026-08-18', type: 'Compte rendu de visite', updatedAt: '18 août 2026', author: 'É. Mercier' },
+  { name: 'CREDIT-2026-041', type: 'Dossier de crédit', updatedAt: '30 juin 2026', author: 'Comité de crédit' },
+]
+
+const AERO_EVENTS: Array<[string, string, 'info' | 'warning' | 'danger']> = [
+  ['15 sept. 2026', 'Call CFO — refinancement', 'info'],
+  ['30 sept. 2026', 'Comité de crédit annuel', 'warning'],
+  ['22 avr. 2027', 'Maturité Notes €500 M', 'danger'],
+  ['30 juin 2027', 'Maturité RCF €250 M', 'danger'],
+]
 
 const TREND_ICON = { up: ArrowUpRight, down: ArrowDownRight, flat: Minus }
 
@@ -63,6 +90,7 @@ function MetricCard({
 
 export function ClientOverviewPage({
   compact,
+  clientName,
   onEdit,
   onOpenCapCbs,
   onOpenMeena,
@@ -71,6 +99,8 @@ export function ClientOverviewPage({
   onApproveCrmNote,
 }: {
   compact: boolean
+  /** Quel client afficher — seul AeroDynamics Group a une fiche entièrement modélisée. */
+  clientName: string
   onEdit: () => void
   onOpenCapCbs?: () => void
   onOpenMeena?: () => void
@@ -81,6 +111,36 @@ export function ClientOverviewPage({
 }) {
   const [tab, setTab] = useState('overview')
 
+  const isKnownClient = clientName === CLIENT.name
+  const portfolioMatch = PORTFOLIO_CLIENTS.find((c) => c.name === clientName)
+
+  // Données réelles pour AeroDynamics Group ; repli honnête sinon — on ne réutilise jamais les
+  // données d'un autre client, on affiche seulement ce qu'on sait vraiment (nom, secteur/notation
+  // du portefeuille si disponibles) et on le dit clairement pour le reste.
+  const display = isKnownClient
+    ? CLIENT
+    : {
+        name: clientName,
+        legalName: clientName,
+        ticker: undefined as string | undefined,
+        sector: portfolioMatch?.sector ?? '—',
+        country: '—',
+        clientId: '—',
+        segment: 'Corporate Coverage — EMEA',
+        rating: portfolioMatch?.rating,
+        ratingAgency: '—',
+        coverage: 'Non assigné',
+        parentGroup: '—',
+        employees: '—',
+        lastContact: '—',
+      }
+  const metrics = isKnownClient ? CLIENT_METRICS : []
+  const facilities = isKnownClient ? CLIENT_FACILITIES : []
+  const pipeline = isKnownClient ? CLIENT_PIPELINE : []
+  const contacts = isKnownClient ? AERO_CONTACTS : []
+  const documents = isKnownClient ? AERO_DOCUMENTS : []
+  const events = isKnownClient ? AERO_EVENTS : []
+
   return (
     <div className="space-y-4">
       {/* En-tête client */}
@@ -90,17 +150,26 @@ export function ClientOverviewPage({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-xl font-semibold tracking-tight text-slate-900">{CLIENT.name}</h1>
-            <Badge variant="secondary">{CLIENT.ticker}</Badge>
-            <Badge variant="info">{CLIENT.rating}</Badge>
-            <Star className="size-4 fill-amber-400 text-amber-400" />
+            <h1 className="text-xl font-semibold tracking-tight text-slate-900">{display.name}</h1>
+            {display.ticker && <Badge variant="secondary">{display.ticker}</Badge>}
+            {display.rating && <Badge variant="info">{display.rating}</Badge>}
+            {isKnownClient && <Star className="size-4 fill-amber-400 text-amber-400" />}
           </div>
-          <p className="mt-1 text-xs text-slate-500">
-            {CLIENT.sector} · {CLIENT.country} · ID client {CLIENT.clientId}
-          </p>
-          {!compact && (
-            <p className="mt-0.5 text-xs text-slate-500">
-              Couverture : {CLIENT.coverage} · Dernier contact : {CLIENT.lastContact}
+          {isKnownClient ? (
+            <>
+              <p className="mt-1 text-xs text-slate-500">
+                {display.sector} · {display.country} · ID client {display.clientId}
+              </p>
+              {!compact && (
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Couverture : {display.coverage} · Dernier contact : {display.lastContact}
+                </p>
+              )}
+            </>
+          ) : (
+            <p className="mt-1 text-xs text-slate-500">
+              {display.sector !== '—' ? `${display.sector} · ` : ''}Fiche détaillée non modélisée dans ce
+              prototype — seules les actions IA ci-dessous (CAP/CBS, CRM+) sont réelles pour ce client.
             </p>
           )}
         </div>
@@ -108,23 +177,27 @@ export function ClientOverviewPage({
           <Button variant="secondary" size="sm">
             <Download className="size-3.5" /> Exporter
           </Button>
-          <Button size="sm" onClick={onEdit}>
+          <Button size="sm" onClick={onEdit} disabled={!isKnownClient} title={isKnownClient ? undefined : 'Édition non disponible — client non modélisé dans ce prototype'}>
             <Pencil className="size-3.5" /> Éditer la fiche
           </Button>
         </div>
       </div>
 
       {/* Métriques financières */}
-      <div
-        className={cn(
-          'grid gap-3',
-          compact ? 'grid-cols-2 xl:grid-cols-3' : 'grid-cols-2 md:grid-cols-3 xl:grid-cols-6'
-        )}
-      >
-        {CLIENT_METRICS.map((m) => (
-          <MetricCard key={m.label} metric={m} compact={compact} />
-        ))}
-      </div>
+      {metrics.length > 0 ? (
+        <div
+          className={cn(
+            'grid gap-3',
+            compact ? 'grid-cols-2 xl:grid-cols-3' : 'grid-cols-2 md:grid-cols-3 xl:grid-cols-6'
+          )}
+        >
+          {metrics.map((m) => (
+            <MetricCard key={m.label} metric={m} compact={compact} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-2xs text-slate-400">Aucune métrique financière modélisée pour ce client dans le prototype.</p>
+      )}
 
       {/* Onglets */}
       <Tabs value={tab} onValueChange={setTab}>
@@ -145,31 +218,41 @@ export function ClientOverviewPage({
                   <CardTitle>Description de la relation</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-xs leading-relaxed text-slate-600">
-                  <p>
-                    {CLIENT.legalName} est un équipementier aéronautique de rang 1 spécialisé dans
-                    les structures composites et les systèmes d’actionnement. Le groupe emploie{' '}
-                    {CLIENT.employees} personnes réparties sur 22 sites industriels et réalise 63 %
-                    de son chiffre d’affaires dans l’aviation commerciale, 24 % dans la défense et
-                    13 % dans les services de maintenance.
-                  </p>
-                  <p>
-                    La relation bancaire est couverte depuis 2011. BNP Paribas intervient
-                    principalement en financement (RCF, Term Loan A, DCM) et, plus marginalement,
-                    sur les métiers de flux et de marchés.
-                  </p>
-                  <dl className="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-slate-100 pt-3">
-                    {[
-                      ['Maison mère', CLIENT.parentGroup],
-                      ['Segment', CLIENT.segment],
-                      ['Notation', `${CLIENT.rating} — ${CLIENT.ratingAgency}`],
-                      ['Effectif', CLIENT.employees],
-                    ].map(([k, v]) => (
-                      <div key={k}>
-                        <dt className="text-2xs uppercase tracking-wider text-slate-400">{k}</dt>
-                        <dd className="mt-0.5 text-xs text-slate-700">{v}</dd>
-                      </div>
-                    ))}
-                  </dl>
+                  {isKnownClient ? (
+                    <>
+                      <p>
+                        {CLIENT.legalName} est un équipementier aéronautique de rang 1 spécialisé dans
+                        les structures composites et les systèmes d’actionnement. Le groupe emploie{' '}
+                        {CLIENT.employees} personnes réparties sur 22 sites industriels et réalise 63 %
+                        de son chiffre d’affaires dans l’aviation commerciale, 24 % dans la défense et
+                        13 % dans les services de maintenance.
+                      </p>
+                      <p>
+                        La relation bancaire est couverte depuis 2011. BNP Paribas intervient
+                        principalement en financement (RCF, Term Loan A, DCM) et, plus marginalement,
+                        sur les métiers de flux et de marchés.
+                      </p>
+                      <dl className="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-slate-100 pt-3">
+                        {[
+                          ['Maison mère', CLIENT.parentGroup],
+                          ['Segment', CLIENT.segment],
+                          ['Notation', `${CLIENT.rating} — ${CLIENT.ratingAgency}`],
+                          ['Effectif', CLIENT.employees],
+                        ].map(([k, v]) => (
+                          <div key={k}>
+                            <dt className="text-2xs uppercase tracking-wider text-slate-400">{k}</dt>
+                            <dd className="mt-0.5 text-xs text-slate-700">{v}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </>
+                  ) : (
+                    <p className="text-slate-400">
+                      Ce client n'a pas encore de fiche détaillée dans ce prototype (chiffres clés,
+                      engagements, pipeline, contacts, documents). Seules les actions IA — CAP/CBS et
+                      CRM+ — sont réelles et consultables dans l'onglet ci-contre.
+                    </p>
+                  )}
                 </CardContent>
               </Card>
 
@@ -178,17 +261,12 @@ export function ClientOverviewPage({
                   <CardTitle>Prochaines échéances</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2.5">
-                  {[
-                    ['15 sept. 2026', 'Call CFO — refinancement', 'info'],
-                    ['30 sept. 2026', 'Comité de crédit annuel', 'warning'],
-                    ['22 avr. 2027', 'Maturité Notes €500 M', 'danger'],
-                    ['30 juin 2027', 'Maturité RCF €250 M', 'danger'],
-                  ].map(([date, label, tone]) => (
-                    <div key={label as string} className="flex items-start gap-2.5">
-                      <Badge
-                        variant={tone as 'info' | 'warning' | 'danger'}
-                        className="mt-0.5 shrink-0"
-                      >
+                  {events.length === 0 && (
+                    <p className="text-2xs text-slate-400">Aucune échéance modélisée pour ce client.</p>
+                  )}
+                  {events.map(([date, label, tone]) => (
+                    <div key={label} className="flex items-start gap-2.5">
+                      <Badge variant={tone} className="mt-0.5 shrink-0">
                         {date}
                       </Badge>
                       <span className="text-xs text-slate-600">{label}</span>
@@ -283,9 +361,12 @@ export function ClientOverviewPage({
           </TabsContent>
 
           <TabsContent value="facilities">
+            {facilities.length === 0 && (
+              <p className="mb-2 text-2xs text-slate-400">Aucun engagement modélisé pour ce client dans le prototype.</p>
+            )}
             <DataTable
               columns={['Référence', 'Produit', 'Montant', 'Part BNPP', 'Maturité', 'Rôle', 'Statut']}
-              rows={CLIENT_FACILITIES.map((f) => [
+              rows={facilities.map((f) => [
                 f.id,
                 f.product,
                 f.amount,
@@ -300,9 +381,12 @@ export function ClientOverviewPage({
           </TabsContent>
 
           <TabsContent value="pipeline">
+            {pipeline.length === 0 && (
+              <p className="mb-2 text-2xs text-slate-400">Aucune opportunité modélisée pour ce client dans le prototype.</p>
+            )}
             <DataTable
               columns={['Opportunité', 'Produit', 'Revenu estimé', 'Étape', 'Probabilité', 'Responsable']}
-              rows={CLIENT_PIPELINE.map((p) => [
+              rows={pipeline.map((p) => [
                 p.name,
                 p.product,
                 p.revenue,
@@ -316,26 +400,22 @@ export function ClientOverviewPage({
           </TabsContent>
 
           <TabsContent value="contacts">
+            {contacts.length === 0 && (
+              <p className="mb-2 text-2xs text-slate-400">Aucun contact modélisé pour ce client dans le prototype.</p>
+            )}
             <DataTable
               columns={['Nom', 'Fonction', 'Entité', 'Dernier échange']}
-              rows={[
-                ['Marc Ferrand', 'Group CFO', 'AeroDynamics Group SA', '18 août 2026'],
-                ['Sonia Kessler', 'Group Treasurer', 'AeroDynamics Group SA', '12 août 2026'],
-                ['Ivan Petrescu', 'Head of M&A', 'AeroDynamics Holding NV', '4 juin 2026'],
-                ['Claire Nguyen', 'Directrice des achats groupe', 'AeroDynamics Group SA', '—'],
-              ]}
+              rows={contacts.map((c) => [c.name, c.role, c.entity, c.lastContact])}
             />
           </TabsContent>
 
           <TabsContent value="documents">
+            {documents.length === 0 && (
+              <p className="mb-2 text-2xs text-slate-400">Aucun document modélisé pour ce client dans le prototype.</p>
+            )}
             <DataTable
               columns={['Document', 'Type', 'Dernière mise à jour', 'Auteur']}
-              rows={[
-                ['CBS-2026-ADYN-004', 'CBS / CAP', '2 septembre 2026', 'É. Mercier'],
-                ['MEMO-2026-ADYN-017', 'Briefing Memo', '2 septembre 2026', 'É. Mercier'],
-                ['CR-2026-08-18', 'Compte rendu de visite', '18 août 2026', 'É. Mercier'],
-                ['CREDIT-2026-041', 'Dossier de crédit', '30 juin 2026', 'Comité de crédit'],
-              ]}
+              rows={documents.map((d) => [d.name, d.type, d.updatedAt, d.author])}
             />
           </TabsContent>
         </div>

@@ -2,14 +2,14 @@ import { useState, useRef, useEffect } from 'react'
 import { Mic, Square, Pause, Play, Send, Clock, ArrowLeft, ArrowUpRight, Plus, Info, Maximize2, Upload, Pencil, FileDown, ShieldCheck, AlertTriangle, Building2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { PORTFOLIO_CLIENTS } from '@/data/portfolio'
-import type { HostRoute } from '@/data/types'
 import type { CrmNote, CrmNoteStatus } from '@/data/crmNotes'
 import type { DossierMessage } from '@/data/capCbsDossiers'
 
 interface CrmAgentPageProps {
   onOpenMeena?: () => void
-  /** Change de route SANS relancer le mode hôte — utilisé pour renvoyer vers la fiche client. */
-  onNavigate?: (route: HostRoute) => void
+  /** Ouvre la fiche du client donné (route hôte 'client') — chaque note a son propre client,
+   *  contrairement à une simple navigation de route sans paramètre. */
+  onReviewOnClientPage?: (clientName: string) => void
   /** Active client from the left panel, used to pre-fill a new recording's subject. */
   currentClientName?: string
   /** Source unique — partagée avec l'onglet "Actions IA" de la fiche client, à gauche. */
@@ -43,7 +43,7 @@ type RecordingState = 'idle' | 'recording' | 'paused' | 'stopped'
 /** Dedicated sidepanel work plan for the CRM+ Agent (Meena) — record, transcribe, ask, and keep the
  *  conversation as memory. The final approval that syncs a note to CRM+ always happens on the
  *  client's page, to the left — this panel only points there. */
-export function CrmAgentPage({ onOpenMeena, onNavigate, currentClientName, notes, onAddNote, onUpdateNote, onAddMessage, isCompact = true }: CrmAgentPageProps) {
+export function CrmAgentPage({ onOpenMeena, onReviewOnClientPage, currentClientName, notes, onAddNote, onUpdateNote, onAddMessage, isCompact = true }: CrmAgentPageProps) {
   const [openId, setOpenId] = useState<string | null>(null)
   const [input, setInput] = useState('')
   // Which client a new recording/conversation should be filed under. Pre-filled from the
@@ -71,8 +71,6 @@ export function CrmAgentPage({ onOpenMeena, onNavigate, currentClientName, notes
 
   const openNote = notes.find((n) => n.id === openId) || null
   const isSessionActive = recordingState !== 'idle'
-
-  const goToClientPage = () => onNavigate?.('client')
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -403,7 +401,7 @@ export function CrmAgentPage({ onOpenMeena, onNavigate, currentClientName, notes
                   <ShieldCheck size={14} className="text-amber-600 flex-shrink-0" />
                   <span className="text-2xs text-amber-800 flex-1">Awaiting human review before syncing to CRM+.</span>
                   <button
-                    onClick={goToClientPage}
+                    onClick={() => onReviewOnClientPage?.(openNote.client)}
                     className="flex items-center gap-1 px-2.5 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition flex-shrink-0"
                   >
                     Review on {openNote.client}'s page
@@ -502,7 +500,7 @@ export function CrmAgentPage({ onOpenMeena, onNavigate, currentClientName, notes
                           <p className="text-2xs text-slate-500 truncate">{n.subject}</p>
                         </button>
                         <button
-                          onClick={goToClientPage}
+                          onClick={() => onReviewOnClientPage?.(n.client)}
                           title={`Review on ${n.client}'s page`}
                           className="flex items-center gap-0.5 px-2 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition flex-shrink-0"
                         >
