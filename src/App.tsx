@@ -10,6 +10,9 @@ import { FloatingWindow } from '@/components/desktop/FloatingWindow'
 import { MeenaApp } from '@/components/meena/MeenaApp'
 import { Sparkles, X } from 'lucide-react'
 import type { HostRoute } from '@/data/types'
+import { INITIAL_CAP_CBS_DOSSIERS, type CapCbsDossier } from '@/data/capCbsDossiers'
+import { INITIAL_CRM_NOTES, type CrmNote } from '@/data/crmNotes'
+import type { DossierMessage } from '@/data/capCbsDossiers'
 
 export type AppMode = 'desktop' | 'legacy' | 'credit-memo-creation' | 'credit-memo'
 
@@ -26,6 +29,31 @@ export default function App() {
   // (Desktop, Daily Assistant, Credit Memo) — "une seule et même appli".
   const [meenaOpen, setMeenaOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
+
+  // Source unique CAP/CBS + CRM+ — partagée entre le panneau gauche (édition/validation)
+  // et le panneau droit (notifications + conversation) pour que les deux ne divergent jamais.
+  const [capCbsDossiers, setCapCbsDossiers] = useState<CapCbsDossier[]>(INITIAL_CAP_CBS_DOSSIERS)
+  const [crmNotes, setCrmNotes] = useState<CrmNote[]>(INITIAL_CRM_NOTES)
+
+  const updateCapCbsDossier = useCallback((id: string, patch: Partial<CapCbsDossier>) => {
+    setCapCbsDossiers((prev) => prev.map((d) => (d.id === id ? { ...d, ...patch } : d)))
+  }, [])
+  const addCapCbsDossier = useCallback((dossier: CapCbsDossier) => {
+    setCapCbsDossiers((prev) => [dossier, ...prev])
+  }, [])
+  const addCapCbsMessage = useCallback((id: string, message: DossierMessage) => {
+    setCapCbsDossiers((prev) => prev.map((d) => (d.id === id ? { ...d, messages: [...d.messages, message] } : d)))
+  }, [])
+
+  const updateCrmNote = useCallback((id: string, patch: Partial<CrmNote>) => {
+    setCrmNotes((prev) => prev.map((n) => (n.id === id ? { ...n, ...patch } : n)))
+  }, [])
+  const addCrmNote = useCallback((note: CrmNote) => {
+    setCrmNotes((prev) => [note, ...prev])
+  }, [])
+  const addCrmNoteMessage = useCallback((id: string, message: DossierMessage) => {
+    setCrmNotes((prev) => prev.map((n) => (n.id === id ? { ...n, messages: [...n.messages, message] } : n)))
+  }, [])
 
   const navigate = useCallback(
     (next: HostRoute) => {
@@ -151,7 +179,16 @@ export default function App() {
           <div className="flex flex-1 min-w-0 overflow-hidden">
             {/* Application hôte */}
             <main className="min-w-0 flex-1 overflow-hidden">
-              <MyClientDev route={route} onNavigate={navigate} compact={false} onOpenMeena={() => setMeenaOpen(true)} />
+              <MyClientDev
+                route={route}
+                onNavigate={navigate}
+                compact={false}
+                onOpenMeena={() => setMeenaOpen(true)}
+                capCbsDossiers={capCbsDossiers}
+                onUpdateCapCbsDossier={updateCapCbsDossier}
+                crmNotes={crmNotes}
+                onApproveCrmNote={(id) => updateCrmNote(id, { status: 'Synced', updatedAt: 'just now' })}
+              />
             </main>
 
             {/* Copilot Sidebar */}
@@ -165,6 +202,13 @@ export default function App() {
               onNavigate={navigate}
               onOpenMeena={() => setMeenaOpen(true)}
               currentRoute={route}
+              capCbsDossiers={capCbsDossiers}
+              onAddCapCbsDossier={addCapCbsDossier}
+              onAddCapCbsMessage={addCapCbsMessage}
+              crmNotes={crmNotes}
+              onAddCrmNote={addCrmNote}
+              onUpdateCrmNote={updateCrmNote}
+              onAddCrmNoteMessage={addCrmNoteMessage}
             />
 
             {/* Sticky button - collé à droite, draggable sur axe Y */}

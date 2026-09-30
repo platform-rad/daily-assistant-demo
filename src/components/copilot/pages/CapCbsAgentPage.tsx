@@ -2,66 +2,27 @@ import { useState, useRef, useEffect } from 'react'
 import { ClipboardList, Send, ArrowLeft, ArrowUpRight, Plus, Info, LayoutGrid, AlertTriangle } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { HostRoute } from '@/data/types'
+import type { CapCbsDossier, CapCbsStatus, DossierMessage } from '@/data/capCbsDossiers'
 
 interface CapCbsAgentPageProps {
   onNavigate?: (route: HostRoute) => void
   onOpenMyClientDev?: (route?: HostRoute) => void
+  /** Source unique — la même que le tableau de bord et la fiche client à gauche. */
+  dossiers: CapCbsDossier[]
+  onAddDossier: (dossier: CapCbsDossier) => void
+  onAddMessage: (id: string, message: DossierMessage) => void
   isCompact?: boolean
 }
 
-interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-}
-
-type DossierStatus = 'Draft' | 'Pending Review' | 'Validated'
-
-interface Dossier {
-  id: string
-  client: string
-  status: DossierStatus
-  updated: boolean
-  note: string
-  messages: ChatMessage[]
-}
-
-const STATUS_STYLE: Record<DossierStatus, string> = {
+const STATUS_STYLE: Record<CapCbsStatus, string> = {
   Validated: 'bg-emerald-100 text-emerald-700',
   'Pending Review': 'bg-rad-indigo-100 text-rad-indigo-700',
   Draft: 'bg-amber-100 text-amber-700',
 }
 
-const INITIAL_DOSSIERS: Dossier[] = [
-  {
-    id: 'c1',
-    client: 'AeroDynamics Group',
-    status: 'Pending Review',
-    updated: true,
-    note: 'ESG axis updated 2h ago — submitted for review',
-    messages: [{ id: 'm1', role: 'assistant', content: '3 of 5 axes completed. The ESG axis was updated by É. Mercier 2h ago and submitted for Pilot Banker review.' }],
-  },
-  {
-    id: 'c2',
-    client: 'TechCorp France',
-    status: 'Validated',
-    updated: false,
-    note: 'Validated Sep 2, 2026',
-    messages: [{ id: 'm1', role: 'assistant', content: 'CBS/CAP validated — data frozen until the next review (Sep 2027).' }],
-  },
-  {
-    id: 'c3',
-    client: 'Manufacturing Ltd',
-    status: 'Pending Review',
-    updated: true,
-    note: 'New EMEA region contribution — submitted for review',
-    messages: [{ id: 'm1', role: 'assistant', content: 'The EMEA region added a contribution on the IB/TB/GM angle axis. Awaiting Pilot Banker review.' }],
-  },
-]
-
-/** Dedicated sidepanel work plan for CAP/CBS. */
-export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = true }: CapCbsAgentPageProps) {
-  const [dossiers, setDossiers] = useState<Dossier[]>(INITIAL_DOSSIERS)
+/** Dedicated sidepanel work plan for CAP/CBS — pointeur + mémoire de conversation,
+ *  la validation elle-même se fait toujours sur le dossier complet, à gauche. */
+export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, dossiers, onAddDossier, onAddMessage, isCompact = true }: CapCbsAgentPageProps) {
   const [openId, setOpenId] = useState<string | null>(null)
   const [input, setInput] = useState('')
   const endRef = useRef<HTMLDivElement>(null)
@@ -84,15 +45,19 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
   }
 
   const handleNewConversation = () => {
-    const newDossier: Dossier = {
+    const newDossier: CapCbsDossier = {
       id: Date.now().toString(),
       client: 'New topic',
+      sector: '—',
       status: 'Draft',
-      updated: false,
+      createdAt: 'just now',
+      updatedAt: 'just now',
+      pilotBanker: '—',
+      nextReview: '—',
       note: 'Unclassified conversation',
       messages: [],
     }
-    setDossiers((prev) => [newDossier, ...prev])
+    onAddDossier(newDossier)
     setOpenId(newDossier.id)
   }
 
@@ -100,27 +65,13 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
     if (!input.trim() || !openId) return
     const question = input.trim()
     setInput('')
-    setDossiers((prev) =>
-      prev.map((d) => (d.id === openId ? { ...d, messages: [...d.messages, { id: Date.now().toString(), role: 'user', content: question }] } : d))
-    )
+    onAddMessage(openId, { id: Date.now().toString(), role: 'user', content: question })
     setTimeout(() => {
-      setDossiers((prev) =>
-        prev.map((d) =>
-          d.id === openId
-            ? {
-                ...d,
-                messages: [
-                  ...d.messages,
-                  {
-                    id: (Date.now() + 1).toString(),
-                    role: 'assistant',
-                    content: `I can dig into this on the CBS/CAP ("${question}"). Open the full dossier to edit the relevant axes directly.`,
-                  },
-                ],
-              }
-            : d
-        )
-      )
+      onAddMessage(openId, {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `I can dig into this on the CBS/CAP ("${question}"). Open the full dossier to edit the relevant axes directly.`,
+      })
     }, 500)
   }
 
@@ -163,7 +114,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
       </div>
 
       {openDossier ? (
-        /* Dossier detail: conversation history + composer */
+        /* Dossier detail: conversation history + composer — mémoire conservée pour reprendre le contexte */
         <>
           <div className={`flex items-center gap-2 ${pad} py-2 border-b border-slate-200 flex-shrink-0`}>
             <button onClick={() => setOpenId(null)} className="p-1 rounded hover:bg-slate-100 transition">
@@ -198,7 +149,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
             ))}
             <p className="flex items-start gap-1 text-2xs text-slate-400 pt-1">
               <AlertTriangle size={11} className="mt-0.5 flex-shrink-0" />
-              AI-drafted content — human validation required before status can change.
+              AI-drafted content — human validation required before status can change. Open the full dossier to submit or validate.
             </p>
             <div ref={endRef} />
           </div>
@@ -239,7 +190,9 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
               >
                 <button onClick={() => setOpenId(d.id)} className="min-w-0 flex-1 text-left">
                   <div className="flex items-center gap-1.5">
-                    {d.updated && <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" title="Recently updated" />}
+                    {d.updatedAt.startsWith('il y a') && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" title="Recently updated" />
+                    )}
                     <p className="text-2xs font-semibold text-slate-900 truncate">{d.client}</p>
                   </div>
                   <p className="text-2xs text-slate-500 truncate">{d.note}</p>

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   AlertTriangle,
   CalendarClock,
@@ -10,25 +9,19 @@ import {
   Sparkles,
   User,
 } from 'lucide-react'
+import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CLIENT } from '@/data/client'
+import type { CapCbsDossier, CapCbsStatus } from '@/data/capCbsDossiers'
 import { cn } from '@/lib/utils'
 
-type CbsCapStatus = 'draft' | 'pending' | 'validated'
-
-const STATUS_LABEL: Record<CbsCapStatus, string> = {
-  draft: 'Draft',
-  pending: 'Pending Review',
-  validated: 'Validated',
-}
-
-const STATUS_BADGE: Record<CbsCapStatus, 'warning' | 'info' | 'success'> = {
-  draft: 'warning',
-  pending: 'info',
-  validated: 'success',
+const STATUS_BADGE: Record<CapCbsStatus, 'warning' | 'info' | 'success'> = {
+  Draft: 'warning',
+  'Pending Review': 'info',
+  Validated: 'success',
 }
 
 const STEPS = [
@@ -124,14 +117,20 @@ const ACTION_STATUS_BADGE: Record<(typeof CAP_ACTIONS)[number]['status'], 'secon
   Fait: 'success',
 }
 
-export function CapCbsPage() {
-  const [status, setStatus] = useState<CbsCapStatus>('draft')
+interface CapCbsPageProps {
+  dossier: CapCbsDossier
+  onSubmitForReview: () => void
+  onValidate: () => void
+}
+
+export function CapCbsPage({ dossier, onSubmitForReview, onValidate }: CapCbsPageProps) {
+  const status = dossier.status
   const [activeStep] = useState(2) // "Complétion CBS" — étape courante mockée
   const [activeAxis, setActiveAxis] = useState<string>(CBS_AXES[0].id)
   const [savedAxis, setSavedAxis] = useState<string | null>(null)
 
-  const isValidated = status === 'validated'
-  const isPending = status === 'pending'
+  const isValidated = status === 'Validated'
+  const isPending = status === 'Pending Review'
 
   const handleSaveAxis = (axisId: string) => {
     setSavedAxis(axisId)
@@ -153,7 +152,7 @@ export function CapCbsPage() {
             </h1>
             <Badge variant={STATUS_BADGE[status]}>
               {isValidated && <ShieldCheck className="size-3" />}
-              {STATUS_LABEL[status]}
+              {status}
             </Badge>
           </div>
           <p className="mt-1 text-xs text-slate-500">
@@ -165,7 +164,7 @@ export function CapCbsPage() {
           <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
             <span className="flex items-center gap-1.5">
               <User className="size-3.5 text-rad-indigo-600" />
-              Pilot Banker : <span className="font-medium text-slate-700">{CLIENT.coverage}</span>
+              Pilot Banker : <span className="font-medium text-slate-700">{dossier.pilotBanker}</span>
             </span>
             <span className="flex items-center gap-1.5">
               <CalendarClock className="size-3.5 text-rad-indigo-600" />
@@ -173,7 +172,7 @@ export function CapCbsPage() {
             </span>
             <span className="flex items-center gap-1.5">
               <CalendarClock className="size-3.5 text-slate-400" />
-              Prochaine revue : <span className="font-medium text-slate-700">mars 2027</span>
+              Prochaine revue : <span className="font-medium text-slate-700">{dossier.nextReview}</span>
             </span>
           </div>
           <Button variant="secondary" size="sm" onClick={handleExport}>
@@ -340,27 +339,27 @@ export function CapCbsPage() {
         </CardHeader>
         <CardContent className="flex flex-wrap items-center justify-between gap-3">
           <p className="max-w-xl text-2xs text-slate-500">
-            {status === 'draft' &&
+            {status === 'Draft' &&
               'Une fois les 5 axes complétés, soumettez le CBS/CAP pour revue. Le Pilot Banker devra ensuite valider avant que le statut ne passe à « Validated ».'}
-            {status === 'pending' &&
+            {status === 'Pending Review' &&
               'Le Pilot Banker revoit la cohérence de la stratégie, des hypothèses et des priorités, vérifie la date de réunion et la prochaine date de revue, puis valide le CBS/CAP.'}
-            {status === 'validated' && (
+            {status === 'Validated' && (
               <>Le CBS/CAP est validé depuis le <span className="font-medium text-slate-700">30 sept. 2026</span>.</>
             )}
           </p>
-          {status === 'draft' && (
-            <Button onClick={() => setStatus('pending')}>
+          {status === 'Draft' && (
+            <Button onClick={onSubmitForReview}>
               <ShieldCheck className="size-4" />
               Soumettre pour validation
             </Button>
           )}
-          {status === 'pending' && (
-            <Button onClick={() => setStatus('validated')}>
+          {status === 'Pending Review' && (
+            <Button onClick={onValidate}>
               <Sparkles className="size-4" />
               Valider le CBS/CAP
             </Button>
           )}
-          {status === 'validated' && (
+          {status === 'Validated' && (
             <Button variant="secondary" disabled>
               <ShieldCheck className="size-4 text-emerald-600" />
               CBS/CAP validé

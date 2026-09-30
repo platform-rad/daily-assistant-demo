@@ -2,18 +2,7 @@ import { ArrowRight, AlertTriangle, Clock } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { StatStrip } from '../DataTable'
-
-type CapCbsStatus = 'Draft' | 'Pending Review' | 'Validated'
-
-interface CapCbsDossier {
-  client: string
-  sector: string
-  status: CapCbsStatus
-  createdAt: string
-  updatedAt: string
-  pilotBanker: string
-  nextReview: string
-}
+import type { CapCbsDossier, CapCbsStatus } from '@/data/capCbsDossiers'
 
 const STATUS_BADGE: Record<CapCbsStatus, 'warning' | 'info' | 'success'> = {
   Draft: 'warning',
@@ -21,65 +10,17 @@ const STATUS_BADGE: Record<CapCbsStatus, 'warning' | 'info' | 'success'> = {
   Validated: 'success',
 }
 
-const DOSSIERS: CapCbsDossier[] = [
-  {
-    client: 'AeroDynamics Group',
-    sector: 'Aerospace & Defence',
-    status: 'Pending Review',
-    createdAt: '12 janv. 2026',
-    updatedAt: 'il y a 2h',
-    pilotBanker: 'É. Mercier',
-    nextReview: 'mars 2027',
-  },
-  {
-    client: 'TechCorp France',
-    sector: 'Technology',
-    status: 'Validated',
-    createdAt: '3 mars 2026',
-    updatedAt: '2 sept. 2026',
-    pilotBanker: 'É. Mercier',
-    nextReview: 'sept. 2027',
-  },
-  {
-    client: 'Manufacturing Ltd',
-    sector: 'Manufacturing',
-    status: 'Pending Review',
-    createdAt: '20 juin 2026',
-    updatedAt: 'il y a 6h',
-    pilotBanker: 'A. Beaulieu',
-    nextReview: 'juin 2027',
-  },
-  {
-    client: 'Financial Services Inc',
-    sector: 'Finance',
-    status: 'Validated',
-    createdAt: '8 févr. 2026',
-    updatedAt: '18 août 2026',
-    pilotBanker: 'T. Nakamura',
-    nextReview: 'févr. 2027',
-  },
-  {
-    client: 'Helvetia Ports SA',
-    sector: 'Infrastructure',
-    status: 'Draft',
-    createdAt: '2 sept. 2026',
-    updatedAt: 'il y a 1j',
-    pilotBanker: 'É. Mercier',
-    nextReview: 'sept. 2027',
-  },
-]
+interface CapCbsDashboardPageProps {
+  dossiers: CapCbsDossier[]
+  onOpenDetail: (client: string) => void
+}
 
-/** Flux "ce qui a bougé" — dérivé des dossiers récemment mis à jour, plus détaillé qu'un simple point rouge. */
-const RECENT_UPDATES = [
-  { client: 'AeroDynamics Group', note: "Axe ESG modifié par É. Mercier", time: 'il y a 2h' },
-  { client: 'Manufacturing Ltd', note: 'Nouvelle contribution région EMEA — soumis pour revue', time: 'il y a 6h' },
-  { client: 'Helvetia Ports SA', note: 'Axe Contexte mis à jour', time: 'il y a 1j' },
-]
-
-export function CapCbsDashboardPage({ onOpenDetail }: { onOpenDetail: (client: string) => void }) {
-  const draftCount = DOSSIERS.filter((d) => d.status === 'Draft').length
-  const pendingCount = DOSSIERS.filter((d) => d.status === 'Pending Review').length
-  const validatedCount = DOSSIERS.filter((d) => d.status === 'Validated').length
+export function CapCbsDashboardPage({ dossiers, onOpenDetail }: CapCbsDashboardPageProps) {
+  const draftCount = dossiers.filter((d) => d.status === 'Draft').length
+  const pendingCount = dossiers.filter((d) => d.status === 'Pending Review').length
+  const validatedCount = dossiers.filter((d) => d.status === 'Validated').length
+  // "Ce qui a bougé" — dossiers récemment mis à jour, dérivé de la même source que la table.
+  const recentUpdates = dossiers.filter((d) => d.updatedAt.startsWith('il y a'))
 
   return (
     <div className="space-y-4">
@@ -92,7 +33,7 @@ export function CapCbsDashboardPage({ onOpenDetail }: { onOpenDetail: (client: s
 
       <StatStrip
         stats={[
-          { label: 'Dossiers actifs', value: String(DOSSIERS.length) },
+          { label: 'Dossiers actifs', value: String(dossiers.length) },
           { label: 'Brouillons', value: String(draftCount) },
           { label: 'En attente de revue', value: String(pendingCount), hint: 'Nécessite validation humaine' },
           { label: 'Validés', value: String(validatedCount) },
@@ -100,30 +41,32 @@ export function CapCbsDashboardPage({ onOpenDetail }: { onOpenDetail: (client: s
       />
 
       {/* Ce qui a bougé — flux d'activité, pas juste un point rouge */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="size-3.5 text-rad-indigo-600" />
-            Ce qui a bougé récemment
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {RECENT_UPDATES.map((u, i) => (
-            <button
-              key={i}
-              onClick={() => onOpenDetail(u.client)}
-              className="w-full flex items-center gap-2.5 rounded-lg border border-slate-200 p-2.5 text-left hover:border-rad-indigo-300 hover:bg-rad-indigo-50/40 transition"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-slate-900">{u.client}</p>
-                <p className="text-2xs text-slate-500">{u.note}</p>
-              </div>
-              <span className="text-2xs text-slate-400 flex-shrink-0">{u.time}</span>
-            </button>
-          ))}
-        </CardContent>
-      </Card>
+      {recentUpdates.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="size-3.5 text-rad-indigo-600" />
+              Ce qui a bougé récemment
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {recentUpdates.map((d) => (
+              <button
+                key={d.id}
+                onClick={() => onOpenDetail(d.client)}
+                className="w-full flex items-center gap-2.5 rounded-lg border border-slate-200 p-2.5 text-left hover:border-rad-indigo-300 hover:bg-rad-indigo-50/40 transition"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-medium text-slate-900">{d.client}</p>
+                  <p className="text-2xs text-slate-500">{d.note}</p>
+                </div>
+                <span className="text-2xs text-slate-400 flex-shrink-0">{d.updatedAt}</span>
+              </button>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
         <table className="w-full min-w-[720px] text-left text-xs">
@@ -137,8 +80,8 @@ export function CapCbsDashboardPage({ onOpenDetail }: { onOpenDetail: (client: s
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {DOSSIERS.map((d) => (
-              <tr key={d.client} className="hover:bg-slate-50 transition-colors">
+            {dossiers.map((d) => (
+              <tr key={d.id} className="hover:bg-slate-50 transition-colors">
                 <td className="whitespace-nowrap px-3 py-2.5 font-medium text-slate-900">{d.client}</td>
                 <td className="whitespace-nowrap px-3 py-2.5 text-slate-600">{d.sector}</td>
                 <td className="whitespace-nowrap px-3 py-2.5">

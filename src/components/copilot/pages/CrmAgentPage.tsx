@@ -1,70 +1,30 @@
 import { useState, useRef, useEffect } from 'react'
-import { Mic, Square, Pause, Play, Send, Clock, ArrowLeft, Plus, Info, Maximize2, Upload, Pencil, FileDown, ShieldCheck, AlertTriangle, Building2 } from 'lucide-react'
+import { Mic, Square, Pause, Play, Send, Clock, ArrowLeft, ArrowUpRight, Plus, Info, Maximize2, Upload, Pencil, FileDown, ShieldCheck, AlertTriangle, Building2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { PORTFOLIO_CLIENTS } from '@/data/portfolio'
+import type { HostRoute } from '@/data/types'
+import type { CrmNote, CrmNoteStatus } from '@/data/crmNotes'
+import type { DossierMessage } from '@/data/capCbsDossiers'
 
 interface CrmAgentPageProps {
   onOpenMeena?: () => void
+  /** Change de route SANS relancer le mode hôte — utilisé pour renvoyer vers la fiche client. */
+  onNavigate?: (route: HostRoute) => void
   /** Active client from the left panel, used to pre-fill a new recording's subject. */
   currentClientName?: string
+  /** Source unique — partagée avec l'onglet "Actions IA" de la fiche client, à gauche. */
+  notes: CrmNote[]
+  onAddNote: (note: CrmNote) => void
+  onUpdateNote: (id: string, patch: Partial<CrmNote>) => void
+  onAddMessage: (id: string, message: DossierMessage) => void
   isCompact?: boolean
 }
 
-interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-}
-
-type DossierStatus = 'Draft' | 'Pending Review' | 'Synced'
-
-interface Dossier {
-  id: string
-  client: string
-  subject: string
-  status: DossierStatus
-  updatedAt: string
-  messages: ChatMessage[]
-}
-
-const STATUS_STYLE: Record<DossierStatus, string> = {
+const STATUS_STYLE: Record<CrmNoteStatus, string> = {
   Synced: 'bg-emerald-100 text-emerald-700',
   'Pending Review': 'bg-amber-100 text-amber-700',
   Draft: 'bg-slate-100 text-slate-600',
 }
-
-const INITIAL_DOSSIERS: Dossier[] = [
-  {
-    id: 'd1',
-    client: 'AeroDynamics Group',
-    subject: 'CFO call — 2027 refinancing',
-    status: 'Synced',
-    updatedAt: 'Aug 18, 2026',
-    messages: [
-      { id: 'm1', role: 'assistant', content: 'Note synced with CRM+. Key points: refinancing timeline agreed, sell-side mandate opportunity raised.' },
-    ],
-  },
-  {
-    id: 'd2',
-    client: 'TechCorp France',
-    subject: 'Monthly business review',
-    status: 'Pending Review',
-    updatedAt: 'Aug 12, 2026',
-    messages: [
-      { id: 'm1', role: 'assistant', content: 'Note transcribed and awaiting your approval before it syncs to CRM+.' },
-    ],
-  },
-  {
-    id: 'd3',
-    client: 'Manufacturing Ltd',
-    subject: 'Covenant follow-up Q2',
-    status: 'Draft',
-    updatedAt: 'Aug 5, 2026',
-    messages: [
-      { id: 'm1', role: 'assistant', content: 'Draft note — not yet submitted for review.' },
-    ],
-  },
-]
 
 const TRANSCRIPT_SCRIPT = [
   "Thanks everyone for joining today's call.",
@@ -80,9 +40,10 @@ const formatTime = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padSta
 
 type RecordingState = 'idle' | 'recording' | 'paused' | 'stopped'
 
-/** Dedicated sidepanel work plan for the CRM+ Agent (Meena) — record, transcribe, ask, sync. */
-export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true }: CrmAgentPageProps) {
-  const [dossiers, setDossiers] = useState<Dossier[]>(INITIAL_DOSSIERS)
+/** Dedicated sidepanel work plan for the CRM+ Agent (Meena) — record, transcribe, ask, and keep the
+ *  conversation as memory. The final approval that syncs a note to CRM+ always happens on the
+ *  client's page, to the left — this panel only points there. */
+export function CrmAgentPage({ onOpenMeena, onNavigate, currentClientName, notes, onAddNote, onUpdateNote, onAddMessage, isCompact = true }: CrmAgentPageProps) {
   const [openId, setOpenId] = useState<string | null>(null)
   const [input, setInput] = useState('')
   // Which client a new recording/conversation should be filed under. Pre-filled from the
@@ -99,7 +60,7 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
   const [seconds, setSeconds] = useState(0)
   const [transcriptLines, setTranscriptLines] = useState<string[]>([])
   const [scriptIndex, setScriptIndex] = useState(0)
-  const [liveMessages, setLiveMessages] = useState<ChatMessage[]>([])
+  const [liveMessages, setLiveMessages] = useState<DossierMessage[]>([])
   const [liveInput, setLiveInput] = useState('')
   const [sentConfirmation, setSentConfirmation] = useState(false)
   const [editedTranscript, setEditedTranscript] = useState('')
@@ -108,12 +69,14 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
   const transcriptEndRef = useRef<HTMLDivElement>(null)
   const pad = isCompact ? 'px-3 py-3' : 'px-4 py-4'
 
-  const openDossier = dossiers.find((d) => d.id === openId) || null
+  const openNote = notes.find((n) => n.id === openId) || null
   const isSessionActive = recordingState !== 'idle'
+
+  const goToClientPage = () => onNavigate?.('client')
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [openDossier?.messages.length])
+  }, [openNote?.messages.length])
 
   useEffect(() => {
     transcriptEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -175,21 +138,17 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
   }
 
   const handleSendToCrm = () => {
-    const summaryMessage: ChatMessage = {
+    const summaryMessage: DossierMessage = {
       id: Date.now().toString(),
       role: 'assistant',
       content: `🎙️ Voice note transcribed (${formatTime(seconds)}). Transcript: "${editedTranscript}"`,
     }
     if (openId) {
-      setDossiers((prev) =>
-        prev.map((d) =>
-          d.id === openId
-            ? { ...d, status: 'Pending Review', updatedAt: 'just now', messages: [...d.messages, summaryMessage, ...liveMessages] }
-            : d
-        )
-      )
+      onUpdateNote(openId, { status: 'Pending Review', updatedAt: 'just now' })
+      onAddMessage(openId, summaryMessage)
+      liveMessages.forEach((m) => onAddMessage(openId, m))
     } else {
-      const newDossier: Dossier = {
+      const newNote: CrmNote = {
         id: Date.now().toString(),
         client: selectedClient || 'Unclassified',
         subject: `Voice note — ${formatTime(seconds)}`,
@@ -197,8 +156,8 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
         updatedAt: 'just now',
         messages: [summaryMessage, ...liveMessages],
       }
-      setDossiers((prev) => [newDossier, ...prev])
-      setOpenId(newDossier.id)
+      onAddNote(newNote)
+      setOpenId(newNote.id)
     }
     setSentConfirmation(true)
     setTimeout(() => {
@@ -206,24 +165,8 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
     }, 1200)
   }
 
-  /** Human confirmation step — nothing reaches CRM+ until someone approves it. */
-  const handleApprove = (id: string) => {
-    setDossiers((prev) =>
-      prev.map((d) =>
-        d.id === id
-          ? {
-              ...d,
-              status: 'Synced',
-              updatedAt: 'just now',
-              messages: [...d.messages, { id: Date.now().toString(), role: 'assistant', content: '✅ Approved and synced to CRM+.' }],
-            }
-          : d
-      )
-    )
-  }
-
   const handleNewConversation = () => {
-    const newDossier: Dossier = {
+    const newNote: CrmNote = {
       id: Date.now().toString(),
       client: selectedClient || 'Unclassified',
       subject: 'New conversation',
@@ -231,35 +174,21 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
       updatedAt: 'just now',
       messages: [],
     }
-    setDossiers((prev) => [newDossier, ...prev])
-    setOpenId(newDossier.id)
+    onAddNote(newNote)
+    setOpenId(newNote.id)
   }
 
   const handleSend = () => {
     if (!input.trim() || !openId) return
     const question = input.trim()
     setInput('')
-    setDossiers((prev) =>
-      prev.map((d) => (d.id === openId ? { ...d, messages: [...d.messages, { id: Date.now().toString(), role: 'user', content: question }] } : d))
-    )
+    onAddMessage(openId, { id: Date.now().toString(), role: 'user', content: question })
     setTimeout(() => {
-      setDossiers((prev) =>
-        prev.map((d) =>
-          d.id === openId
-            ? {
-                ...d,
-                messages: [
-                  ...d.messages,
-                  {
-                    id: (Date.now() + 1).toString(),
-                    role: 'assistant',
-                    content: `I can draft a meeting note on this ("${question}"). Use the mic below to start recording.`,
-                  },
-                ],
-              }
-            : d
-        )
-      )
+      onAddMessage(openId, {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `I can draft a meeting note on this ("${question}"). Use the mic below to start recording.`,
+      })
     }, 500)
   }
 
@@ -434,7 +363,7 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
       ) : (
         <>
           {/* Idle: start recording (topic detail only — list view pairs it with "New conversation" below) */}
-          {openDossier && (
+          {openNote && (
             <div className={`${pad} py-2 border-b border-slate-200 flex-shrink-0`}>
               <button
                 onClick={startRecording}
@@ -446,19 +375,19 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
             </div>
           )}
 
-          {openDossier ? (
-            /* Topic detail: message history + composer */
+          {openNote ? (
+            /* Topic detail: message history (kept as memory/context) + composer */
             <>
               <div className={`flex items-center gap-2 ${pad} py-2 border-b border-slate-200 flex-shrink-0`}>
                 <button onClick={() => setOpenId(null)} className="p-1 rounded hover:bg-slate-100 transition">
                   <ArrowLeft size={14} className="text-slate-600" />
                 </button>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold text-slate-900 truncate">{openDossier.client}</p>
-                  <p className="text-2xs text-slate-500 truncate">{openDossier.subject}</p>
+                  <p className="text-xs font-semibold text-slate-900 truncate">{openNote.client}</p>
+                  <p className="text-2xs text-slate-500 truncate">{openNote.subject}</p>
                 </div>
-                <span className={`text-2xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${STATUS_STYLE[openDossier.status]}`}>
-                  {openDossier.status}
+                <span className={`text-2xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${STATUS_STYLE[openNote.status]}`}>
+                  {openNote.status}
                 </span>
                 <button
                   onClick={() => alert('Exported as PDF (mock).')}
@@ -469,24 +398,25 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
                 </button>
               </div>
 
-              {openDossier.status === 'Pending Review' && (
+              {openNote.status === 'Pending Review' && (
                 <div className={`flex items-center gap-2 ${pad} py-2 bg-amber-50 border-b border-amber-200 flex-shrink-0`}>
                   <ShieldCheck size={14} className="text-amber-600 flex-shrink-0" />
                   <span className="text-2xs text-amber-800 flex-1">Awaiting human review before syncing to CRM+.</span>
                   <button
-                    onClick={() => handleApprove(openDossier.id)}
-                    className="px-2.5 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition flex-shrink-0"
+                    onClick={goToClientPage}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition flex-shrink-0"
                   >
-                    Approve & Sync
+                    Review on {openNote.client}'s page
+                    <ArrowUpRight size={12} />
                   </button>
                 </div>
               )}
 
               <div className={`flex-1 overflow-y-auto ${pad} space-y-1.5`}>
-                {openDossier.messages.length === 0 && (
+                {openNote.messages.length === 0 && (
                   <p className="text-2xs text-slate-400 text-center pt-6">No messages yet — ask a question or record a note above.</p>
                 )}
-                {openDossier.messages.map((msg) => (
+                {openNote.messages.map((msg) => (
                   <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div
                       className={`max-w-[85%] rounded-lg px-2.5 py-1.5 text-2xs leading-snug ${
@@ -555,27 +485,29 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
               </div>
 
               {/* Rend explicite ce que compte le badge de la barre d'onglets — pas de notif sans preuve visible */}
-              {dossiers.some((d) => d.status === 'Pending Review') && (
+              {notes.some((n) => n.status === 'Pending Review') && (
                 <div>
                   <p className="text-2xs font-semibold text-amber-700 uppercase tracking-wide pt-1 flex items-center gap-1">
                     <ShieldCheck size={11} />
-                    Needs your review ({dossiers.filter((d) => d.status === 'Pending Review').length})
+                    Needs your review ({notes.filter((n) => n.status === 'Pending Review').length})
                   </p>
                   <div className="space-y-1.5 mt-1">
-                    {dossiers.filter((d) => d.status === 'Pending Review').map((d) => (
+                    {notes.filter((n) => n.status === 'Pending Review').map((n) => (
                       <div
-                        key={d.id}
+                        key={n.id}
                         className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200"
                       >
-                        <button onClick={() => setOpenId(d.id)} className="min-w-0 flex-1 text-left">
-                          <p className="text-2xs font-semibold text-slate-900 truncate">{d.client}</p>
-                          <p className="text-2xs text-slate-500 truncate">{d.subject}</p>
+                        <button onClick={() => setOpenId(n.id)} className="min-w-0 flex-1 text-left">
+                          <p className="text-2xs font-semibold text-slate-900 truncate">{n.client}</p>
+                          <p className="text-2xs text-slate-500 truncate">{n.subject}</p>
                         </button>
                         <button
-                          onClick={() => handleApprove(d.id)}
-                          className="px-2 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition flex-shrink-0"
+                          onClick={goToClientPage}
+                          title={`Review on ${n.client}'s page`}
+                          className="flex items-center gap-0.5 px-2 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition flex-shrink-0"
                         >
-                          Approve
+                          Review
+                          <ArrowUpRight size={11} />
                         </button>
                       </div>
                     ))}
@@ -585,23 +517,23 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
 
               <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide pt-1">Recent topics</p>
               <div className="space-y-1.5">
-                {dossiers.map((d) => (
+                {notes.map((n) => (
                   <button
-                    key={d.id}
-                    onClick={() => setOpenId(d.id)}
+                    key={n.id}
+                    onClick={() => setOpenId(n.id)}
                     className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-rad-indigo-300 hover:bg-rad-indigo-50/40 transition"
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="text-2xs font-semibold text-slate-900 truncate">{d.client}</p>
-                      <p className="text-2xs text-slate-500 truncate">{d.subject}</p>
+                      <p className="text-2xs font-semibold text-slate-900 truncate">{n.client}</p>
+                      <p className="text-2xs text-slate-500 truncate">{n.subject}</p>
                     </div>
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      <span className={`text-2xs px-1.5 py-0.5 rounded font-medium ${STATUS_STYLE[d.status]}`}>
-                        {d.status}
+                      <span className={`text-2xs px-1.5 py-0.5 rounded font-medium ${STATUS_STYLE[n.status]}`}>
+                        {n.status}
                       </span>
                       <span className="text-2xs text-slate-400 flex items-center gap-0.5">
                         <Clock size={10} />
-                        {d.updatedAt}
+                        {n.updatedAt}
                       </span>
                     </div>
                   </button>

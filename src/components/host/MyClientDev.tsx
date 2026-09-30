@@ -9,6 +9,9 @@ import { PipelinePage } from './pages/PipelinePage'
 import { PortfolioPage } from './pages/PortfolioPage'
 import { ROUTES } from '@/data/hostRoutes'
 import type { HostRoute } from '@/data/types'
+import type { CapCbsDossier } from '@/data/capCbsDossiers'
+import type { CrmNote } from '@/data/crmNotes'
+import { CLIENT } from '@/data/client'
 
 interface Props {
   route: HostRoute
@@ -17,14 +20,31 @@ interface Props {
   compact?: boolean
   /** Ouvre Meena (agent CRM+) — utilisé depuis l'onglet "Actions IA" de la fiche client. */
   onOpenMeena?: () => void
+  /** Source unique CAP/CBS + CRM+ — partagée avec le panneau assistant. */
+  capCbsDossiers: CapCbsDossier[]
+  onUpdateCapCbsDossier: (id: string, patch: Partial<CapCbsDossier>) => void
+  crmNotes: CrmNote[]
+  onApproveCrmNote: (id: string) => void
 }
 
 /**
  * Application hôte simulée. Elle change d'écran sans jamais remonter
  * l'assistant, qui vit à côté d'elle dans l'arbre React.
  */
-export function MyClientDev({ route, onNavigate, compact = false, onOpenMeena }: Props) {
+export function MyClientDev({
+  route,
+  onNavigate,
+  compact = false,
+  onOpenMeena,
+  capCbsDossiers,
+  onUpdateCapCbsDossier,
+  crmNotes,
+  onApproveCrmNote,
+}: Props) {
   const meta = ROUTES[route]
+  // Prototype : un seul client est réellement modélisé (AeroDynamics Group).
+  const clientCapCbsDossier = capCbsDossiers.find((d) => d.client === CLIENT.name)
+  const clientCrmNotes = crmNotes.filter((n) => n.client === CLIENT.name)
 
   return (
     <div className="flex h-full flex-col bg-background">
@@ -51,13 +71,22 @@ export function MyClientDev({ route, onNavigate, compact = false, onOpenMeena }:
               onEdit={() => onNavigate('client-edit')}
               onOpenCapCbs={() => onNavigate('cap-cbs-detail')}
               onOpenMeena={onOpenMeena}
+              capCbsDossier={clientCapCbsDossier}
+              crmNotes={clientCrmNotes}
+              onApproveCrmNote={onApproveCrmNote}
             />
           )}
           {route === 'client-edit' && <ClientEditPage onCancel={() => onNavigate('client')} />}
           {route === 'cap-cbs' && (
-            <CapCbsDashboardPage onOpenDetail={() => onNavigate('cap-cbs-detail')} />
+            <CapCbsDashboardPage dossiers={capCbsDossiers} onOpenDetail={() => onNavigate('cap-cbs-detail')} />
           )}
-          {route === 'cap-cbs-detail' && <CapCbsPage />}
+          {route === 'cap-cbs-detail' && clientCapCbsDossier && (
+            <CapCbsPage
+              dossier={clientCapCbsDossier}
+              onSubmitForReview={() => onUpdateCapCbsDossier(clientCapCbsDossier.id, { status: 'Pending Review', updatedAt: 'just now' })}
+              onValidate={() => onUpdateCapCbsDossier(clientCapCbsDossier.id, { status: 'Validated', updatedAt: 'just now' })}
+            />
+          )}
           {route === 'pipeline' && <PipelinePage />}
           {route === 'credit' && <CreditPage />}
         </div>

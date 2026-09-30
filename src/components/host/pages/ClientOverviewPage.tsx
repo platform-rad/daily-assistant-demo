@@ -17,19 +17,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CLIENT, CLIENT_FACILITIES, CLIENT_METRICS, CLIENT_PIPELINE } from '@/data/client'
+import type { CapCbsDossier } from '@/data/capCbsDossiers'
+import type { CrmNote } from '@/data/crmNotes'
 import { cn } from '@/lib/utils'
 import { DataTable } from '../DataTable'
-
-const CBS_CAP_HISTORY = [
-  { cycle: 'Cycle 2026–2027', status: 'Draft' as const, updated: 'il y a 2h', pilotBanker: 'É. Mercier' },
-  { cycle: 'Cycle 2025–2026', status: 'Validated' as const, updated: '15 janv. 2026', pilotBanker: 'É. Mercier' },
-]
-
-const MEETING_HISTORY = [
-  { subject: 'Call CFO — refinancement 2027', date: '18 août 2026', synced: true },
-  { subject: 'Revue stratégique division Défense', date: '12 juil. 2026', synced: true },
-  { subject: 'Point trimestriel Q2', date: '3 mai 2026', synced: false },
-]
 
 const TREND_ICON = { up: ArrowUpRight, down: ArrowDownRight, flat: Minus }
 
@@ -75,11 +66,18 @@ export function ClientOverviewPage({
   onEdit,
   onOpenCapCbs,
   onOpenMeena,
+  capCbsDossier,
+  crmNotes,
+  onApproveCrmNote,
 }: {
   compact: boolean
   onEdit: () => void
   onOpenCapCbs?: () => void
   onOpenMeena?: () => void
+  /** Source unique CAP/CBS + CRM+ — la même que le tableau de bord et le panneau assistant. */
+  capCbsDossier?: CapCbsDossier
+  crmNotes: CrmNote[]
+  onApproveCrmNote: (id: string) => void
 }) {
   const [tab, setTab] = useState('overview')
 
@@ -214,9 +212,8 @@ export function ClientOverviewPage({
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {CBS_CAP_HISTORY.map((h) => (
+                  {capCbsDossier ? (
                     <button
-                      key={h.cycle}
                       onClick={onOpenCapCbs}
                       className="w-full flex items-center gap-2.5 rounded-lg border border-slate-200 p-2.5 text-left hover:border-rad-indigo-300 hover:bg-rad-indigo-50/40 transition"
                     >
@@ -224,14 +221,18 @@ export function ClientOverviewPage({
                         <ClipboardList className="size-3.5" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium text-slate-900">{h.cycle}</p>
+                        <p className="text-xs font-medium text-slate-900">Cycle 2026–2027</p>
                         <p className="text-2xs text-slate-500">
-                          Mis à jour {h.updated} · {h.pilotBanker}
+                          Mis à jour {capCbsDossier.updatedAt} · {capCbsDossier.pilotBanker}
                         </p>
                       </div>
-                      <Badge variant={h.status === 'Validated' ? 'success' : 'warning'}>{h.status}</Badge>
+                      <Badge variant={capCbsDossier.status === 'Validated' ? 'success' : capCbsDossier.status === 'Pending Review' ? 'info' : 'warning'}>
+                        {capCbsDossier.status}
+                      </Badge>
                     </button>
-                  ))}
+                  ) : (
+                    <p className="text-2xs text-slate-400">Aucun cycle CBS/CAP en cours.</p>
+                  )}
                 </CardContent>
               </Card>
 
@@ -246,27 +247,35 @@ export function ClientOverviewPage({
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {MEETING_HISTORY.map((m) => (
-                    <button
-                      key={m.subject}
-                      onClick={onOpenMeena}
-                      className="w-full flex items-center gap-2.5 rounded-lg border border-slate-200 p-2.5 text-left hover:border-amber-300 hover:bg-amber-50/40 transition"
+                  {crmNotes.length === 0 && (
+                    <p className="text-2xs text-slate-400">Aucune note pour ce client.</p>
+                  )}
+                  {crmNotes.map((note) => (
+                    <div
+                      key={note.id}
+                      className="w-full flex items-center gap-2.5 rounded-lg border border-slate-200 p-2.5 hover:border-amber-300 hover:bg-amber-50/40 transition"
                     >
-                      <div className="flex size-7 items-center justify-center rounded-md bg-amber-50 text-amber-600 shrink-0">
-                        <Mic className="size-3.5" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium text-slate-900 truncate">{m.subject}</p>
-                        <p className="text-2xs text-slate-500">{m.date}</p>
-                      </div>
-                      {m.synced ? (
+                      <button onClick={onOpenMeena} className="flex items-center gap-2.5 min-w-0 flex-1 text-left">
+                        <div className="flex size-7 items-center justify-center rounded-md bg-amber-50 text-amber-600 shrink-0">
+                          <Mic className="size-3.5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-slate-900 truncate">{note.subject}</p>
+                          <p className="text-2xs text-slate-500">{note.updatedAt}</p>
+                        </div>
+                      </button>
+                      {note.status === 'Synced' && (
                         <Badge variant="success">
-                          <CheckCircle2 className="size-3" /> Synchronisé
+                          <CheckCircle2 className="size-3" /> Synced
                         </Badge>
-                      ) : (
-                        <Badge variant="secondary">Brouillon</Badge>
                       )}
-                    </button>
+                      {note.status === 'Draft' && <Badge variant="secondary">Draft</Badge>}
+                      {note.status === 'Pending Review' && (
+                        <Button size="xs" onClick={() => onApproveCrmNote(note.id)}>
+                          <CheckCircle2 className="size-3" /> Approve &amp; Sync
+                        </Button>
+                      )}
+                    </div>
                   ))}
                 </CardContent>
               </Card>

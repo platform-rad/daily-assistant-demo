@@ -11,12 +11,8 @@ import { ContextualActionsPanel } from './ContextualActionsPanel'
 import { GlobalSearch } from './GlobalSearch'
 import type { HostRoute } from '@/data/types'
 import { ROUTES } from '@/data/hostRoutes'
-
-// Mock — en prod, dériverait du nombre réel de dossiers "Pending Review".
-const BADGE_COUNTS: Partial<Record<NavView, number>> = {
-  'crm-agent': 1,
-  'cap-cbs': 2,
-}
+import type { CapCbsDossier, DossierMessage } from '@/data/capCbsDossiers'
+import type { CrmNote } from '@/data/crmNotes'
 
 interface CopilotSidebarProps {
   isCollapsed: boolean
@@ -28,9 +24,32 @@ interface CopilotSidebarProps {
   /** Ouvre Meena (agent CRM+) en fenêtre flottante, quel que soit le mode courant. */
   onOpenMeena?: () => void
   currentRoute?: HostRoute
+  /** Source unique CAP/CBS + CRM+ — partagée avec le panneau gauche. */
+  capCbsDossiers: CapCbsDossier[]
+  onAddCapCbsDossier: (dossier: CapCbsDossier) => void
+  onAddCapCbsMessage: (id: string, message: DossierMessage) => void
+  crmNotes: CrmNote[]
+  onAddCrmNote: (note: CrmNote) => void
+  onUpdateCrmNote: (id: string, patch: Partial<CrmNote>) => void
+  onAddCrmNoteMessage: (id: string, message: DossierMessage) => void
 }
 
-export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, onCreateCreditMemo, onNavigate, onOpenMeena, currentRoute = 'client' }: CopilotSidebarProps) {
+export function CopilotSidebar({
+  isCollapsed,
+  onToggleCollapse,
+  onSelectPrompt,
+  onCreateCreditMemo,
+  onNavigate,
+  onOpenMeena,
+  currentRoute = 'client',
+  capCbsDossiers,
+  onAddCapCbsDossier,
+  onAddCapCbsMessage,
+  crmNotes,
+  onAddCrmNote,
+  onUpdateCrmNote,
+  onAddCrmNoteMessage,
+}: CopilotSidebarProps) {
   const [currentView, setCurrentView] = useState<NavView>('home')
   const [width, setWidth] = useState(590) // 590px par défaut
   const [isDragging, setIsDragging] = useState(false)
@@ -41,6 +60,12 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
 
   // Prototype : un seul client est réellement modélisé (AeroDynamics Group).
   const currentClientName = currentRoute === 'client' || currentRoute === 'client-edit' ? 'AeroDynamics Group' : undefined
+
+  // Calculé en direct depuis la source partagée — ne peut plus diverger de ce qui est affiché.
+  const badgeCounts: Partial<Record<NavView, number>> = {
+    'crm-agent': crmNotes.filter((n) => n.status === 'Pending Review').length,
+    'cap-cbs': capCbsDossiers.filter((d) => d.status === 'Pending Review').length,
+  }
 
   // Get context from route for dynamic suggestions
   const getContextFromRoute = (route: string): string => {
@@ -135,7 +160,7 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
       </div>
 
       {/* New Navigation Bar with Menu & Tabs */}
-      <SidebarNav currentView={currentView} onViewChange={setCurrentView} badgeCounts={BADGE_COUNTS} />
+      <SidebarNav currentView={currentView} onViewChange={setCurrentView} badgeCounts={badgeCounts} />
 
       {/* Contexte persistant : s'actualise avec l'écran ouvert à gauche, visible sur tous les onglets */}
       <ContextualActionsPanel
@@ -157,9 +182,26 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
           />
         )}
         {currentView === 'crm-agent' && (
-          <CrmAgentPage onOpenMeena={onOpenMeena} currentClientName={currentClientName} isCompact />
+          <CrmAgentPage
+            onOpenMeena={onOpenMeena}
+            onNavigate={onNavigate}
+            currentClientName={currentClientName}
+            notes={crmNotes}
+            onAddNote={onAddCrmNote}
+            onUpdateNote={onUpdateCrmNote}
+            onAddMessage={onAddCrmNoteMessage}
+            isCompact
+          />
         )}
-        {currentView === 'cap-cbs' && <CapCbsAgentPage onNavigate={onNavigate} isCompact />}
+        {currentView === 'cap-cbs' && (
+          <CapCbsAgentPage
+            onNavigate={onNavigate}
+            dossiers={capCbsDossiers}
+            onAddDossier={onAddCapCbsDossier}
+            onAddMessage={onAddCapCbsMessage}
+            isCompact
+          />
+        )}
         {currentView === 'history' && <HistoryPage />}
         {currentView === 'favorites' && <FavoritesPage onSelectPrompt={handleSelectPrompt} />}
         {currentView === 'active-actions' && <ActiveActionsPage />}
