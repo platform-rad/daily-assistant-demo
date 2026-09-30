@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Mic, Send, Clock, ArrowLeft, Plus, Info } from 'lucide-react'
+import { Mic, Square, Send, Clock, ArrowLeft, Plus, Info, Maximize2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface CrmAgentPageProps {
@@ -55,11 +55,15 @@ const INITIAL_DOSSIERS: Dossier[] = [
   },
 ]
 
+const formatTime = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+
 /** Page dédiée dans le sidepanel assistant — plan de travail de l'agent Meena (notes de réunion). */
 export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProps) {
   const [dossiers, setDossiers] = useState<Dossier[]>(INITIAL_DOSSIERS)
   const [openId, setOpenId] = useState<string | null>(null)
   const [input, setInput] = useState('')
+  const [isRecording, setIsRecording] = useState(false)
+  const [recordingSeconds, setRecordingSeconds] = useState(0)
   const endRef = useRef<HTMLDivElement>(null)
   const pad = isCompact ? 'px-3 py-3' : 'px-4 py-4'
 
@@ -68,6 +72,53 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [openDossier?.messages.length])
+
+  useEffect(() => {
+    if (!isRecording) return
+    const interval = setInterval(() => setRecordingSeconds((s) => s + 1), 1000)
+    return () => clearInterval(interval)
+  }, [isRecording])
+
+  const startRecording = () => {
+    setRecordingSeconds(0)
+    setIsRecording(true)
+  }
+
+  const stopRecording = () => {
+    setIsRecording(false)
+    const duration = formatTime(recordingSeconds)
+    if (openId) {
+      // Enregistrement rattaché au dossier actuellement ouvert
+      setDossiers((prev) =>
+        prev.map((d) =>
+          d.id === openId
+            ? {
+                ...d,
+                status: 'Brouillon',
+                updatedAt: "à l'instant",
+                messages: [
+                  ...d.messages,
+                  { id: Date.now().toString(), role: 'assistant', content: `🎙️ Note vocale enregistrée (${duration}) — transcription en cours, synchronisation CRM+ à venir.` },
+                ],
+              }
+            : d
+        )
+      )
+    } else {
+      const newDossier: Dossier = {
+        id: Date.now().toString(),
+        client: 'Nouvel enregistrement',
+        subject: `Note vocale — ${duration}`,
+        status: 'Brouillon',
+        updatedAt: "à l'instant",
+        messages: [
+          { id: 'm1', role: 'assistant', content: `🎙️ Transcription en cours (${duration}). Un résumé et les actions extraites apparaîtront ici une fois traités.` },
+        ],
+      }
+      setDossiers((prev) => [newDossier, ...prev])
+      setOpenId(newDossier.id)
+    }
+  }
 
   const handleNewConversation = () => {
     const newDossier: Dossier = {
@@ -100,7 +151,7 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
                   {
                     id: (Date.now() + 1).toString(),
                     role: 'assistant',
-                    content: `Je peux préparer une note de réunion à ce sujet ("${question}"). Cliquez sur "Ouvrir Meena" pour démarrer l'enregistrement vocal.`,
+                    content: `Je peux préparer une note de réunion à ce sujet ("${question}"). Utilisez le micro pour démarrer l'enregistrement vocal.`,
                   },
                 ],
               }
@@ -112,7 +163,7 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      {/* En-tête compact : titre + info au survol */}
+      {/* En-tête compact : titre + info au survol + agrandir */}
       <div className={`flex items-center gap-2 ${pad} pb-2 border-b border-slate-200 flex-shrink-0`}>
         <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
           <Mic size={14} className="text-amber-600" />
@@ -133,13 +184,42 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
             </ul>
           </TooltipContent>
         </Tooltip>
-        <button
-          onClick={() => onOpenMeena?.()}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition flex-shrink-0"
-        >
-          <Mic size={12} />
-          Ouvrir
-        </button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={() => onOpenMeena?.()}
+              className="p-1.5 rounded-lg hover:bg-slate-100 transition flex-shrink-0"
+            >
+              <Maximize2 size={14} className="text-slate-500" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="left">Agrandir dans une fenêtre</TooltipContent>
+        </Tooltip>
+      </div>
+
+      {/* Enregistrement — reste visible et actif quelle que soit la vue */}
+      <div className={`${pad} py-2 border-b border-slate-200 flex-shrink-0`}>
+        {isRecording ? (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 border border-red-200">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
+            <span className="text-2xs font-medium text-red-700 flex-1">Enregistrement en cours… {formatTime(recordingSeconds)}</span>
+            <button
+              onClick={stopRecording}
+              className="flex items-center gap-1 px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-2xs font-medium transition"
+            >
+              <Square size={11} />
+              Arrêter
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={startRecording}
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition"
+          >
+            <Mic size={13} />
+            {openDossier ? 'Enregistrer une note pour ce dossier' : 'Démarrer un enregistrement'}
+          </button>
+        )}
       </div>
 
       {openDossier ? (
@@ -164,7 +244,7 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
 
           <div className={`flex-1 overflow-y-auto ${pad} space-y-1.5`}>
             {openDossier.messages.length === 0 && (
-              <p className="text-2xs text-slate-400 text-center pt-6">Aucun message pour l'instant — posez une question ci-dessous.</p>
+              <p className="text-2xs text-slate-400 text-center pt-6">Aucun message pour l'instant — posez une question ou enregistrez une note ci-dessus.</p>
             )}
             {openDossier.messages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
