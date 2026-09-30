@@ -9,6 +9,7 @@ import { ActiveActionsPage } from './pages/ActiveActionsPage'
 import { SidebarNav, type NavView } from './SidebarNav'
 import { ContextualActionsPanel } from './ContextualActionsPanel'
 import type { HostRoute } from '@/data/types'
+import { ROUTES } from '@/data/hostRoutes'
 
 interface CopilotSidebarProps {
   isCollapsed: boolean
@@ -36,6 +37,7 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
     if (route === 'credit') return 'myCreditApp'
     if (route === 'portfolio') return 'portfolio'
     if (route === 'pipeline') return 'pipeline'
+    if (route === 'cap-cbs') return 'cap-cbs'
     return 'myClientDev'
   }
 
@@ -72,10 +74,13 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
     }
   }, [isDragging, dragStartX, dragStartWidth])
 
-  // Handle onSelectPrompt to detect Credit Memo
+  // Handle onSelectPrompt to detect Credit Memo / CBS-CAP navigation shortcuts
   const handleSelectPrompt = (prompt: string) => {
     if (prompt.includes('Credit Memo') || prompt.includes('credit memo')) {
       onCreateCreditMemo?.()
+    } else if (prompt.toLowerCase().includes('cbs/cap') || prompt.toLowerCase().includes('cbs-cap')) {
+      if (onNavigate) onNavigate('cap-cbs')
+      setCurrentView('cap-cbs')
     } else {
       onSelectPrompt?.(prompt)
     }
@@ -111,14 +116,13 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
       {/* New Navigation Bar with Menu & Tabs */}
       <SidebarNav currentView={currentView} onViewChange={setCurrentView} />
 
-      {/* Contextual Suggestions (Quick Actions based on current context) */}
-      {currentView === 'home' && (
-        <ContextualActionsPanel
-          context={displayContext}
-          onActionClick={handleSelectPrompt}
-          initialExpanded={true}
-        />
-      )}
+      {/* Contexte persistant : s'actualise avec l'écran ouvert à gauche, visible sur tous les onglets */}
+      <ContextualActionsPanel
+        context={displayContext}
+        contextLabel={ROUTES[currentRoute]?.contextLabel}
+        onActionClick={handleSelectPrompt}
+        initialExpanded={currentView === 'home'}
+      />
 
       {/* Pages Content */}
       <div className="flex-1 overflow-hidden flex flex-col">

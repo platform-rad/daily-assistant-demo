@@ -223,6 +223,45 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
       },
     ],
   },
+  'cap-cbs': {
+    kpis: [
+      {
+        label: 'Statut',
+        value: 'Draft',
+        status: 'warning',
+      },
+      {
+        label: 'Axes complétés',
+        value: '3/5',
+        status: 'neutral',
+      },
+      {
+        label: 'Prochaine revue',
+        value: 'mars 2027',
+        status: 'neutral',
+      },
+    ],
+    actions: [
+      {
+        icon: <TrendingUp size={16} />,
+        title: 'Ouvrir le CBS/CAP',
+        description: 'Éditer les axes et le plan d\'action',
+        prompt: 'Ouvre le CBS/CAP de ce client',
+      },
+      {
+        icon: <AlertCircle size={16} />,
+        title: 'Dossiers mis à jour',
+        description: 'Voir les CBS/CAP récemment modifiés',
+        prompt: 'Quels dossiers CBS/CAP ont été mis à jour récemment ?',
+      },
+      {
+        icon: <Zap size={16} />,
+        title: 'Résumer la stratégie',
+        description: 'Synthèse des 5 axes en 1 minute',
+        prompt: 'Résume la stratégie CBS/CAP de ce client',
+      },
+    ],
+  },
   pipeline: {
     kpis: [
       {
