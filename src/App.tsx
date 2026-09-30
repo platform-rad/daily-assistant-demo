@@ -128,7 +128,6 @@ export default function App() {
         /* Mode Desktop: Simulation d'un environnement Windows */
         <DesktopEnvironment
           onOpenMyClientDev={() => openDailyAssistant()}
-          onToggleMeena={() => setMeenaOpen((o) => !o)}
           meenaOpen={meenaOpen}
         />
       ) : appMode === 'credit-memo-creation' ? (

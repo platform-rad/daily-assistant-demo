@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Mic } from 'lucide-react'
 import { Taskbar } from './Taskbar'
 
 interface DesktopEnvironmentProps {
   onOpenMyClientDev?: () => void
-  /** Ouvre/ferme Meena — l'état vit dans App.tsx pour flotter au-dessus de tous les modes. */
-  onToggleMeena?: () => void
+  /** Meena reste accessible depuis la fiche client et le panneau CRM+ Agent — juste plus depuis la taskbar. */
   meenaOpen?: boolean
 }
 
-export function DesktopEnvironment({ onOpenMyClientDev, onToggleMeena, meenaOpen = false }: DesktopEnvironmentProps) {
+export function DesktopEnvironment({ onOpenMyClientDev, meenaOpen = false }: DesktopEnvironmentProps) {
   const [currentTime, setCurrentTime] = useState('')
 
   useEffect(() => {
@@ -25,8 +23,6 @@ export function DesktopEnvironment({ onOpenMyClientDev, onToggleMeena, meenaOpen
   const handleTaskbarClick = (appId: string) => {
     if (appId === 'daily-assistant') {
       onOpenMyClientDev?.()
-    } else if (appId === 'meena') {
-      onToggleMeena?.()
     }
   }
 
@@ -40,13 +36,6 @@ export function DesktopEnvironment({ onOpenMyClientDev, onToggleMeena, meenaOpen
       label: 'Daily Assistant',
       icon: <span className="text-sm">📊</span>,
       isActive: false,
-      isMinimized: false,
-    },
-    {
-      id: 'meena',
-      label: 'Meena',
-      icon: <Mic size={16} />,
-      isActive: meenaOpen,
       isMinimized: false,
     },
   ]
