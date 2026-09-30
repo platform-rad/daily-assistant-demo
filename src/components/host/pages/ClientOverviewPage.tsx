@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import {
   ArrowDownRight,
+  ArrowRight,
   ArrowUpRight,
   Building2,
+  CheckCircle2,
+  ClipboardList,
   Download,
+  Mic,
   Minus,
   Pencil,
   Star,
@@ -15,6 +19,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CLIENT, CLIENT_FACILITIES, CLIENT_METRICS, CLIENT_PIPELINE } from '@/data/client'
 import { cn } from '@/lib/utils'
 import { DataTable } from '../DataTable'
+
+const CBS_CAP_HISTORY = [
+  { cycle: 'Cycle 2026–2027', status: 'Draft' as const, updated: 'il y a 2h', pilotBanker: 'É. Mercier' },
+  { cycle: 'Cycle 2025–2026', status: 'Validated' as const, updated: '15 janv. 2026', pilotBanker: 'É. Mercier' },
+]
+
+const MEETING_HISTORY = [
+  { subject: 'Call CFO — refinancement 2027', date: '18 août 2026', synced: true },
+  { subject: 'Revue stratégique division Défense', date: '12 juil. 2026', synced: true },
+  { subject: 'Point trimestriel Q2', date: '3 mai 2026', synced: false },
+]
 
 const TREND_ICON = { up: ArrowUpRight, down: ArrowDownRight, flat: Minus }
 
@@ -58,9 +73,13 @@ function MetricCard({
 export function ClientOverviewPage({
   compact,
   onEdit,
+  onOpenCapCbs,
+  onOpenMeena,
 }: {
   compact: boolean
   onEdit: () => void
+  onOpenCapCbs?: () => void
+  onOpenMeena?: () => void
 }) {
   const [tab, setTab] = useState('overview')
 
@@ -113,6 +132,7 @@ export function ClientOverviewPage({
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="overflow-x-auto">
           <TabsTrigger value="overview">Vue d’ensemble</TabsTrigger>
+          <TabsTrigger value="actions-ia">Actions IA</TabsTrigger>
           <TabsTrigger value="facilities">Engagements</TabsTrigger>
           <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
           <TabsTrigger value="contacts">Contacts</TabsTrigger>
@@ -175,6 +195,78 @@ export function ClientOverviewPage({
                       </Badge>
                       <span className="text-xs text-slate-600">{label}</span>
                     </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="actions-ia">
+            <div className={cn('grid gap-4', compact ? 'grid-cols-1' : 'lg:grid-cols-2')}>
+              {/* Historique CBS/CAP */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>CBS / CAP</CardTitle>
+                    <Button variant="ghost" size="icon-sm" onClick={onOpenCapCbs} title="Ouvrir le CBS/CAP">
+                      <ArrowRight className="size-3.5" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {CBS_CAP_HISTORY.map((h) => (
+                    <button
+                      key={h.cycle}
+                      onClick={onOpenCapCbs}
+                      className="w-full flex items-center gap-2.5 rounded-lg border border-slate-200 p-2.5 text-left hover:border-rad-indigo-300 hover:bg-rad-indigo-50/40 transition"
+                    >
+                      <div className="flex size-7 items-center justify-center rounded-md bg-rad-indigo-50 text-rad-indigo-600 shrink-0">
+                        <ClipboardList className="size-3.5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium text-slate-900">{h.cycle}</p>
+                        <p className="text-2xs text-slate-500">
+                          Mis à jour {h.updated} · {h.pilotBanker}
+                        </p>
+                      </div>
+                      <Badge variant={h.status === 'Validated' ? 'success' : 'warning'}>{h.status}</Badge>
+                    </button>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Historique des réunions — CRM+ Agent / Meena */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Réunions &amp; notes — CRM+ Agent</CardTitle>
+                    <Button variant="ghost" size="icon-sm" onClick={onOpenMeena} title="Ouvrir Meena">
+                      <ArrowRight className="size-3.5" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {MEETING_HISTORY.map((m) => (
+                    <button
+                      key={m.subject}
+                      onClick={onOpenMeena}
+                      className="w-full flex items-center gap-2.5 rounded-lg border border-slate-200 p-2.5 text-left hover:border-amber-300 hover:bg-amber-50/40 transition"
+                    >
+                      <div className="flex size-7 items-center justify-center rounded-md bg-amber-50 text-amber-600 shrink-0">
+                        <Mic className="size-3.5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium text-slate-900 truncate">{m.subject}</p>
+                        <p className="text-2xs text-slate-500">{m.date}</p>
+                      </div>
+                      {m.synced ? (
+                        <Badge variant="success">
+                          <CheckCircle2 className="size-3" /> Synchronisé
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">Brouillon</Badge>
+                      )}
+                    </button>
                   ))}
                 </CardContent>
               </Card>

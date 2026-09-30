@@ -28,7 +28,8 @@ export const ROUTES: Record<HostRoute, RouteMeta> = {
   },
   client: {
     id: 'client',
-    navLabel: 'Clients',
+    // Pas d'entrée de nav dédiée : on y accède depuis la ligne d'un client dans "Mon portefeuille".
+    navLabel: null,
     breadcrumb: ['Clients', 'Industrials EMEA', 'AeroDynamics Group'],
     contextLabel: 'Fiche client — AeroDynamics Group',
     suggestedAgentId: 'client-market-intel',
@@ -49,6 +50,17 @@ export const ROUTES: Record<HostRoute, RouteMeta> = {
   'cap-cbs': {
     id: 'cap-cbs',
     navLabel: 'CAP/CBS',
+    breadcrumb: ['CAP/CBS'],
+    contextLabel: 'Tableau de bord CAP/CBS — dossiers en cours',
+    suggestedAgentId: 'cbs-cap',
+    contextHint:
+      'Vue tableau de bord CAP/CBS : je peux prioriser les dossiers à valider ou en retard de contribution.',
+    contextAction: { label: 'Voir le Briefing Memo', target: 'memo' },
+  },
+  'cap-cbs-detail': {
+    id: 'cap-cbs-detail',
+    // Atteint uniquement depuis une ligne du tableau de bord CAP/CBS.
+    navLabel: null,
     breadcrumb: ['CAP/CBS', 'AeroDynamics Group', 'Cycle 2026–2027'],
     contextLabel: 'CAP/CBS en cours — Complétion CBS',
     suggestedAgentId: 'cbs-cap',
@@ -78,5 +90,7 @@ export const ROUTES: Record<HostRoute, RouteMeta> = {
   },
 }
 
-/** Ordre des entrées de la navigation supérieure. */
-export const NAV_ORDER: HostRoute[] = ['portfolio', 'client', 'cap-cbs', 'pipeline', 'credit']
+/** Ordre des entrées de la navigation supérieure. 'client' et 'cap-cbs-detail' ne sont
+ *  volontairement pas listés ici : on y accède uniquement en cliquant une ligne
+ *  (portefeuille → client, tableau de bord CAP/CBS → dossier). */
+export const NAV_ORDER: HostRoute[] = ['portfolio', 'cap-cbs', 'pipeline', 'credit']

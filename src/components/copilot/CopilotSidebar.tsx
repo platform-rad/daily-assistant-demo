@@ -38,6 +38,7 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
     if (route === 'portfolio') return 'portfolio'
     if (route === 'pipeline') return 'pipeline'
     if (route === 'cap-cbs') return 'cap-cbs'
+    if (route === 'cap-cbs-detail') return 'cap-cbs-detail'
     return 'myClientDev'
   }
 

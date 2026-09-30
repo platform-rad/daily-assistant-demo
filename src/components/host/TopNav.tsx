@@ -10,8 +10,10 @@ interface Props {
 }
 
 export function TopNav({ route, onNavigate, compact = false }: Props) {
-  // L'écran d'édition reste rattaché à l'onglet « Clients ».
-  const activeTab: HostRoute = route === 'client-edit' ? 'client' : route
+  // Les écrans « client » et « détail CAP/CBS » n'ont pas d'entrée de nav dédiée :
+  // ils restent rattachés à l'onglet depuis lequel on y accède (portefeuille, CAP/CBS).
+  const activeTab: HostRoute =
+    route === 'client-edit' || route === 'client' ? 'portfolio' : route === 'cap-cbs-detail' ? 'cap-cbs' : route
   return (
     <header className="sticky top-0 z-30 border-b border-slate-800 bg-rad-navy">
       <div className="flex h-14 items-center gap-4 px-4">

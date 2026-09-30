@@ -44,6 +44,11 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
     else onOpenMyClientDev?.('cap-cbs')
   }
 
+  const handleOpenDossier = () => {
+    if (onNavigate) onNavigate('cap-cbs-detail')
+    else onOpenMyClientDev?.('cap-cbs-detail')
+  }
+
   const handleSend = () => {
     if (!input.trim()) return
     const question = input.trim()
@@ -108,7 +113,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
             {RECENT_DOSSIERS.map((d, i) => (
               <button
                 key={i}
-                onClick={handleOpen}
+                onClick={handleOpenDossier}
                 className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-purple-300 hover:bg-purple-50/40 transition"
               >
                 <div className="min-w-0 flex-1">

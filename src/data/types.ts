@@ -47,6 +47,7 @@ export type HostRoute =
   | 'client'
   | 'client-edit'
   | 'cap-cbs'
+  | 'cap-cbs-detail'
   | 'pipeline'
   | 'credit'
 

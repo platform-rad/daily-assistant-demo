@@ -151,7 +151,7 @@ export default function App() {
           <div className="flex flex-1 min-w-0 overflow-hidden">
             {/* Application hôte */}
             <main className="min-w-0 flex-1 overflow-hidden">
-              <MyClientDev route={route} onNavigate={navigate} compact={false} />
+              <MyClientDev route={route} onNavigate={navigate} compact={false} onOpenMeena={() => setMeenaOpen(true)} />
             </main>
 
             {/* Copilot Sidebar */}

@@ -226,6 +226,46 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
   'cap-cbs': {
     kpis: [
       {
+        label: 'Dossiers actifs',
+        value: '5',
+        status: 'neutral',
+      },
+      {
+        label: 'À valider',
+        value: '3',
+        status: 'warning',
+      },
+      {
+        label: 'Mis à jour (24h)',
+        value: '3',
+        trend: 'up',
+        status: 'warning',
+      },
+    ],
+    actions: [
+      {
+        icon: <TrendingUp size={16} />,
+        title: 'Voir le tableau de bord',
+        description: 'Tous les CBS/CAP en cours',
+        prompt: 'Ouvre le CBS/CAP de ce client',
+      },
+      {
+        icon: <AlertCircle size={16} />,
+        title: 'Dossiers mis à jour',
+        description: 'Voir les CBS/CAP récemment modifiés',
+        prompt: 'Quels dossiers CBS/CAP ont été mis à jour récemment ?',
+      },
+      {
+        icon: <Zap size={16} />,
+        title: 'Résumer la stratégie',
+        description: 'Synthèse des 5 axes en 1 minute',
+        prompt: 'Résume la stratégie CBS/CAP de ce client',
+      },
+    ],
+  },
+  'cap-cbs-detail': {
+    kpis: [
+      {
         label: 'Statut',
         value: 'Draft',
         status: 'warning',
@@ -244,15 +284,15 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
     actions: [
       {
         icon: <TrendingUp size={16} />,
-        title: 'Ouvrir le CBS/CAP',
-        description: 'Éditer les axes et le plan d\'action',
-        prompt: 'Ouvre le CBS/CAP de ce client',
+        title: 'Compléter les axes restants',
+        description: 'ESG et Angle IB/TB/GM à finaliser',
+        prompt: 'Aide-moi à compléter les axes restants du CBS/CAP',
       },
       {
         icon: <AlertCircle size={16} />,
-        title: 'Dossiers mis à jour',
-        description: 'Voir les CBS/CAP récemment modifiés',
-        prompt: 'Quels dossiers CBS/CAP ont été mis à jour récemment ?',
+        title: 'Vérifier la cohérence',
+        description: 'Relire la stratégie avant validation',
+        prompt: 'Vérifie la cohérence de ce CBS/CAP avant validation',
       },
       {
         icon: <Zap size={16} />,

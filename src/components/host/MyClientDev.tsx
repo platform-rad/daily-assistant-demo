@@ -1,5 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import { TopNav } from './TopNav'
+import { CapCbsDashboardPage } from './pages/CapCbsDashboardPage'
 import { CapCbsPage } from './pages/CapCbsPage'
 import { ClientEditPage } from './pages/ClientEditPage'
 import { ClientOverviewPage } from './pages/ClientOverviewPage'
@@ -14,13 +15,15 @@ interface Props {
   onNavigate: (route: HostRoute) => void
   /** Vrai quand l'assistant est en Split View : la page se resserre. */
   compact?: boolean
+  /** Ouvre Meena (agent CRM+) — utilisé depuis l'onglet "Actions IA" de la fiche client. */
+  onOpenMeena?: () => void
 }
 
 /**
  * Application hôte simulée. Elle change d'écran sans jamais remonter
  * l'assistant, qui vit à côté d'elle dans l'arbre React.
  */
-export function MyClientDev({ route, onNavigate, compact = false }: Props) {
+export function MyClientDev({ route, onNavigate, compact = false, onOpenMeena }: Props) {
   const meta = ROUTES[route]
 
   return (
@@ -43,10 +46,18 @@ export function MyClientDev({ route, onNavigate, compact = false }: Props) {
         <div className="px-5 pb-16">
           {route === 'portfolio' && <PortfolioPage onOpenClient={() => onNavigate('client')} />}
           {route === 'client' && (
-            <ClientOverviewPage compact={compact} onEdit={() => onNavigate('client-edit')} />
+            <ClientOverviewPage
+              compact={compact}
+              onEdit={() => onNavigate('client-edit')}
+              onOpenCapCbs={() => onNavigate('cap-cbs-detail')}
+              onOpenMeena={onOpenMeena}
+            />
           )}
           {route === 'client-edit' && <ClientEditPage onCancel={() => onNavigate('client')} />}
-          {route === 'cap-cbs' && <CapCbsPage />}
+          {route === 'cap-cbs' && (
+            <CapCbsDashboardPage onOpenDetail={() => onNavigate('cap-cbs-detail')} />
+          )}
+          {route === 'cap-cbs-detail' && <CapCbsPage />}
           {route === 'pipeline' && <PipelinePage />}
           {route === 'credit' && <CreditPage />}
         </div>
