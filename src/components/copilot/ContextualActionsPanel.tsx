@@ -29,7 +29,7 @@ export function ContextualActionsPanel({
           <Sparkles size={16} className="text-rad-indigo-600 flex-shrink-0" />
           <div className="min-w-0 text-left">
             <p className="text-xs font-semibold text-slate-700 uppercase tracking-wide">
-              Ce que je vois à l'écran
+              Context suggestions
             </p>
             {contextLabel && (
               <p className="text-2xs text-rad-indigo-700 truncate">{contextLabel}</p>

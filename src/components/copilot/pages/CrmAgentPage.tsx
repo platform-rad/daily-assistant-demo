@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Mic, Square, Pause, Play, Send, Clock, ArrowLeft, Plus, Info, Maximize2, Upload } from 'lucide-react'
+import { Mic, Square, Pause, Play, Send, Clock, ArrowLeft, Plus, Info, Maximize2, Upload, Pencil } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface CrmAgentPageProps {
@@ -83,6 +83,7 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
   const [liveMessages, setLiveMessages] = useState<ChatMessage[]>([])
   const [liveInput, setLiveInput] = useState('')
   const [sentConfirmation, setSentConfirmation] = useState(false)
+  const [editedTranscript, setEditedTranscript] = useState('')
 
   const endRef = useRef<HTMLDivElement>(null)
   const transcriptEndRef = useRef<HTMLDivElement>(null)
@@ -128,7 +129,10 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
 
   const pauseRecording = () => setRecordingState('paused')
   const resumeRecording = () => setRecordingState('recording')
-  const stopRecording = () => setRecordingState('stopped')
+  const stopRecording = () => {
+    setEditedTranscript(transcriptLines.join(' '))
+    setRecordingState('stopped')
+  }
   const discardRecording = () => setRecordingState('idle')
 
   const handleAskLive = () => {
@@ -155,7 +159,7 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
     const summaryMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'assistant',
-      content: `🎙️ Voice note transcribed (${formatTime(seconds)}). Transcript: "${transcriptLines.join(' ')}"`,
+      content: `🎙️ Voice note transcribed (${formatTime(seconds)}). Transcript: "${editedTranscript}"`,
     }
     if (openId) {
       setDossiers((prev) =>
@@ -313,19 +317,36 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
           {/* Live transcript + ask-AI thread, scrollable */}
           <div className={`flex-1 overflow-y-auto ${pad} space-y-3`}>
             <div>
-              <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Live transcript</p>
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-2.5 space-y-1 min-h-[60px]">
-                {transcriptLines.length === 0 ? (
-                  <p className="text-2xs text-slate-400 italic">Listening…</p>
-                ) : (
-                  transcriptLines.map((line, i) => (
-                    <p key={i} className="text-2xs text-slate-700 leading-relaxed">{line}</p>
-                  ))
-                )}
-                {recordingState === 'recording' && scriptIndex < TRANSCRIPT_SCRIPT.length && (
-                  <p className="text-2xs text-slate-400 italic">Transcribing…</p>
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide">Transcript</p>
+                {recordingState === 'stopped' && (
+                  <span className="flex items-center gap-1 text-2xs text-slate-400">
+                    <Pencil size={10} />
+                    Editable
+                  </span>
                 )}
               </div>
+              {recordingState === 'stopped' ? (
+                <textarea
+                  value={editedTranscript}
+                  onChange={(e) => setEditedTranscript(e.target.value)}
+                  rows={5}
+                  className="w-full resize-none rounded-lg border border-slate-200 bg-white p-2.5 text-2xs text-slate-700 leading-relaxed focus:border-rad-indigo-300 focus:outline-none focus:ring-1 focus:ring-rad-indigo-500"
+                />
+              ) : (
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-2.5 space-y-1 min-h-[60px]">
+                  {transcriptLines.length === 0 ? (
+                    <p className="text-2xs text-slate-400 italic">Listening…</p>
+                  ) : (
+                    transcriptLines.map((line, i) => (
+                      <p key={i} className="text-2xs text-slate-700 leading-relaxed">{line}</p>
+                    ))
+                  )}
+                  {recordingState === 'recording' && scriptIndex < TRANSCRIPT_SCRIPT.length && (
+                    <p className="text-2xs text-slate-400 italic">Transcribing…</p>
+                  )}
+                </div>
+              )}
             </div>
 
             {liveMessages.length > 0 && (

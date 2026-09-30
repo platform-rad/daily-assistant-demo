@@ -14,15 +14,15 @@ const RECENT_CONVERSATIONS = [
     source: 'CAP / CBS',
     icon: <ClipboardList size={14} className="text-rad-indigo-600" />,
     title: 'Manufacturing Ltd · EMEA contribution',
-    time: 'il y a 6h',
+    time: '6h ago',
     messages: 3,
   },
   {
     id: 'c3',
-    source: 'Accueil',
+    source: 'Home',
     icon: <MessageSquare size={14} className="text-slate-500" />,
-    title: 'Question sur l\'exposition portefeuille',
-    time: "aujourd'hui",
+    title: 'Question on portfolio exposure',
+    time: 'today',
     messages: 1,
   },
 ]
@@ -31,36 +31,36 @@ export function HistoryPage() {
   const historyItems = [
     {
       id: 1,
-      title: 'Analyse TechCorp France',
-      time: 'Aujourd\'hui, 14:32',
+      title: 'TechCorp France Analysis',
+      time: 'Today, 2:32 PM',
       type: 'Analysis',
       status: 'completed',
     },
     {
       id: 2,
       title: 'Credit Memo - Manufacturing Ltd',
-      time: 'Aujourd\'hui, 11:45',
+      time: 'Today, 11:45 AM',
       type: 'Memo',
       status: 'completed',
     },
     {
       id: 3,
       title: 'Portfolio Risk Overview',
-      time: 'Hier, 09:20',
+      time: 'Yesterday, 9:20 AM',
       type: 'Risk Assessment',
       status: 'completed',
     },
     {
       id: 4,
       title: 'Covenant Review - Facility XYZ',
-      time: 'Hier, 15:10',
+      time: 'Yesterday, 3:10 PM',
       type: 'Review',
       status: 'completed',
     },
     {
       id: 5,
       title: 'Pipeline Forecast',
-      time: '2 jours ago',
+      time: '2 days ago',
       type: 'Forecast',
       status: 'completed',
     },
@@ -69,9 +69,9 @@ export function HistoryPage() {
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="max-w-4xl mx-auto px-6 py-6 space-y-6">
-        {/* Conversations récentes — tous plans de travail confondus */}
+        {/* Recent conversations — across all work plans */}
         <div>
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2.5">Conversations récentes</h2>
+          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2.5">Recent Conversations</h2>
           <div className="space-y-2">
             {RECENT_CONVERSATIONS.map((c) => (
               <button
@@ -91,9 +91,9 @@ export function HistoryPage() {
           </div>
         </div>
 
-        {/* Historique d'activité */}
+        {/* Activity history */}
         <div>
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2.5">Activité</h2>
+          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2.5">Activity</h2>
           <div className="space-y-3">
             {historyItems.map((item) => (
               <div

@@ -39,7 +39,7 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
       },
       {
         label: 'Risk Level',
-        value: 'Modéré',
+        value: 'Moderate',
         status: 'neutral',
       },
     ],
@@ -48,19 +48,19 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
         icon: <TrendingUp size={16} />,
         title: 'Client Analysis',
         description: 'Analyze exposure and structure',
-        prompt: 'Fais une analyse complète de l\'exposition de ce client',
+        prompt: 'Run a full exposure analysis for this client',
       },
       {
         icon: <AlertCircle size={16} />,
         title: 'Risk Assessment',
         description: 'Identify specific risks',
-        prompt: 'Quels risques identifiez-vous pour ce client?',
+        prompt: 'What risks do you identify for this client?',
       },
       {
         icon: <Zap size={16} />,
         title: 'Create Credit Memo',
         description: 'Generate analysis memo',
-        prompt: 'Génère un Credit Memo complet pour ce client',
+        prompt: 'Generate a complete Credit Memo for this client',
       },
     ],
   },
@@ -87,19 +87,19 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
         icon: <TrendingUp size={16} />,
         title: 'Facility Details',
         description: 'View detailed structure',
-        prompt: 'Montre-moi les détails de cette facility',
+        prompt: 'Show me the details of this facility',
       },
       {
         icon: <AlertCircle size={16} />,
         title: 'Covenant Status',
         description: 'Check covenant compliance',
-        prompt: 'Vérife les covenants de cette facility',
+        prompt: 'Check the covenants for this facility',
       },
       {
         icon: <Zap size={16} />,
         title: 'Renewal Planning',
         description: 'Plan for maturity',
-        prompt: 'Prépare le renouvellement de cette facility',
+        prompt: 'Prepare the renewal for this facility',
       },
     ],
   },
@@ -127,19 +127,19 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
         icon: <TrendingUp size={16} />,
         title: 'Daily Summary',
         description: 'Get key metrics overview',
-        prompt: 'Résume les métriques clés du jour',
+        prompt: "Summarize today's key metrics",
       },
       {
         icon: <AlertCircle size={16} />,
         title: 'Pending Items',
         description: 'Review what needs attention',
-        prompt: 'Montre-moi les items en attente',
+        prompt: 'Show me the pending items',
       },
       {
         icon: <Zap size={16} />,
         title: 'Trends',
         description: 'Analyze recent trends',
-        prompt: 'Quelles sont les tendances récentes?',
+        prompt: 'What are the recent trends?',
       },
     ],
   },
@@ -166,19 +166,19 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
         icon: <TrendingUp size={16} />,
         title: 'Generate Report',
         description: 'Create fresh report',
-        prompt: 'Génère un rapport mensuel complet',
+        prompt: 'Generate a complete monthly report',
       },
       {
         icon: <AlertCircle size={16} />,
         title: 'Data Exceptions',
         description: 'Review data issues',
-        prompt: 'Quelles sont les exceptions dans les données?',
+        prompt: 'What are the exceptions in the data?',
       },
       {
         icon: <Zap size={16} />,
         title: 'Comparisons',
         description: 'Compare vs previous periods',
-        prompt: 'Compare avec le mois précédent',
+        prompt: 'Compare with the previous month',
       },
     ],
   },
@@ -207,36 +207,36 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
         icon: <TrendingUp size={16} />,
         title: 'Portfolio Composition',
         description: 'Analyze by sector and size',
-        prompt: 'Fais une analyse du portefeuille par secteur',
+        prompt: 'Analyze the portfolio by sector',
       },
       {
         icon: <AlertCircle size={16} />,
         title: 'Risk Overview',
         description: 'Identify portfolio risks',
-        prompt: 'Quel est le profil de risque du portefeuille?',
+        prompt: "What is the portfolio's risk profile?",
       },
       {
         icon: <Zap size={16} />,
         title: 'Optimization',
         description: 'Rebalancing opportunities',
-        prompt: 'Quelles optimisations recommandez-vous?',
+        prompt: 'What optimizations do you recommend?',
       },
     ],
   },
   'cap-cbs': {
     kpis: [
       {
-        label: 'Dossiers actifs',
+        label: 'Active dossiers',
         value: '5',
         status: 'neutral',
       },
       {
-        label: 'À valider',
+        label: 'To validate',
         value: '3',
         status: 'warning',
       },
       {
-        label: 'Mis à jour (24h)',
+        label: 'Updated (24h)',
         value: '3',
         trend: 'up',
         status: 'warning',
@@ -245,60 +245,60 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
     actions: [
       {
         icon: <TrendingUp size={16} />,
-        title: 'Voir le tableau de bord',
-        description: 'Tous les CBS/CAP en cours',
-        prompt: 'Ouvre le CBS/CAP de ce client',
+        title: 'View dashboard',
+        description: 'All CBS/CAP in progress',
+        prompt: 'Open the CBS/CAP for this client',
       },
       {
         icon: <AlertCircle size={16} />,
-        title: 'Dossiers mis à jour',
-        description: 'Voir les CBS/CAP récemment modifiés',
-        prompt: 'Quels dossiers CBS/CAP ont été mis à jour récemment ?',
+        title: 'Recently updated',
+        description: 'See recently modified CBS/CAP',
+        prompt: 'Which CBS/CAP dossiers were updated recently?',
       },
       {
         icon: <Zap size={16} />,
-        title: 'Résumer la stratégie',
-        description: 'Synthèse des 5 axes en 1 minute',
-        prompt: 'Résume la stratégie CBS/CAP de ce client',
+        title: 'Summarize strategy',
+        description: 'A 1-minute summary of the 5 axes',
+        prompt: 'Summarize the CBS/CAP strategy for this client',
       },
     ],
   },
   'cap-cbs-detail': {
     kpis: [
       {
-        label: 'Statut',
+        label: 'Status',
         value: 'Draft',
         status: 'warning',
       },
       {
-        label: 'Axes complétés',
+        label: 'Axes completed',
         value: '3/5',
         status: 'neutral',
       },
       {
-        label: 'Prochaine revue',
-        value: 'mars 2027',
+        label: 'Next review',
+        value: 'Mar 2027',
         status: 'neutral',
       },
     ],
     actions: [
       {
         icon: <TrendingUp size={16} />,
-        title: 'Compléter les axes restants',
-        description: 'ESG et Angle IB/TB/GM à finaliser',
-        prompt: 'Aide-moi à compléter les axes restants du CBS/CAP',
+        title: 'Complete remaining axes',
+        description: 'ESG and IB/TB/GM angle still open',
+        prompt: 'Help me complete the remaining CBS/CAP axes',
       },
       {
         icon: <AlertCircle size={16} />,
-        title: 'Vérifier la cohérence',
-        description: 'Relire la stratégie avant validation',
-        prompt: 'Vérifie la cohérence de ce CBS/CAP avant validation',
+        title: 'Check consistency',
+        description: 'Review the strategy before validation',
+        prompt: 'Check the consistency of this CBS/CAP before validation',
       },
       {
         icon: <Zap size={16} />,
-        title: 'Résumer la stratégie',
-        description: 'Synthèse des 5 axes en 1 minute',
-        prompt: 'Résume la stratégie CBS/CAP de ce client',
+        title: 'Summarize strategy',
+        description: 'A 1-minute summary of the 5 axes',
+        prompt: 'Summarize the CBS/CAP strategy for this client',
       },
     ],
   },
@@ -325,19 +325,19 @@ const CONTEXT_DATA: Record<string, { kpis: KPI[]; actions: Action[] }> = {
         icon: <TrendingUp size={16} />,
         title: 'Pipeline Status',
         description: 'View deal stages',
-        prompt: 'Résume l\'état du pipeline',
+        prompt: 'Summarize the pipeline status',
       },
       {
         icon: <AlertCircle size={16} />,
         title: 'At-Risk Deals',
         description: 'Deals needing attention',
-        prompt: 'Quels deals sont à risque?',
+        prompt: 'Which deals are at risk?',
       },
       {
         icon: <Zap size={16} />,
         title: 'Forecast',
         description: 'Quarter projection',
-        prompt: 'Quelle est la projection Q3?',
+        prompt: 'What is the Q3 projection?',
       },
     ],
   },
@@ -350,7 +350,7 @@ export function ContextualSuggestions({
 }: ContextualSuggestionsProps) {
   const data = CONTEXT_DATA[context] || CONTEXT_DATA.myClientDev
   const { kpis, actions } = data
-  const currentItem = contextData?.currentItem || 'ce contexte'
+  const currentItem = contextData?.currentItem || 'this context'
 
   const getTrendIcon = (trend?: string) => {
     if (trend === 'up') return '📈'
@@ -368,7 +368,7 @@ export function ContextualSuggestions({
     <div className="space-y-4">
       {/* KPIs */}
       <div>
-        <p className="text-2xs font-semibold text-slate-700 mb-2 uppercase tracking-wide">Indicateurs clés</p>
+        <p className="text-2xs font-semibold text-slate-700 mb-2 uppercase tracking-wide">Key Indicators</p>
         <div className="grid grid-cols-3 gap-2">
           {kpis.map((kpi, idx) => (
             <div
@@ -386,15 +386,15 @@ export function ContextualSuggestions({
 
       {/* Actions */}
       <div>
-        <p className="text-2xs font-semibold text-slate-700 mb-2 uppercase tracking-wide">Actions pour {currentItem}</p>
+        <p className="text-2xs font-semibold text-slate-700 mb-2 uppercase tracking-wide">Actions for {currentItem}</p>
         <div className="space-y-2">
           {actions.map((action, idx) => {
-            // Adapter le texte pour inclure le contexte actuel
-            const adaptedTitle = currentItem && currentItem !== 'ce contexte'
+            // Adapt the text to include the current context
+            const adaptedTitle = currentItem && currentItem !== 'this context'
               ? `${action.title} - ${currentItem}`
               : action.title
-            const adaptedPrompt = currentItem && currentItem !== 'ce contexte'
-              ? action.prompt.replace(/ce client|this client|de ce contexte/gi, `de ${currentItem}`)
+            const adaptedPrompt = currentItem && currentItem !== 'this context'
+              ? action.prompt.replace(/this client|this context/gi, currentItem)
               : action.prompt
 
             return (

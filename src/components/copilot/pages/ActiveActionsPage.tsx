@@ -4,22 +4,22 @@ export function ActiveActionsPage() {
   const activeActions = [
     {
       id: 1,
-      title: 'Analyse TechCorp France',
-      startedAt: 'Il y a 15 min',
+      title: 'TechCorp France Analysis',
+      startedAt: '15 min ago',
       status: 'completed',
       progress: 100,
     },
     {
       id: 2,
-      title: 'Génération Credit Memo - Manufacturing Ltd',
-      startedAt: 'Il y a 8 min',
+      title: 'Generating Credit Memo - Manufacturing Ltd',
+      startedAt: '8 min ago',
       status: 'generating',
       progress: 65,
     },
     {
       id: 3,
       title: 'Risk Assessment Portfolio',
-      startedAt: 'Il y a 3 min',
+      startedAt: '3 min ago',
       status: 'processing',
       progress: 35,
     },
@@ -43,15 +43,15 @@ export function ActiveActionsPage() {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'Complété'
+        return 'Completed'
       case 'generating':
-        return 'En génération'
+        return 'Generating'
       case 'processing':
-        return 'En traitement'
+        return 'Processing'
       case 'error':
-        return 'Erreur'
+        return 'Error'
       default:
-        return 'Inconnu'
+        return 'Unknown'
     }
   }
 
@@ -89,7 +89,7 @@ export function ActiveActionsPage() {
                   style={{ width: `${action.progress}%` }}
                 />
               </div>
-              <p className="text-xs text-slate-500 mt-1">{action.progress}% complété</p>
+              <p className="text-xs text-slate-500 mt-1">{action.progress}% complete</p>
             </div>
 
             {/* Actions */}
@@ -97,7 +97,7 @@ export function ActiveActionsPage() {
               {action.status === 'completed' && (
                 <button className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition text-sm font-medium">
                   <Eye size={16} />
-                  Voir le résultat
+                  View result
                 </button>
               )}
               <button className="p-1.5 rounded-lg hover:bg-red-50 transition">

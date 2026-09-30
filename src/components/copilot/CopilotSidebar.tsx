@@ -108,7 +108,7 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
         <button
           onClick={onToggleCollapse}
           className="p-1 hover:bg-white/15 rounded transition"
-          title="Réduire sidebar"
+          title="Collapse sidebar"
         >
           <ChevronRight size={20} className="text-white" />
         </button>
@@ -147,7 +147,7 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
       <div className="border-t border-slate-200 px-3 py-3 bg-white">
         <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-100 transition">
           <Settings size={18} />
-          <span className="text-sm font-medium">Paramètres</span>
+          <span className="text-sm font-medium">Settings</span>
         </button>
       </div>
 
@@ -166,7 +166,7 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
           background: isDragging ? '#4F46E5' : 'transparent',
           boxShadow: isDragging ? '0 0 12px rgba(79, 70, 229, 0.4)' : 'none',
         }}
-        title="Glissez pour redimensionner"
+        title="Drag to resize"
       />
     </div>
   )

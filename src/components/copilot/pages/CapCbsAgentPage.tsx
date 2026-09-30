@@ -30,28 +30,28 @@ const INITIAL_DOSSIERS: Dossier[] = [
     client: 'AeroDynamics Group',
     status: 'Draft',
     updated: true,
-    note: 'Axe ESG modifié il y a 2h',
-    messages: [{ id: 'm1', role: 'assistant', content: "3 axes sur 5 complétés. L'axe ESG a été mis à jour par É. Mercier il y a 2h." }],
+    note: 'ESG axis updated 2h ago',
+    messages: [{ id: 'm1', role: 'assistant', content: '3 of 5 axes completed. The ESG axis was updated by É. Mercier 2h ago.' }],
   },
   {
     id: 'c2',
     client: 'TechCorp France',
     status: 'Validated',
     updated: false,
-    note: 'Validé le 2 sept. 2026',
-    messages: [{ id: 'm1', role: 'assistant', content: 'CBS/CAP validé — données figées jusqu\'à la prochaine revue (sept. 2027).' }],
+    note: 'Validated Sep 2, 2026',
+    messages: [{ id: 'm1', role: 'assistant', content: 'CBS/CAP validated — data frozen until the next review (Sep 2027).' }],
   },
   {
     id: 'c3',
     client: 'Manufacturing Ltd',
     status: 'Draft',
     updated: true,
-    note: 'Nouvelle contribution région EMEA',
-    messages: [{ id: 'm1', role: 'assistant', content: 'La région EMEA a ajouté une contribution sur l\'axe Angle IB/TB/GM.' }],
+    note: 'New EMEA region contribution',
+    messages: [{ id: 'm1', role: 'assistant', content: 'The EMEA region added a contribution on the IB/TB/GM angle axis.' }],
   },
 ]
 
-/** Page dédiée dans le sidepanel assistant — plan de travail CAP/CBS. */
+/** Dedicated sidepanel work plan for CAP/CBS. */
 export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = true }: CapCbsAgentPageProps) {
   const [dossiers, setDossiers] = useState<Dossier[]>(INITIAL_DOSSIERS)
   const [openId, setOpenId] = useState<string | null>(null)
@@ -78,10 +78,10 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
   const handleNewConversation = () => {
     const newDossier: Dossier = {
       id: Date.now().toString(),
-      client: 'Nouveau sujet',
+      client: 'New topic',
       status: 'Draft',
       updated: false,
-      note: 'Conversation non classée',
+      note: 'Unclassified conversation',
       messages: [],
     }
     setDossiers((prev) => [newDossier, ...prev])
@@ -106,7 +106,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
                   {
                     id: (Date.now() + 1).toString(),
                     role: 'assistant',
-                    content: `Je peux creuser ce point sur le CBS/CAP ("${question}"). Ouvrez le dossier complet pour éditer directement les axes concernés.`,
+                    content: `I can dig into this on the CBS/CAP ("${question}"). Open the full dossier to edit the relevant axes directly.`,
                   },
                 ],
               }
@@ -118,7 +118,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      {/* En-tête compact : titre + info au survol */}
+      {/* Compact header: title + info tooltip */}
       <div className={`flex items-center gap-2 ${pad} pb-2 border-b border-slate-200 flex-shrink-0`}>
         <div className="w-7 h-7 rounded-lg bg-rad-indigo-100 flex items-center justify-center flex-shrink-0">
           <ClipboardList size={14} className="text-rad-indigo-600" />
@@ -126,22 +126,22 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
         <h2 className="text-sm font-bold text-slate-900 flex-1 truncate">CAP / CBS</h2>
         <Tooltip>
           <TooltipTrigger asChild>
-            <button className="p-1 rounded hover:bg-slate-100 transition flex-shrink-0" title="En savoir plus">
+            <button className="p-1 rounded hover:bg-slate-100 transition flex-shrink-0" title="Learn more">
               <Info size={14} className="text-slate-400" />
             </button>
           </TooltipTrigger>
           <TooltipContent side="left">
-            <p className="font-semibold text-white mb-1">Stratégie & plan d'action client</p>
+            <p className="font-semibold text-white mb-1">Client strategy & action plan</p>
             <p className="text-slate-300 mb-1.5">
-              Le CBS consolide la vision client, l'ambition commerciale et les opportunités
-              prioritaires. Le CAP traduit cette stratégie en actions et suivis.
+              The CBS consolidates the client vision, commercial ambition and priority
+              opportunities. The CAP translates that strategy into actions and follow-ups.
             </p>
             <ul className="space-y-0.5 text-slate-300">
-              <li>• Contexte</li>
-              <li>• Revenus historiques & prévisions</li>
-              <li>• RWA / Profitabilité</li>
+              <li>• Context</li>
+              <li>• Historical revenue & forecasts</li>
+              <li>• RWA / Profitability</li>
               <li>• ESG</li>
-              <li>• Angle IB/TB/GM — opportunités & connectivité</li>
+              <li>• IB/TB/GM angle — opportunities & connectivity</li>
             </ul>
           </TooltipContent>
         </Tooltip>
@@ -150,12 +150,12 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-rad-indigo-600 hover:bg-rad-indigo-700 text-white text-2xs font-medium transition flex-shrink-0"
         >
           <LayoutGrid size={12} />
-          Tableau de bord
+          Dashboard
         </button>
       </div>
 
       {openDossier ? (
-        /* Détail d'un dossier : historique de la conversation + composer */
+        /* Dossier detail: conversation history + composer */
         <>
           <div className={`flex items-center gap-2 ${pad} py-2 border-b border-slate-200 flex-shrink-0`}>
             <button onClick={() => setOpenId(null)} className="p-1 rounded hover:bg-slate-100 transition">
@@ -172,14 +172,14 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
             >
               {openDossier.status}
             </span>
-            <button onClick={goToDetail} title="Ouvrir le dossier complet" className="p-1 rounded hover:bg-rad-indigo-50 transition flex-shrink-0">
+            <button onClick={goToDetail} title="Open the full dossier" className="p-1 rounded hover:bg-rad-indigo-50 transition flex-shrink-0">
               <ArrowUpRight size={14} className="text-rad-indigo-600" />
             </button>
           </div>
 
           <div className={`flex-1 overflow-y-auto ${pad} space-y-1.5`}>
             {openDossier.messages.length === 0 && (
-              <p className="text-2xs text-slate-400 text-center pt-6">Aucun message pour l'instant — posez une question ci-dessous.</p>
+              <p className="text-2xs text-slate-400 text-center pt-6">No messages yet — ask a question below.</p>
             )}
             {openDossier.messages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -202,7 +202,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="Continuer la conversation..."
+                placeholder="Continue the conversation..."
                 className="w-full h-8 rounded-lg border border-slate-200 bg-white pl-3 pr-9 text-2xs focus:border-rad-indigo-300 focus:outline-none focus:ring-1 focus:ring-rad-indigo-500"
               />
               <button onClick={handleSend} className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 hover:bg-rad-indigo-50 rounded transition">
@@ -212,17 +212,17 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
           </div>
         </>
       ) : (
-        /* Liste des dossiers traités */
+        /* Recent dossiers list */
         <div className={`flex-1 overflow-y-auto ${pad} space-y-2`}>
           <button
             onClick={handleNewConversation}
             className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-rad-indigo-300 text-rad-indigo-700 hover:bg-rad-indigo-50 transition text-2xs font-medium"
           >
             <Plus size={14} />
-            Nouvelle conversation
+            New conversation
           </button>
 
-          <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide pt-1">Dossiers traités</p>
+          <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide pt-1">Recent dossiers</p>
           <div className="space-y-1.5">
             {dossiers.map((d) => (
               <div
@@ -231,7 +231,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
               >
                 <button onClick={() => setOpenId(d.id)} className="min-w-0 flex-1 text-left">
                   <div className="flex items-center gap-1.5">
-                    {d.updated && <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" title="Mis à jour récemment" />}
+                    {d.updated && <span className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" title="Recently updated" />}
                     <p className="text-2xs font-semibold text-slate-900 truncate">{d.client}</p>
                   </div>
                   <p className="text-2xs text-slate-500 truncate">{d.note}</p>
@@ -243,7 +243,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
                 >
                   {d.status}
                 </span>
-                <button onClick={goToDetail} title="Ouvrir le dossier complet" className="p-1 rounded hover:bg-rad-indigo-100 transition flex-shrink-0">
+                <button onClick={goToDetail} title="Open the full dossier" className="p-1 rounded hover:bg-rad-indigo-100 transition flex-shrink-0">
                   <ArrowUpRight size={13} className="text-rad-indigo-600" />
                 </button>
               </div>

@@ -16,9 +16,9 @@ const SECTIONS: DigestSection[] = [
     title: 'Must-read Articles',
     icon: <Newspaper size={13} />,
     items: [
-      { text: 'JP Morgan relève ses prévisions de revenus IB pour le T4 sur fond de reprise M&A.', tag: 'Financial Times' },
-      { text: 'Goldman Sachs annonce une réorganisation de sa division Asset Management.', tag: 'Bloomberg' },
-      { text: 'Morgan Stanley renforce son équipe Private Credit en Europe.', tag: 'Reuters' },
+      { text: 'JP Morgan raises Q4 IB revenue guidance on the back of an M&A rebound.', tag: 'Financial Times' },
+      { text: 'Goldman Sachs announces a reorganization of its Asset Management division.', tag: 'Bloomberg' },
+      { text: "Morgan Stanley strengthens its Private Credit team in Europe.", tag: 'Reuters' },
     ],
   },
   {
@@ -26,8 +26,8 @@ const SECTIONS: DigestSection[] = [
     title: 'Sector 360 — Commercial & Investment Banking · Asset Management & Private Equity',
     icon: <Building2 size={13} />,
     items: [
-      { text: 'Consolidation continue chez les gérants d\'actifs alternatifs : flux records vers le Private Credit.', tag: 'Sector Watch' },
-      { text: 'Les banques d\'investissement américaines relèvent leurs objectifs de fee pool 2026.', tag: 'Sector Watch' },
+      { text: 'Continued consolidation among alternative asset managers: record flows into Private Credit.', tag: 'Sector Watch' },
+      { text: 'US investment banks raise their 2026 fee pool targets.', tag: 'Sector Watch' },
     ],
   },
   {
@@ -35,10 +35,10 @@ const SECTIONS: DigestSection[] = [
     title: 'Client 360',
     icon: <Users size={13} />,
     items: [
-      { text: 'JP Morgan : renouvellement de mandat de conseil attendu au T1 2027.', tag: 'C3' },
-      { text: 'Goldman Sachs : nouvelle ligne de crédit syndiquée en cours de structuration.', tag: 'Dealogic' },
-      { text: 'Morgan Stanley : revue annuelle de la relation prévue le mois prochain.', tag: 'Orbit' },
-      { text: 'Macquarie : intérêt confirmé pour une opération de financement d\'infrastructure.', tag: 'C3' },
+      { text: 'JP Morgan: advisory mandate renewal expected in Q1 2027.', tag: 'C3' },
+      { text: 'Goldman Sachs: new syndicated credit line being structured.', tag: 'Dealogic' },
+      { text: "Morgan Stanley: annual relationship review scheduled for next month.", tag: 'Orbit' },
+      { text: 'Macquarie: confirmed interest in an infrastructure financing deal.', tag: 'C3' },
     ],
   },
   {
@@ -46,8 +46,8 @@ const SECTIONS: DigestSection[] = [
     title: 'Competitive intelligence',
     icon: <Swords size={13} />,
     items: [
-      { text: 'Un concurrent direct a remporté le mandat sell-side sur un deal comparable au secteur Financial Institutions.', tag: 'Presse' },
-      { text: 'Repositionnement tarifaire observé chez deux banques concurrentes sur le Transaction Banking.', tag: 'Presse' },
+      { text: 'A direct competitor won the sell-side mandate on a comparable Financial Institutions deal.', tag: 'Press' },
+      { text: 'Pricing repositioning observed at two competing banks in Transaction Banking.', tag: 'Press' },
     ],
   },
 ]
@@ -65,7 +65,7 @@ export function DigestCard() {
         <div className="min-w-0">
           <p className="text-2xs font-bold text-slate-900">Good Morning Jessica 👋</p>
           <p className="text-2xs text-slate-600 mt-0.5">
-            Votre digest client personnalisé du {today}. Actualités récentes pour {CLIENTS.join(', ')}.
+            Your personalized client digest for {today}. Recent news for {CLIENTS.join(', ')}.
           </p>
         </div>
       </div>

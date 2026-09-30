@@ -8,29 +8,29 @@ export function FavoritesPage({ onSelectPrompt }: FavoritesPageProps) {
   const favorites = [
     {
       id: 1,
-      title: 'Analyse complète de client',
-      prompt: 'Fais une analyse complète de l\'exposition de ce client',
+      title: 'Full client analysis',
+      prompt: 'Run a full exposure analysis for this client',
       category: 'Analysis',
       saves: 12,
     },
     {
       id: 2,
-      title: 'Credit Memo complet',
-      prompt: 'Génère un Credit Memo complet pour ce client',
+      title: 'Complete Credit Memo',
+      prompt: 'Generate a complete Credit Memo for this client',
       category: 'Memo',
       saves: 8,
     },
     {
       id: 3,
-      title: 'Risk Assessment détaillé',
-      prompt: 'Quels risques identifiez-vous pour ce client?',
+      title: 'Detailed Risk Assessment',
+      prompt: 'What risks do you identify for this client?',
       category: 'Risk',
       saves: 5,
     },
     {
       id: 4,
-      title: 'Portfolio par secteur',
-      prompt: 'Fais une analyse du portefeuille par secteur',
+      title: 'Portfolio by sector',
+      prompt: 'Analyze the portfolio by sector',
       category: 'Portfolio',
       saves: 3,
     },
@@ -42,7 +42,7 @@ export function FavoritesPage({ onSelectPrompt }: FavoritesPageProps) {
         {/* Add New Favorite Button */}
         <button className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-dashed border-rad-indigo-300 text-rad-indigo-600 hover:bg-rad-indigo-50 transition font-medium">
           <Plus size={18} />
-          Ajouter un nouveau prompt favoris
+          Add a new favorite prompt
         </button>
 
         {/* Favorites Grid */}
@@ -72,7 +72,7 @@ export function FavoritesPage({ onSelectPrompt }: FavoritesPageProps) {
                   onClick={() => onSelectPrompt?.(fav.prompt)}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rad-indigo-500 text-white hover:bg-rad-indigo-600 transition text-sm font-medium"
                 >
-                  Utiliser
+                  Use
                 </button>
                 <button className="p-1.5 rounded-lg hover:bg-slate-100 transition">
                   <Copy size={16} className="text-slate-500" />

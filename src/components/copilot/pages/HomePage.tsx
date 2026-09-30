@@ -67,11 +67,11 @@ export function HomePage({
 
   // Detect keywords for placeholder suggestions
   const keywords = {
-    'exposition': '€847.3M',
-    'risque': 'Modéré',
+    'exposure': '€847.3M',
+    'risk': 'Moderate',
     'rating': 'BBB+',
     'clients': '12',
-    'portefeuille': '€847.3M',
+    'portfolio': '€847.3M',
   }
 
   const detectKeyword = (text: string) => {
@@ -96,31 +96,31 @@ export function HomePage({
   const isMedium = sidebarWidth >= 350 && sidebarWidth < 500
 
   const dateOptions = [
-    { id: 'today', label: "Aujourd'hui", date: new Date() },
-    { id: 'yesterday', label: 'Hier', date: new Date(Date.now() - 86400000) },
-    { id: '3days', label: 'Il y a 3j', date: new Date(Date.now() - 3 * 86400000) },
-    { id: 'week', label: 'Semaine', date: new Date(Date.now() - 7 * 86400000) },
+    { id: 'today', label: 'Today', date: new Date() },
+    { id: 'yesterday', label: 'Yesterday', date: new Date(Date.now() - 86400000) },
+    { id: '3days', label: '3 days ago', date: new Date(Date.now() - 3 * 86400000) },
+    { id: 'week', label: 'This week', date: new Date(Date.now() - 7 * 86400000) },
   ]
 
-  /** Réponse contextuelle simulée — suffisant pour un prototype conversationnel crédible. */
+  /** Simulated contextual reply — good enough for a credible conversational prototype. */
   const generateAssistantReply = (question: string): string => {
     const q = question.toLowerCase()
     if (q.includes('credit memo')) {
-      return 'Je peux générer un Credit Memo complet. Cliquez sur la carte "Créer un Credit Memo" ci-dessous pour démarrer : je pré-remplirai les données disponibles.'
+      return 'I can generate a full Credit Memo. Click the "Create a Credit Memo" card below to get started — I\'ll pre-fill the available data.'
     }
     if (q.includes('cbs') || q.includes('cap')) {
-      return 'Le CBS/CAP de ce client est en cours de complétion. Ouvrez le plan de travail "CAP / CBS" ci-dessous pour éditer les 5 axes stratégiques ou suivre les actions du plan.'
+      return 'This client\'s CBS/CAP is in progress. Open the "CAP / CBS" work plan below to edit the 5 strategic axes or follow up on action items.'
     }
-    if (q.includes('digest') || q.includes('actualit') || q.includes('news')) {
-      return 'Votre digest du jour couvre JP Morgan, Goldman Sachs, Morgan Stanley et Macquarie. Dépliez les sections ci-dessus pour le détail par thème.'
+    if (q.includes('digest') || q.includes('news')) {
+      return "Today's digest covers JP Morgan, Goldman Sachs, Morgan Stanley and Macquarie. Expand the sections above for the detail by theme."
     }
-    if (q.includes('exposition') || q.includes('risque') || q.includes('rating') || q.includes('portefeuille')) {
-      return "D'après les derniers KPIs : exposition €847.3M (+5.2%), 12 clients à risque, rating moyen BBB+. Voulez-vous que je lance une analyse détaillée sur un client en particulier ?"
+    if (q.includes('exposure') || q.includes('risk') || q.includes('rating') || q.includes('portfolio')) {
+      return "Based on the latest KPIs: exposure €847.3M (+5.2%), 12 at-risk clients, average rating BBB+. Would you like me to run a detailed analysis on a specific client?"
     }
-    if (q.includes('meena') || q.includes('réunion') || q.includes('notes')) {
-      return 'Meena peut enregistrer vos notes de réunion à la voix et les synchroniser avec CRM+. Ouvrez-la depuis le plan de travail "CRM+ Agent" ci-dessous.'
+    if (q.includes('meena') || q.includes('meeting') || q.includes('notes')) {
+      return 'Meena can record your meeting notes by voice and sync them with CRM+. Open it from the "CRM+ Agent" work plan below.'
     }
-    return `J'ai bien noté : "${question}". Je peux analyser un client, générer un Credit Memo, ouvrir le CBS/CAP ou synchroniser vos notes de réunion via Meena — précisez votre besoin.`
+    return `Got it: "${question}". I can analyze a client, generate a Credit Memo, open the CBS/CAP, or sync your meeting notes via Meena — let me know what you need.`
   }
 
   const handleSendChat = () => {
@@ -219,7 +219,7 @@ export function HomePage({
 
               <div className="flex items-start justify-between flex-1">
                 <div className="flex-1">
-                  <p className={`${labelSize} text-slate-600 uppercase tracking-wide`}>Exposition</p>
+                  <p className={`${labelSize} text-slate-600 uppercase tracking-wide`}>Exposure</p>
                   <p className={`${valueSize} text-slate-900 ${isCompact ? 'mt-0.5' : 'mt-2'}`}>€847.3M</p>
                   <p className={`${descriptionSize} text-rad-indigo-600 ${isCompact ? 'mt-0.5' : 'mt-1'}`}>↑ +5.2%</p>
                 </div>
@@ -228,7 +228,7 @@ export function HomePage({
                 </div>
               </div>
               <button className={`w-full ${labelSize} px-2 py-0.5 rounded border hover:bg-rad-indigo-50 transition ${isCompact ? 'mt-1.5' : 'mt-4'}`} style={{ borderColor: '#4F46E5', color: '#4F46E5' }}>
-                {isCompact ? 'Détails' : 'Voir détails'}
+                {isCompact ? 'Details' : 'View details'}
               </button>
             </div>
 
@@ -238,16 +238,16 @@ export function HomePage({
 
               <div className="flex items-start justify-between flex-1">
                 <div className="flex-1">
-                  <p className={`${labelSize} font-semibold text-slate-600 uppercase tracking-wide`}>Clients À Risque</p>
+                  <p className={`${labelSize} font-semibold text-slate-600 uppercase tracking-wide`}>At-Risk Clients</p>
                   <p className={`${valueSize} font-bold text-slate-900 ${isCompact ? 'mt-1' : 'mt-2'}`}>12</p>
-                  <p className={`${labelSize} text-red-600 font-medium ${isCompact ? 'mt-0.5' : 'mt-1'}`}>↑ +2 vs semaine passée</p>
+                  <p className={`${labelSize} text-red-600 font-medium ${isCompact ? 'mt-0.5' : 'mt-1'}`}>↑ +2 vs last week</p>
                 </div>
                 <div className={`${isCompact ? (isNarrow ? 'p-1.5' : 'p-2') : 'p-2.5'} rounded-lg bg-red-100/60`}>
                   <AlertCircle size={isCompact ? (isNarrow ? 14 : 16) : 20} className="text-red-600" />
                 </div>
               </div>
               <button className={`w-full ${labelSize} px-2.5 py-1 rounded border hover:bg-red-50 transition ${isCompact ? 'mt-2' : 'mt-4'}`} style={{ borderColor: '#DC2626', color: '#DC2626' }}>
-                Voir détails
+                View details
               </button>
             </div>
 
@@ -257,7 +257,7 @@ export function HomePage({
 
               <div className="flex items-start justify-between flex-1">
                 <div className="flex-1">
-                  <p className={`${labelSize} font-semibold text-slate-600 uppercase tracking-wide`}>Rating Moyen</p>
+                  <p className={`${labelSize} font-semibold text-slate-600 uppercase tracking-wide`}>Average Rating</p>
                   <p className={`${valueSize} font-bold text-slate-900 ${isCompact ? 'mt-1' : 'mt-2'}`}>BBB+</p>
                   <p className={`${labelSize} text-green-600 font-medium ${isCompact ? 'mt-0.5' : 'mt-1'}`}>Stable</p>
                 </div>
@@ -266,7 +266,7 @@ export function HomePage({
                 </div>
               </div>
               <button className={`w-full ${labelSize} px-2.5 py-1 rounded border hover:bg-green-50 transition ${isCompact ? 'mt-2' : 'mt-4'}`} style={{ borderColor: '#16A34A', color: '#16A34A' }}>
-                Voir détails
+                View details
               </button>
             </div>
           </div>
@@ -275,7 +275,7 @@ export function HomePage({
         {/* Top Recommendations */}
         {!isCompact && (
         <section>
-          <h2 className="text-lg font-bold text-slate-900 mb-4">⭐ Top Recommandations pour vous</h2>
+          <h2 className="text-lg font-bold text-slate-900 mb-4">⭐ Top Recommendations for You</h2>
 
           <div className="relative p-5 rounded-lg border-2" style={{ borderColor: '#4F46E5', background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, transparent 100%)' }} >
             {/* Accent stripe */}
@@ -284,10 +284,10 @@ export function HomePage({
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h3 className="font-semibold text-slate-900">Analyse complète du client Manufacturing Ltd</h3>
+                  <h3 className="font-semibold text-slate-900">Full analysis of Manufacturing Ltd</h3>
                   <p className="text-sm text-slate-600 mt-1">
-                    Ce client BBB- montre des signes de détérioration. Une analyse détaillée pourrait révéler les
-                    opportunités de restructuration.
+                    This BBB- client shows signs of deterioration. A detailed analysis could reveal
+                    restructuring opportunities.
                   </p>
                 </div>
                 <div className="p-2 rounded-lg" style={{ background: 'rgba(79, 70, 229, 0.1)' }}>
@@ -297,15 +297,15 @@ export function HomePage({
 
               <div className="flex items-center gap-2 pt-3" style={{ borderTopColor: '#4F46E5', borderTopWidth: '1px' }}>
                 <button
-                  onClick={() => onSelectPrompt?.("Fais une analyse complète de l'exposition de ce client: Manufacturing Ltd")}
+                  onClick={() => onSelectPrompt?.("Run a full exposure analysis for this client: Manufacturing Ltd")}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-white hover:opacity-90 transition font-medium text-sm"
                   style={{ background: 'linear-gradient(135deg, #4F46E5 0%, #0B1220 100%)' }}
                 >
                   <Brain size={16} />
-                  Lancer l'analyse
+                  Run analysis
                 </button>
                 <button className="px-3 py-2 rounded-lg border transition font-medium text-sm" style={{ borderColor: '#4F46E5', color: '#4F46E5' }}>
-                  Détails
+                  Details
                 </button>
               </div>
             </div>
@@ -316,16 +316,16 @@ export function HomePage({
         {/* Start From Scratch - Action Categories */}
         <section>
           <h2 className={`${sectionTitleSize} font-bold text-slate-900 ${isCompact ? 'mb-1.5' : 'mb-4'}`}>
-            {isCompact ? '🚀 Actions' : '🚀 Commencer une nouvelle action'}
+            {isCompact ? '🚀 Actions' : '🚀 Start a New Action'}
           </h2>
 
           <div className={`grid ${layout === 'full' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : actionGridCols} ${gap}`}>
             {/* Action Card 1 */}
             <ActionCard
-              title="Analyser un Client"
-              description="Ouvre Daily Assistant avec l'assistant en side panel pour analyser exposition, risques et recommandations"
+              title="Analyze a Client"
+              description="Opens Daily Assistant with the assistant side panel to analyze exposure, risks and recommendations"
               icon={<Brain size={actionCardIconSize} />}
-              prompt="Fais une analyse complète de l'exposition de ce client"
+              prompt="Run a full exposure analysis for this client"
               onSelect={onSelectPrompt}
               onOpenMyClientDev={() => openWorkPlan('client')}
               isCompact={isCompact}
@@ -333,10 +333,10 @@ export function HomePage({
 
             {/* Action Card 2 */}
             <ActionCard
-              title="Créer un Credit Memo"
-              description="Génère un memo de crédit détaillé avec tous les éléments"
+              title="Create a Credit Memo"
+              description="Generates a detailed credit memo with all elements"
               icon={<FileText size={actionCardIconSize} />}
-              prompt="Génère un Credit Memo complet pour ce client"
+              prompt="Generate a complete Credit Memo for this client"
               onSelect={onSelectPrompt}
               onCreateCreditMemo={onCreateCreditMemo}
               isCompact={isCompact}
@@ -344,37 +344,37 @@ export function HomePage({
 
             {/* Action Card 3 */}
             <ActionCard
-              title="Portefeuille Overview"
-              description="Vue d'ensemble du portefeuille et des tendances"
+              title="Portfolio Overview"
+              description="Portfolio overview and trends"
               icon={<BarChart3 size={20} />}
-              prompt="Fais une analyse du portefeuille par secteur"
+              prompt="Analyze the portfolio by sector"
               onSelect={onSelectPrompt}
             />
 
             {/* Action Card 4 */}
             <ActionCard
               title="Risk Assessment"
-              description="Évaluation détaillée des risques pour un client"
+              description="Detailed risk evaluation for a client"
               icon={<AlertCircle size={20} />}
-              prompt="Quels risques identifiez-vous pour ce client?"
+              prompt="What risks do you identify for this client?"
               onSelect={onSelectPrompt}
             />
 
             {/* Action Card 5 */}
             <ActionCard
               title="Pipeline Status"
-              description="État du pipeline et forecast des deals"
+              description="Pipeline status and deal forecast"
               icon={<TrendingUp size={20} />}
-              prompt="Résume l'état du pipeline"
+              prompt="Summarize the pipeline status"
               onSelect={onSelectPrompt}
             />
 
             {/* Action Card 6 */}
             <ActionCard
               title="Covenant Review"
-              description="Vérification des covenants et compliance"
+              description="Covenant compliance check"
               icon={<Target size={20} />}
-              prompt="Vérifie les covenants de cette facility"
+              prompt="Check the covenants for this facility"
               onSelect={onSelectPrompt}
             />
           </div>
@@ -383,18 +383,18 @@ export function HomePage({
         {/* Pinned Conversations */}
         {!isCompact && (
         <section>
-          <h2 className="text-lg font-bold text-slate-900 mb-4">📌 Conversations Épinglées</h2>
+          <h2 className="text-lg font-bold text-slate-900 mb-4">📌 Pinned Conversations</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <ConversationCard
               title="TechCorp France - Q3 Review"
-              date="Il y a 2 jours"
-              snippet="Analyse de l'exposition et des risques pour Q3..."
+              date="2 days ago"
+              snippet="Exposure and risk analysis for Q3..."
             />
             <ConversationCard
               title="Portfolio Rebalancing Options"
-              date="Il y a 5 jours"
-              snippet="Stratégies d'optimisation du portefeuille..."
+              date="5 days ago"
+              snippet="Portfolio optimization strategies..."
             />
           </div>
         </section>
@@ -436,7 +436,7 @@ export function HomePage({
               value={chatInput}
               onChange={handleChatInputChange}
               onKeyPress={(e) => e.key === 'Enter' && handleSendChat()}
-              placeholder={isCompact ? "Question..." : "Posez votre question ou utilisez une action..."}
+              placeholder={isCompact ? "Ask a question..." : "Ask a question or use an action..."}
               className={`w-full ${isCompact ? 'h-8' : 'h-10'} rounded-lg border border-slate-200 bg-white pl-3 pr-10 text-sm focus:border-rad-indigo-300 focus:outline-none focus:ring-1 focus:ring-rad-indigo-500`}
             />
             <button
@@ -467,7 +467,7 @@ function ActionCard({ title, description, icon, prompt, onSelect, onCreateCredit
   const handleClick = () => {
     if (title.includes('Credit Memo') && onCreateCreditMemo) {
       onCreateCreditMemo()
-    } else if (title.includes('Analyser un Client') && onOpenMyClientDev) {
+    } else if (title.includes('Analyze a Client') && onOpenMyClientDev) {
       onOpenMyClientDev()
     } else if (onSelect) {
       // Send the prompt to the chat

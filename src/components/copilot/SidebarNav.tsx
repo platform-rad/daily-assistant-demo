@@ -17,11 +17,11 @@ interface SidebarNavProps {
 // Historique a sa propre icône dédiée dans la barre du haut (accès direct) —
 // il n'a donc pas besoin d'apparaître aussi dans la liste épinglable.
 const PINNABLE_ITEMS: NavItem[] = [
-  { id: 'home', label: 'Accueil', icon: <Home size={18} /> },
+  { id: 'home', label: 'Home', icon: <Home size={18} /> },
   { id: 'crm-agent', label: 'CRM+ Agent', icon: <Mic size={18} /> },
   { id: 'cap-cbs', label: 'CAP / CBS', icon: <ClipboardList size={18} /> },
-  { id: 'active-actions', label: 'Actions en cours', icon: <Zap size={18} /> },
-  { id: 'favorites', label: 'Prompts Favoris', icon: <Star size={18} /> },
+  { id: 'active-actions', label: 'Active Actions', icon: <Zap size={18} /> },
+  { id: 'favorites', label: 'Favorite Prompts', icon: <Star size={18} /> },
 ]
 
 export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
@@ -71,7 +71,7 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
           className={`p-2 rounded-lg transition flex-shrink-0 ${
             currentView === 'history' ? 'bg-rad-indigo-600 text-white' : 'hover:bg-white/10 text-slate-300'
           }`}
-          title="Historique des conversations"
+          title="Conversation history"
         >
           <Clock size={18} />
         </button>
@@ -100,7 +100,7 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
                 <button
                   onClick={() => togglePin(item.id)}
                   className="p-1.5 opacity-0 group-hover:opacity-100 transition hover:bg-white/10 rounded flex-shrink-0"
-                  title={pinnedTabs.includes(item.id) ? 'Dépingler' : 'Épingler'}
+                  title={pinnedTabs.includes(item.id) ? 'Unpin' : 'Pin'}
                 >
                   {pinnedTabs.includes(item.id) ? (
                     <PinOff size={14} className="text-rad-indigo-300" />
@@ -122,7 +122,7 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
               }`}
             >
               <Clock size={18} className="flex-shrink-0" />
-              <span className="text-sm font-medium">Historique</span>
+              <span className="text-sm font-medium">History</span>
             </button>
           </nav>
         </div>
