@@ -12,6 +12,8 @@ interface NavItem {
 interface SidebarNavProps {
   currentView: NavView
   onViewChange: (view: NavView) => void
+  /** Pending-item counts shown as a small badge on the matching tab (e.g. items awaiting validation). */
+  badgeCounts?: Partial<Record<NavView, number>>
 }
 
 // Historique a sa propre icône dédiée dans la barre du haut (accès direct) —
@@ -24,7 +26,7 @@ const PINNABLE_ITEMS: NavItem[] = [
   { id: 'favorites', label: 'Favorite Prompts', icon: <Star size={18} /> },
 ]
 
-export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
+export function SidebarNav({ currentView, onViewChange, badgeCounts = {} }: SidebarNavProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [pinnedTabs, setPinnedTabs] = useState<NavView[]>(['home', 'crm-agent', 'cap-cbs'])
 
@@ -51,16 +53,22 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
             const item = PINNABLE_ITEMS.find((n) => n.id === tabId)
             if (!item) return null
             const isActive = currentView === tabId
+            const count = badgeCounts[tabId]
             return (
               <button
                 key={tabId}
                 onClick={() => onViewChange(tabId)}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg whitespace-nowrap text-xs font-medium transition flex-shrink-0 ${
+                className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg whitespace-nowrap text-xs font-medium transition flex-shrink-0 ${
                   isActive ? 'bg-rad-indigo-600 text-white' : 'text-slate-300 hover:bg-white/10'
                 }`}
               >
                 {item.icon}
                 <span className="hidden sm:inline">{item.label}</span>
+                {!!count && (
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] leading-4 font-bold flex items-center justify-center">
+                    {count}
+                  </span>
+                )}
               </button>
             )
           })}
@@ -93,7 +101,12 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
                   }`}
                 >
                   <span className="flex-shrink-0">{item.icon}</span>
-                  <span className="text-sm font-medium">{item.label}</span>
+                  <span className="text-sm font-medium flex-1">{item.label}</span>
+                  {!!badgeCounts[item.id] && (
+                    <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] leading-4 font-bold flex items-center justify-center flex-shrink-0">
+                      {badgeCounts[item.id]}
+                    </span>
+                  )}
                 </button>
 
                 {/* Pin Button - Always visible, at right */}

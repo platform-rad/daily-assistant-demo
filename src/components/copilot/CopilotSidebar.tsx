@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Settings, ChevronRight, Sparkles } from 'lucide-react'
+import { Settings, ChevronRight, Sparkles, Search } from 'lucide-react'
 import { HomePage } from './pages/HomePage'
 import { CrmAgentPage } from './pages/CrmAgentPage'
 import { CapCbsAgentPage } from './pages/CapCbsAgentPage'
@@ -8,8 +8,15 @@ import { FavoritesPage } from './pages/FavoritesPage'
 import { ActiveActionsPage } from './pages/ActiveActionsPage'
 import { SidebarNav, type NavView } from './SidebarNav'
 import { ContextualActionsPanel } from './ContextualActionsPanel'
+import { GlobalSearch } from './GlobalSearch'
 import type { HostRoute } from '@/data/types'
 import { ROUTES } from '@/data/hostRoutes'
+
+// Mock — en prod, dériverait du nombre réel de dossiers "Pending Review".
+const BADGE_COUNTS: Partial<Record<NavView, number>> = {
+  'crm-agent': 1,
+  'cap-cbs': 1,
+}
 
 interface CopilotSidebarProps {
   isCollapsed: boolean
@@ -29,7 +36,11 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
   const [isDragging, setIsDragging] = useState(false)
   const [dragStartX, setDragStartX] = useState(0)
   const [dragStartWidth, setDragStartWidth] = useState(0)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const sidebarRef = useRef<HTMLDivElement>(null)
+
+  // Prototype : un seul client est réellement modélisé (AeroDynamics Group).
+  const currentClientName = currentRoute === 'client' || currentRoute === 'client-edit' ? 'AeroDynamics Group' : undefined
 
   // Get context from route for dynamic suggestions
   const getContextFromRoute = (route: string): string => {
@@ -105,17 +116,26 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
           </div>
           <span className="font-semibold text-white text-sm">Copilot</span>
         </div>
-        <button
-          onClick={onToggleCollapse}
-          className="p-1 hover:bg-white/15 rounded transition"
-          title="Collapse sidebar"
-        >
-          <ChevronRight size={20} className="text-white" />
-        </button>
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="p-1.5 hover:bg-white/15 rounded transition"
+            title="Search clients, dossiers, conversations"
+          >
+            <Search size={18} className="text-white" />
+          </button>
+          <button
+            onClick={onToggleCollapse}
+            className="p-1 hover:bg-white/15 rounded transition"
+            title="Collapse sidebar"
+          >
+            <ChevronRight size={20} className="text-white" />
+          </button>
+        </div>
       </div>
 
       {/* New Navigation Bar with Menu & Tabs */}
-      <SidebarNav currentView={currentView} onViewChange={setCurrentView} />
+      <SidebarNav currentView={currentView} onViewChange={setCurrentView} badgeCounts={BADGE_COUNTS} />
 
       {/* Contexte persistant : s'actualise avec l'écran ouvert à gauche, visible sur tous les onglets */}
       <ContextualActionsPanel
@@ -126,7 +146,7 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
       />
 
       {/* Pages Content */}
-      <div className="flex-1 overflow-hidden flex flex-col">
+      <div className="flex-1 overflow-hidden flex flex-col relative">
         {currentView === 'home' && (
           <HomePage
             onSelectPrompt={handleSelectPrompt}
@@ -136,11 +156,21 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
             sidebarWidth={width}
           />
         )}
-        {currentView === 'crm-agent' && <CrmAgentPage onOpenMeena={onOpenMeena} isCompact />}
+        {currentView === 'crm-agent' && (
+          <CrmAgentPage onOpenMeena={onOpenMeena} currentClientName={currentClientName} isCompact />
+        )}
         {currentView === 'cap-cbs' && <CapCbsAgentPage onNavigate={onNavigate} isCompact />}
         {currentView === 'history' && <HistoryPage />}
         {currentView === 'favorites' && <FavoritesPage onSelectPrompt={handleSelectPrompt} />}
         {currentView === 'active-actions' && <ActiveActionsPage />}
+
+        <GlobalSearch
+          isOpen={isSearchOpen}
+          onClose={() => setIsSearchOpen(false)}
+          onViewChange={setCurrentView}
+          onGoToClient={() => onNavigate?.('client')}
+          onGoToCapCbs={() => onNavigate?.('cap-cbs-detail')}
+        />
       </div>
 
       {/* Settings Footer */}

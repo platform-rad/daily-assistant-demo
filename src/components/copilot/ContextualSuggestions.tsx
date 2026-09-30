@@ -1,4 +1,23 @@
-import { TrendingUp, AlertCircle, Zap } from 'lucide-react'
+import { TrendingUp, AlertCircle, Zap, AlertTriangle } from 'lucide-react'
+
+// Provenance heuristique par mot-clé — discret, sans indicateur de confiance.
+const SOURCE_BY_KEYWORD: Array<[RegExp, string]> = [
+  [/exposure/i, 'C3'],
+  [/rating/i, "S&P / Moody's"],
+  [/risk/i, 'Risk Engine'],
+  [/facility|utilization|maturity/i, 'Atlas'],
+  [/activity|transactions/i, 'Baccarat'],
+  [/alert/i, 'Monitoring'],
+  [/report|quality|exception/i, 'Data Quality Hub'],
+  [/deal|volume|forecast/i, 'Dealogic'],
+  [/dossier|updated|status|axes|review/i, 'CBS/CAP Engine'],
+]
+function getSource(label: string): string {
+  for (const [re, src] of SOURCE_BY_KEYWORD) {
+    if (re.test(label)) return src
+  }
+  return 'C3'
+}
 
 interface KPI {
   label: string
@@ -379,6 +398,7 @@ export function ContextualSuggestions({
               <p className={`text-sm font-bold mt-1 ${getStatusColor(kpi.status)}`}>
                 {kpi.trend ? getTrendIcon(kpi.trend) : ''} {kpi.value}
               </p>
+              <p className="text-[10px] text-slate-400 mt-0.5 truncate">{getSource(kpi.label)}</p>
             </div>
           ))}
         </div>
@@ -421,6 +441,11 @@ export function ContextualSuggestions({
           })}
         </div>
       </div>
+
+      <p className="flex items-start gap-1 text-[10px] text-slate-400 leading-relaxed">
+        <AlertTriangle size={10} className="mt-0.5 flex-shrink-0" />
+        AI-assisted suggestions — verify before acting.
+      </p>
     </div>
   )
 }

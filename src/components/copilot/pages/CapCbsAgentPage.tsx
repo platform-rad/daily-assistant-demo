@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { ClipboardList, Send, ArrowLeft, ArrowUpRight, Plus, Info, LayoutGrid } from 'lucide-react'
+import { ClipboardList, Send, ArrowLeft, ArrowUpRight, Plus, Info, LayoutGrid, AlertTriangle } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import type { HostRoute } from '@/data/types'
 
@@ -15,13 +15,21 @@ interface ChatMessage {
   content: string
 }
 
+type DossierStatus = 'Draft' | 'Pending Review' | 'Validated'
+
 interface Dossier {
   id: string
   client: string
-  status: 'Draft' | 'Validated'
+  status: DossierStatus
   updated: boolean
   note: string
   messages: ChatMessage[]
+}
+
+const STATUS_STYLE: Record<DossierStatus, string> = {
+  Validated: 'bg-emerald-100 text-emerald-700',
+  'Pending Review': 'bg-rad-indigo-100 text-rad-indigo-700',
+  Draft: 'bg-amber-100 text-amber-700',
 }
 
 const INITIAL_DOSSIERS: Dossier[] = [
@@ -44,10 +52,10 @@ const INITIAL_DOSSIERS: Dossier[] = [
   {
     id: 'c3',
     client: 'Manufacturing Ltd',
-    status: 'Draft',
+    status: 'Pending Review',
     updated: true,
-    note: 'New EMEA region contribution',
-    messages: [{ id: 'm1', role: 'assistant', content: 'The EMEA region added a contribution on the IB/TB/GM angle axis.' }],
+    note: 'New EMEA region contribution — submitted for review',
+    messages: [{ id: 'm1', role: 'assistant', content: 'The EMEA region added a contribution on the IB/TB/GM angle axis. Awaiting Pilot Banker review.' }],
   },
 ]
 
@@ -165,11 +173,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
               <p className="text-xs font-semibold text-slate-900 truncate">{openDossier.client}</p>
               <p className="text-2xs text-slate-500 truncate">{openDossier.note}</p>
             </div>
-            <span
-              className={`text-2xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${
-                openDossier.status === 'Validated' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-              }`}
-            >
+            <span className={`text-2xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${STATUS_STYLE[openDossier.status]}`}>
               {openDossier.status}
             </span>
             <button onClick={goToDetail} title="Open the full dossier" className="p-1 rounded hover:bg-rad-indigo-50 transition flex-shrink-0">
@@ -192,6 +196,10 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
                 </div>
               </div>
             ))}
+            <p className="flex items-start gap-1 text-2xs text-slate-400 pt-1">
+              <AlertTriangle size={11} className="mt-0.5 flex-shrink-0" />
+              AI-drafted content — human validation required before status can change.
+            </p>
             <div ref={endRef} />
           </div>
 
@@ -236,11 +244,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
                   </div>
                   <p className="text-2xs text-slate-500 truncate">{d.note}</p>
                 </button>
-                <span
-                  className={`text-2xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${
-                    d.status === 'Validated' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-                  }`}
-                >
+                <span className={`text-2xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${STATUS_STYLE[d.status]}`}>
                   {d.status}
                 </span>
                 <button onClick={goToDetail} title="Open the full dossier" className="p-1 rounded hover:bg-rad-indigo-100 transition flex-shrink-0">

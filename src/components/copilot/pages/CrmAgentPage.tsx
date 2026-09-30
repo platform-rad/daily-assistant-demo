@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
-import { Mic, Square, Pause, Play, Send, Clock, ArrowLeft, Plus, Info, Maximize2, Upload, Pencil } from 'lucide-react'
+import { Mic, Square, Pause, Play, Send, Clock, ArrowLeft, Plus, Info, Maximize2, Upload, Pencil, FileDown, ShieldCheck, AlertTriangle } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface CrmAgentPageProps {
   onOpenMeena?: () => void
+  /** Active client from the left panel, used to pre-fill a new recording's subject. */
+  currentClientName?: string
   isCompact?: boolean
 }
 
@@ -13,13 +15,21 @@ interface ChatMessage {
   content: string
 }
 
+type DossierStatus = 'Draft' | 'Pending Review' | 'Synced'
+
 interface Dossier {
   id: string
   client: string
   subject: string
-  status: 'Synced' | 'Draft'
+  status: DossierStatus
   updatedAt: string
   messages: ChatMessage[]
+}
+
+const STATUS_STYLE: Record<DossierStatus, string> = {
+  Synced: 'bg-emerald-100 text-emerald-700',
+  'Pending Review': 'bg-amber-100 text-amber-700',
+  Draft: 'bg-slate-100 text-slate-600',
 }
 
 const INITIAL_DOSSIERS: Dossier[] = [
@@ -37,10 +47,10 @@ const INITIAL_DOSSIERS: Dossier[] = [
     id: 'd2',
     client: 'TechCorp France',
     subject: 'Monthly business review',
-    status: 'Synced',
+    status: 'Pending Review',
     updatedAt: 'Aug 12, 2026',
     messages: [
-      { id: 'm1', role: 'assistant', content: 'Note synced with CRM+. No blocking action identified.' },
+      { id: 'm1', role: 'assistant', content: 'Note transcribed and awaiting your approval before it syncs to CRM+.' },
     ],
   },
   {
@@ -50,7 +60,7 @@ const INITIAL_DOSSIERS: Dossier[] = [
     status: 'Draft',
     updatedAt: 'Aug 5, 2026',
     messages: [
-      { id: 'm1', role: 'assistant', content: 'Draft note awaiting review before syncing to CRM+.' },
+      { id: 'm1', role: 'assistant', content: 'Draft note — not yet submitted for review.' },
     ],
   },
 ]
@@ -70,7 +80,7 @@ const formatTime = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padSta
 type RecordingState = 'idle' | 'recording' | 'paused' | 'stopped'
 
 /** Dedicated sidepanel work plan for the CRM+ Agent (Meena) — record, transcribe, ask, sync. */
-export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProps) {
+export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true }: CrmAgentPageProps) {
   const [dossiers, setDossiers] = useState<Dossier[]>(INITIAL_DOSSIERS)
   const [openId, setOpenId] = useState<string | null>(null)
   const [input, setInput] = useState('')
@@ -165,16 +175,16 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
       setDossiers((prev) =>
         prev.map((d) =>
           d.id === openId
-            ? { ...d, status: 'Synced', updatedAt: 'just now', messages: [...d.messages, summaryMessage, ...liveMessages] }
+            ? { ...d, status: 'Pending Review', updatedAt: 'just now', messages: [...d.messages, summaryMessage, ...liveMessages] }
             : d
         )
       )
     } else {
       const newDossier: Dossier = {
         id: Date.now().toString(),
-        client: 'New recording',
+        client: currentClientName || 'New recording',
         subject: `Voice note — ${formatTime(seconds)}`,
-        status: 'Synced',
+        status: 'Pending Review',
         updatedAt: 'just now',
         messages: [summaryMessage, ...liveMessages],
       }
@@ -185,6 +195,22 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
     setTimeout(() => {
       setRecordingState('idle')
     }, 1200)
+  }
+
+  /** Human confirmation step — nothing reaches CRM+ until someone approves it. */
+  const handleApprove = (id: string) => {
+    setDossiers((prev) =>
+      prev.map((d) =>
+        d.id === id
+          ? {
+              ...d,
+              status: 'Synced',
+              updatedAt: 'just now',
+              messages: [...d.messages, { id: Date.now().toString(), role: 'assistant', content: '✅ Approved and synced to CRM+.' }],
+            }
+          : d
+      )
+    )
   }
 
   const handleNewConversation = () => {
@@ -273,7 +299,7 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100">
                 <span className="text-2xs font-medium text-slate-700 flex-1">Recording stopped — {formatTime(seconds)}</span>
                 {sentConfirmation ? (
-                  <span className="text-2xs font-medium text-emerald-600">Sent to CRM+ ✓</span>
+                  <span className="text-2xs font-medium text-amber-600">Submitted for review ✓</span>
                 ) : (
                   <>
                     <button onClick={discardRecording} className="px-2 py-1 rounded text-2xs font-medium text-slate-500 hover:bg-slate-200 transition">
@@ -284,7 +310,7 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
                       className="flex items-center gap-1 px-2.5 py-1 rounded bg-rad-indigo-600 hover:bg-rad-indigo-700 text-white text-2xs font-medium transition"
                     >
                       <Upload size={11} />
-                      Send to CRM+
+                      Submit for Review
                     </button>
                   </>
                 )}
@@ -318,7 +344,10 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
           <div className={`flex-1 overflow-y-auto ${pad} space-y-3`}>
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide">Transcript</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide">Transcript</p>
+                  <span className="text-2xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">Source: voice, auto-transcribed</span>
+                </div>
                 {recordingState === 'stopped' && (
                   <span className="flex items-center gap-1 text-2xs text-slate-400">
                     <Pencil size={10} />
@@ -367,6 +396,10 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
                 </div>
               </div>
             )}
+            <p className="flex items-start gap-1 text-2xs text-slate-400 pt-1">
+              <AlertTriangle size={11} className="mt-0.5 flex-shrink-0" />
+              AI-generated transcript — review for accuracy before sending to CRM+.
+            </p>
             <div ref={transcriptEndRef} />
           </div>
 
@@ -415,14 +448,30 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
                   <p className="text-xs font-semibold text-slate-900 truncate">{openDossier.client}</p>
                   <p className="text-2xs text-slate-500 truncate">{openDossier.subject}</p>
                 </div>
-                <span
-                  className={`text-2xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${
-                    openDossier.status === 'Synced' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
-                  }`}
-                >
+                <span className={`text-2xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${STATUS_STYLE[openDossier.status]}`}>
                   {openDossier.status}
                 </span>
+                <button
+                  onClick={() => alert('Exported as PDF (mock).')}
+                  title="Export as PDF"
+                  className="p-1 rounded hover:bg-rad-indigo-50 transition flex-shrink-0"
+                >
+                  <FileDown size={14} className="text-rad-indigo-600" />
+                </button>
               </div>
+
+              {openDossier.status === 'Pending Review' && (
+                <div className={`flex items-center gap-2 ${pad} py-2 bg-amber-50 border-b border-amber-200 flex-shrink-0`}>
+                  <ShieldCheck size={14} className="text-amber-600 flex-shrink-0" />
+                  <span className="text-2xs text-amber-800 flex-1">Awaiting human review before syncing to CRM+.</span>
+                  <button
+                    onClick={() => handleApprove(openDossier.id)}
+                    className="px-2.5 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition flex-shrink-0"
+                  >
+                    Approve & Sync
+                  </button>
+                </div>
+              )}
 
               <div className={`flex-1 overflow-y-auto ${pad} space-y-1.5`}>
                 {openDossier.messages.length === 0 && (
@@ -491,11 +540,7 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
                       <p className="text-2xs text-slate-500 truncate">{d.subject}</p>
                     </div>
                     <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                      <span
-                        className={`text-2xs px-1.5 py-0.5 rounded font-medium ${
-                          d.status === 'Synced' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
-                        }`}
-                      >
+                      <span className={`text-2xs px-1.5 py-0.5 rounded font-medium ${STATUS_STYLE[d.status]}`}>
                         {d.status}
                       </span>
                       <span className="text-2xs text-slate-400 flex items-center gap-0.5">
