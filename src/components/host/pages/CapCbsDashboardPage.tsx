@@ -25,7 +25,7 @@ const DOSSIERS: CapCbsDossier[] = [
   {
     client: 'AeroDynamics Group',
     sector: 'Aerospace & Defence',
-    status: 'Draft',
+    status: 'Pending Review',
     createdAt: '12 janv. 2026',
     updatedAt: 'il y a 2h',
     pilotBanker: 'É. Mercier',

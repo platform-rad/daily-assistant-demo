@@ -48,7 +48,7 @@ export function SidebarNav({ currentView, onViewChange, badgeCounts = {} }: Side
           {menuOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
 
-        <div className="flex items-center gap-1 overflow-x-auto flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto flex-1 min-w-0 py-1">
           {pinnedTabs.map((tabId) => {
             const item = PINNABLE_ITEMS.find((n) => n.id === tabId)
             if (!item) return null
@@ -58,14 +58,14 @@ export function SidebarNav({ currentView, onViewChange, badgeCounts = {} }: Side
               <button
                 key={tabId}
                 onClick={() => onViewChange(tabId)}
-                className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg whitespace-nowrap text-xs font-medium transition flex-shrink-0 ${
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg whitespace-nowrap text-xs font-medium transition flex-shrink-0 ${
                   isActive ? 'bg-rad-indigo-600 text-white' : 'text-slate-300 hover:bg-white/10'
                 }`}
               >
                 {item.icon}
                 <span className="hidden sm:inline">{item.label}</span>
                 {!!count && (
-                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] leading-4 font-bold flex items-center justify-center">
+                  <span className="min-w-[17px] h-[17px] px-1 rounded-full bg-red-500 text-white text-[10px] leading-[17px] font-bold flex items-center justify-center flex-shrink-0 ring-2 ring-rad-navy">
                     {count}
                   </span>
                 )}

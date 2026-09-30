@@ -15,7 +15,7 @@ import { ROUTES } from '@/data/hostRoutes'
 // Mock — en prod, dériverait du nombre réel de dossiers "Pending Review".
 const BADGE_COUNTS: Partial<Record<NavView, number>> = {
   'crm-agent': 1,
-  'cap-cbs': 1,
+  'cap-cbs': 2,
 }
 
 interface CopilotSidebarProps {

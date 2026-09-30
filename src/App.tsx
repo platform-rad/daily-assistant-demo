@@ -15,7 +15,7 @@ export type AppMode = 'desktop' | 'legacy' | 'credit-memo-creation' | 'credit-me
 
 export default function App() {
   const [appMode, setAppMode] = useState<AppMode>('desktop')
-  const [route, setRoute] = useState<HostRoute>('client')
+  const [route, setRoute] = useState<HostRoute>('portfolio')
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [buttonY, setButtonY] = useState(50)
   const [isDragging, setIsDragging] = useState(false)

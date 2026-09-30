@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
-import { Mic, Square, Pause, Play, Send, Clock, ArrowLeft, Plus, Info, Maximize2, Upload, Pencil, FileDown, ShieldCheck, AlertTriangle } from 'lucide-react'
+import { Mic, Square, Pause, Play, Send, Clock, ArrowLeft, Plus, Info, Maximize2, Upload, Pencil, FileDown, ShieldCheck, AlertTriangle, Building2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { PORTFOLIO_CLIENTS } from '@/data/portfolio'
 
 interface CrmAgentPageProps {
   onOpenMeena?: () => void
@@ -84,6 +85,14 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
   const [dossiers, setDossiers] = useState<Dossier[]>(INITIAL_DOSSIERS)
   const [openId, setOpenId] = useState<string | null>(null)
   const [input, setInput] = useState('')
+  // Which client a new recording/conversation should be filed under. Pre-filled from the
+  // left panel when a client fiche is open; otherwise the user picks one explicitly —
+  // there's no implicit "New recording" bucket anymore.
+  const [selectedClient, setSelectedClient] = useState(currentClientName || '')
+
+  useEffect(() => {
+    if (currentClientName) setSelectedClient(currentClientName)
+  }, [currentClientName])
 
   // Recording session state
   const [recordingState, setRecordingState] = useState<RecordingState>('idle')
@@ -182,7 +191,7 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
     } else {
       const newDossier: Dossier = {
         id: Date.now().toString(),
-        client: currentClientName || 'New recording',
+        client: selectedClient || 'Unclassified',
         subject: `Voice note — ${formatTime(seconds)}`,
         status: 'Pending Review',
         updatedAt: 'just now',
@@ -216,8 +225,8 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
   const handleNewConversation = () => {
     const newDossier: Dossier = {
       id: Date.now().toString(),
-      client: 'New topic',
-      subject: 'Unclassified conversation',
+      client: selectedClient || 'Unclassified',
+      subject: 'New conversation',
       status: 'Draft',
       updatedAt: 'just now',
       messages: [],
@@ -510,6 +519,24 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
           ) : (
             /* Topics list */
             <div className={`flex-1 overflow-y-auto ${pad} space-y-2`}>
+              {/* Which client is this for? Pre-filled from the left panel, editable otherwise. */}
+              <div>
+                <label className="flex items-center gap-1 text-2xs font-medium text-slate-500 mb-1">
+                  <Building2 size={11} />
+                  Client
+                </label>
+                <select
+                  value={selectedClient}
+                  onChange={(e) => setSelectedClient(e.target.value)}
+                  className="w-full h-8 rounded-lg border border-slate-200 bg-white px-2 text-2xs focus:border-rad-indigo-300 focus:outline-none focus:ring-1 focus:ring-rad-indigo-500"
+                >
+                  <option value="">No client selected</option>
+                  {PORTFOLIO_CLIENTS.map((c) => (
+                    <option key={c.name} value={c.name}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={startRecording}

@@ -36,10 +36,10 @@ const INITIAL_DOSSIERS: Dossier[] = [
   {
     id: 'c1',
     client: 'AeroDynamics Group',
-    status: 'Draft',
+    status: 'Pending Review',
     updated: true,
-    note: 'ESG axis updated 2h ago',
-    messages: [{ id: 'm1', role: 'assistant', content: '3 of 5 axes completed. The ESG axis was updated by É. Mercier 2h ago.' }],
+    note: 'ESG axis updated 2h ago — submitted for review',
+    messages: [{ id: 'm1', role: 'assistant', content: '3 of 5 axes completed. The ESG axis was updated by É. Mercier 2h ago and submitted for Pilot Banker review.' }],
   },
   {
     id: 'c2',

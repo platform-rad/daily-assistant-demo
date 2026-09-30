@@ -1,4 +1,4 @@
-import { TrendingUp, AlertCircle, Target, Zap, Brain, FileText, BarChart3, ArrowRight, Send, Clock, Mail } from 'lucide-react'
+import { TrendingUp, AlertCircle, Target, Zap, Brain, FileText, BarChart3, ArrowRight, Send, Clock } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import React from 'react'
 import type { HostRoute } from '@/data/types'
@@ -179,18 +179,6 @@ export function HomePage({
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-y-auto">
         <div className={`mx-auto ${px} ${py} ${spacing}`}>
-        {/* Digest — le contenu détaillé vit désormais à gauche (Mon portefeuille), toujours à jour */}
-        <section>
-          <button
-            onClick={() => openWorkPlan('portfolio')}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 hover:border-rad-indigo-300 hover:bg-rad-indigo-50/40 transition text-left"
-          >
-            <Mail size={14} className="text-rad-indigo-600 flex-shrink-0" />
-            <span className="text-2xs text-slate-600 flex-1">Today's digest is on the left, always up to date</span>
-            <ArrowRight size={12} className="text-slate-400 flex-shrink-0" />
-          </button>
-        </section>
-
         {/* What's New - KPIs */}
         <section>
           <div className="flex items-center justify-between mb-2">
