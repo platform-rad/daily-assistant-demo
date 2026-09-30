@@ -213,21 +213,21 @@ export function HomePage({
 
           <div className={`grid ${kpiGridCols} ${gap}`}>
             {/* KPI Card 1 - Portfolio Exposure */}
-            <div className={`relative ${isCompact ? (isNarrow ? 'p-2' : 'p-2.5') : 'p-4'} rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full`}>
+            <div className={`relative ${isCompact ? (isNarrow ? 'p-2' : 'p-2.5') : 'p-4'} rounded-lg border border-rad-indigo-200 bg-gradient-to-br from-rad-indigo-50/40 to-transparent backdrop-blur-sm hover:shadow-md transition flex flex-col h-full`}>
               {/* Colored Stroke Accent */}
-              <div className={`absolute top-0 left-0 w-1 ${isCompact ? 'h-6' : 'h-8'} bg-purple-500 rounded-br-lg`} />
+              <div className={`absolute top-0 left-0 w-1 ${isCompact ? 'h-6' : 'h-8'} bg-rad-indigo-500 rounded-br-lg`} />
 
               <div className="flex items-start justify-between flex-1">
                 <div className="flex-1">
                   <p className={`${labelSize} text-slate-600 uppercase tracking-wide`}>Exposition</p>
                   <p className={`${valueSize} text-slate-900 ${isCompact ? 'mt-0.5' : 'mt-2'}`}>€847.3M</p>
-                  <p className={`${descriptionSize} text-purple-600 ${isCompact ? 'mt-0.5' : 'mt-1'}`}>↑ +5.2%</p>
+                  <p className={`${descriptionSize} text-rad-indigo-600 ${isCompact ? 'mt-0.5' : 'mt-1'}`}>↑ +5.2%</p>
                 </div>
-                <div className={`${isCompact ? (isNarrow ? 'p-1.5' : 'p-2') : 'p-2.5'} rounded-lg bg-purple-100/60`}>
-                  <TrendingUp size={isCompact ? (isNarrow ? 14 : 16) : 20} className="text-purple-600" />
+                <div className={`${isCompact ? (isNarrow ? 'p-1.5' : 'p-2') : 'p-2.5'} rounded-lg bg-rad-indigo-100/60`}>
+                  <TrendingUp size={isCompact ? (isNarrow ? 14 : 16) : 20} className="text-rad-indigo-600" />
                 </div>
               </div>
-              <button className={`w-full ${labelSize} px-2 py-0.5 rounded border hover:bg-purple-50 transition ${isCompact ? 'mt-1.5' : 'mt-4'}`} style={{ borderColor: '#7D4FFE', color: '#7D4FFE' }}>
+              <button className={`w-full ${labelSize} px-2 py-0.5 rounded border hover:bg-rad-indigo-50 transition ${isCompact ? 'mt-1.5' : 'mt-4'}`} style={{ borderColor: '#4F46E5', color: '#4F46E5' }}>
                 {isCompact ? 'Détails' : 'Voir détails'}
               </button>
             </div>
@@ -277,9 +277,9 @@ export function HomePage({
         <section>
           <h2 className="text-lg font-bold text-slate-900 mb-4">⭐ Top Recommandations pour vous</h2>
 
-          <div className="relative p-5 rounded-lg border-2" style={{ borderColor: '#7D4FFE', background: 'linear-gradient(135deg, rgba(125, 79, 254, 0.08) 0%, transparent 100%)' }} >
+          <div className="relative p-5 rounded-lg border-2" style={{ borderColor: '#4F46E5', background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, transparent 100%)' }} >
             {/* Accent stripe */}
-            <div className="absolute top-0 right-0 w-20 h-20 opacity-5 rounded-full blur-3xl" style={{ background: '#7D4FFE' }} />
+            <div className="absolute top-0 right-0 w-20 h-20 opacity-5 rounded-full blur-3xl" style={{ background: '#4F46E5' }} />
 
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-3">
@@ -290,21 +290,21 @@ export function HomePage({
                     opportunités de restructuration.
                   </p>
                 </div>
-                <div className="p-2 rounded-lg" style={{ background: 'rgba(125, 79, 254, 0.1)' }}>
-                  <Zap size={18} style={{ color: '#7D4FFE' }} />
+                <div className="p-2 rounded-lg" style={{ background: 'rgba(79, 70, 229, 0.1)' }}>
+                  <Zap size={18} style={{ color: '#4F46E5' }} />
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pt-3" style={{ borderTopColor: '#7D4FFE', borderTopWidth: '1px' }}>
+              <div className="flex items-center gap-2 pt-3" style={{ borderTopColor: '#4F46E5', borderTopWidth: '1px' }}>
                 <button
                   onClick={() => onSelectPrompt?.("Fais une analyse complète de l'exposition de ce client: Manufacturing Ltd")}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-white hover:opacity-90 transition font-medium text-sm"
-                  style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}
+                  style={{ background: 'linear-gradient(135deg, #4F46E5 0%, #0B1220 100%)' }}
                 >
                   <Brain size={16} />
                   Lancer l'analyse
                 </button>
-                <button className="px-3 py-2 rounded-lg border transition font-medium text-sm" style={{ borderColor: '#7D4FFE', color: '#7D4FFE' }}>
+                <button className="px-3 py-2 rounded-lg border transition font-medium text-sm" style={{ borderColor: '#4F46E5', color: '#4F46E5' }}>
                   Détails
                 </button>
               </div>
@@ -410,7 +410,7 @@ export function HomePage({
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
                   className={`max-w-[85%] rounded-lg px-2.5 py-1.5 text-2xs leading-snug ${
-                    msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-white border border-slate-200 text-slate-900'
+                    msg.role === 'user' ? 'bg-rad-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-900'
                   }`}
                 >
                   {msg.content}
@@ -426,8 +426,8 @@ export function HomePage({
       <div className={`border-t border-slate-200 bg-white ${isCompact ? 'p-2' : 'p-4'} flex-shrink-0`}>
         <div className="flex flex-col gap-2">
           {suggestedPlaceholder && chatInput && (
-            <div className="px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-200">
-              <p className="text-2xs text-slate-600">Suggestion: <span className="text-purple-700 font-semibold">{suggestedPlaceholder}</span></p>
+            <div className="px-3 py-1.5 rounded-lg bg-rad-indigo-50 border border-rad-indigo-200">
+              <p className="text-2xs text-slate-600">Suggestion: <span className="text-rad-indigo-700 font-semibold">{suggestedPlaceholder}</span></p>
             </div>
           )}
           <div className="relative flex-1">
@@ -437,13 +437,13 @@ export function HomePage({
               onChange={handleChatInputChange}
               onKeyPress={(e) => e.key === 'Enter' && handleSendChat()}
               placeholder={isCompact ? "Question..." : "Posez votre question ou utilisez une action..."}
-              className={`w-full ${isCompact ? 'h-8' : 'h-10'} rounded-lg border border-slate-200 bg-white pl-3 pr-10 text-sm focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500`}
+              className={`w-full ${isCompact ? 'h-8' : 'h-10'} rounded-lg border border-slate-200 bg-white pl-3 pr-10 text-sm focus:border-rad-indigo-300 focus:outline-none focus:ring-1 focus:ring-rad-indigo-500`}
             />
             <button
               onClick={handleSendChat}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-purple-50 rounded transition"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-rad-indigo-50 rounded transition"
             >
-              <Send size={isCompact ? 14 : 18} className="text-purple-600" />
+              <Send size={isCompact ? 14 : 18} className="text-rad-indigo-600" />
             </button>
           </div>
         </div>
@@ -485,13 +485,13 @@ function ActionCard({ title, description, icon, prompt, onSelect, onCreateCredit
   return (
     <button
       onClick={handleClick}
-      className={`${cardPadding} rounded-lg border border-slate-200 bg-white hover:border-purple-300 hover:shadow-md hover:bg-purple-50/30 transition group text-left`}
+      className={`${cardPadding} rounded-lg border border-slate-200 bg-white hover:border-rad-indigo-300 hover:shadow-md hover:bg-rad-indigo-50/30 transition group text-left`}
     >
       <div className="flex items-start justify-between mb-0.5">
-        <div className={`${iconPadding} rounded-lg bg-slate-100 group-hover:bg-purple-100 transition flex-shrink-0`}>{icon}</div>
+        <div className={`${iconPadding} rounded-lg bg-slate-100 group-hover:bg-rad-indigo-100 transition flex-shrink-0`}>{icon}</div>
         <ArrowRight size={arrowSize} className="text-slate-400 opacity-0 group-hover:opacity-100 transition flex-shrink-0 ml-1" />
       </div>
-      <h3 className={`${titleSize} text-slate-900 group-hover:text-purple-700 transition`}>{title}</h3>
+      <h3 className={`${titleSize} text-slate-900 group-hover:text-rad-indigo-700 transition`}>{title}</h3>
       <p className={`${descSize} text-slate-600 ${isCompact ? 'mt-0.5' : 'mt-1'} line-clamp-2`}>{description}</p>
     </button>
   )
@@ -505,9 +505,9 @@ interface ConversationCardProps {
 
 function ConversationCard({ title, date, snippet }: ConversationCardProps) {
   return (
-    <button className="p-3 rounded-lg border border-slate-200 bg-white hover:border-purple-300 hover:shadow-md transition text-left group">
+    <button className="p-3 rounded-lg border border-slate-200 bg-white hover:border-rad-indigo-300 hover:shadow-md transition text-left group">
       <div className="flex items-start justify-between">
-        <h3 className="font-semibold text-sm text-slate-900 group-hover:text-purple-700 transition flex-1">{title}</h3>
+        <h3 className="font-semibold text-sm text-slate-900 group-hover:text-rad-indigo-700 transition flex-1">{title}</h3>
         <span className="text-2xs text-slate-400 flex-shrink-0 ml-2">{date}</span>
       </div>
       <p className="text-xs text-slate-600 mt-1.5 line-clamp-2">{snippet}</p>

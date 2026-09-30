@@ -120,8 +120,8 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
     <div className="flex h-full flex-col overflow-hidden">
       {/* En-tête compact : titre + info au survol */}
       <div className={`flex items-center gap-2 ${pad} pb-2 border-b border-slate-200 flex-shrink-0`}>
-        <div className="w-7 h-7 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-          <ClipboardList size={14} className="text-purple-600" />
+        <div className="w-7 h-7 rounded-lg bg-rad-indigo-100 flex items-center justify-center flex-shrink-0">
+          <ClipboardList size={14} className="text-rad-indigo-600" />
         </div>
         <h2 className="text-sm font-bold text-slate-900 flex-1 truncate">CAP / CBS</h2>
         <Tooltip>
@@ -147,7 +147,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
         </Tooltip>
         <button
           onClick={goToDashboard}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-2xs font-medium transition flex-shrink-0"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-rad-indigo-600 hover:bg-rad-indigo-700 text-white text-2xs font-medium transition flex-shrink-0"
         >
           <LayoutGrid size={12} />
           Tableau de bord
@@ -172,8 +172,8 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
             >
               {openDossier.status}
             </span>
-            <button onClick={goToDetail} title="Ouvrir le dossier complet" className="p-1 rounded hover:bg-purple-50 transition flex-shrink-0">
-              <ArrowUpRight size={14} className="text-purple-600" />
+            <button onClick={goToDetail} title="Ouvrir le dossier complet" className="p-1 rounded hover:bg-rad-indigo-50 transition flex-shrink-0">
+              <ArrowUpRight size={14} className="text-rad-indigo-600" />
             </button>
           </div>
 
@@ -185,7 +185,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
                   className={`max-w-[85%] rounded-lg px-2.5 py-1.5 text-2xs leading-snug ${
-                    msg.role === 'user' ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-900'
+                    msg.role === 'user' ? 'bg-rad-indigo-600 text-white' : 'bg-slate-100 text-slate-900'
                   }`}
                 >
                   {msg.content}
@@ -203,10 +203,10 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                 placeholder="Continuer la conversation..."
-                className="w-full h-8 rounded-lg border border-slate-200 bg-white pl-3 pr-9 text-2xs focus:border-purple-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full h-8 rounded-lg border border-slate-200 bg-white pl-3 pr-9 text-2xs focus:border-rad-indigo-300 focus:outline-none focus:ring-1 focus:ring-rad-indigo-500"
               />
-              <button onClick={handleSend} className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 hover:bg-purple-50 rounded transition">
-                <Send size={14} className="text-purple-600" />
+              <button onClick={handleSend} className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 hover:bg-rad-indigo-50 rounded transition">
+                <Send size={14} className="text-rad-indigo-600" />
               </button>
             </div>
           </div>
@@ -216,7 +216,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
         <div className={`flex-1 overflow-y-auto ${pad} space-y-2`}>
           <button
             onClick={handleNewConversation}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-purple-300 text-purple-700 hover:bg-purple-50 transition text-2xs font-medium"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-rad-indigo-300 text-rad-indigo-700 hover:bg-rad-indigo-50 transition text-2xs font-medium"
           >
             <Plus size={14} />
             Nouvelle conversation
@@ -227,7 +227,7 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
             {dossiers.map((d) => (
               <div
                 key={d.id}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-purple-300 hover:bg-purple-50/40 transition"
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-rad-indigo-300 hover:bg-rad-indigo-50/40 transition"
               >
                 <button onClick={() => setOpenId(d.id)} className="min-w-0 flex-1 text-left">
                   <div className="flex items-center gap-1.5">
@@ -243,8 +243,8 @@ export function CapCbsAgentPage({ onNavigate, onOpenMyClientDev, isCompact = tru
                 >
                   {d.status}
                 </span>
-                <button onClick={goToDetail} title="Ouvrir le dossier complet" className="p-1 rounded hover:bg-purple-100 transition flex-shrink-0">
-                  <ArrowUpRight size={13} className="text-purple-600" />
+                <button onClick={goToDetail} title="Ouvrir le dossier complet" className="p-1 rounded hover:bg-rad-indigo-100 transition flex-shrink-0">
+                  <ArrowUpRight size={13} className="text-rad-indigo-600" />
                 </button>
               </div>
             ))}

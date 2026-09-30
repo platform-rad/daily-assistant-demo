@@ -160,11 +160,11 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
           setDragStartWidth(width)
         }}
         className={`absolute left-0 top-0 w-1 h-full cursor-col-resize transition-all ${
-          isDragging ? 'bg-purple-500 shadow-lg' : 'hover:bg-purple-400/70 bg-transparent'
+          isDragging ? 'bg-rad-indigo-500 shadow-lg' : 'hover:bg-rad-indigo-400/70 bg-transparent'
         }`}
         style={{
-          background: isDragging ? '#7D4FFE' : 'transparent',
-          boxShadow: isDragging ? '0 0 12px rgba(125, 79, 254, 0.4)' : 'none',
+          background: isDragging ? '#4F46E5' : 'transparent',
+          boxShadow: isDragging ? '0 0 12px rgba(79, 70, 229, 0.4)' : 'none',
         }}
         title="Glissez pour redimensionner"
       />

@@ -4,7 +4,7 @@ const RECENT_CONVERSATIONS = [
   {
     id: 'c1',
     source: 'CRM+ Agent',
-    icon: <Mic size={14} className="text-amber-600" />,
+    icon: <Mic size={14} className="text-rad-indigo-600" />,
     title: 'AeroDynamics Group · CFO call',
     time: 'Aug 18, 2026',
     messages: 2,
@@ -12,7 +12,7 @@ const RECENT_CONVERSATIONS = [
   {
     id: 'c2',
     source: 'CAP / CBS',
-    icon: <ClipboardList size={14} className="text-purple-600" />,
+    icon: <ClipboardList size={14} className="text-rad-indigo-600" />,
     title: 'Manufacturing Ltd · EMEA contribution',
     time: 'il y a 6h',
     messages: 3,
@@ -76,7 +76,7 @@ export function HistoryPage() {
             {RECENT_CONVERSATIONS.map((c) => (
               <button
                 key={c.id}
-                className="w-full flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:border-purple-300 hover:shadow-sm transition text-left"
+                className="w-full flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:border-rad-indigo-300 hover:shadow-sm transition text-left"
               >
                 <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">{c.icon}</div>
                 <div className="min-w-0 flex-1">
@@ -98,7 +98,7 @@ export function HistoryPage() {
             {historyItems.map((item) => (
               <div
                 key={item.id}
-                className="p-4 rounded-lg border border-slate-200 bg-white hover:shadow-md hover:border-orange-300 transition flex items-center justify-between group"
+                className="p-4 rounded-lg border border-slate-200 bg-white hover:shadow-md hover:border-rad-indigo-300 transition flex items-center justify-between group"
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">

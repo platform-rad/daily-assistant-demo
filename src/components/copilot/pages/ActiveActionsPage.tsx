@@ -30,9 +30,9 @@ export function ActiveActionsPage() {
       case 'completed':
         return <CheckCircle size={18} className="text-green-600" />
       case 'generating':
-        return <Loader size={18} className="text-blue-600 animate-spin" />
+        return <Loader size={18} className="text-rad-indigo-600 animate-spin" />
       case 'processing':
-        return <Loader size={18} className="text-blue-600 animate-spin" />
+        return <Loader size={18} className="text-rad-indigo-600 animate-spin" />
       case 'error':
         return <AlertCircle size={18} className="text-red-600" />
       default:
@@ -74,7 +74,7 @@ export function ActiveActionsPage() {
                     ? 'bg-green-100 text-green-700'
                     : action.status === 'error'
                       ? 'bg-red-100 text-red-700'
-                      : 'bg-blue-100 text-blue-700'
+                      : 'bg-rad-indigo-100 text-rad-indigo-700'
                 }`}
               >
                 {getStatusLabel(action.status)}
@@ -85,7 +85,7 @@ export function ActiveActionsPage() {
             <div className="mb-3">
               <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-orange-500 to-orange-600 h-full transition-all duration-500"
+                  className="bg-gradient-to-r from-rad-indigo-500 to-rad-indigo-600 h-full transition-all duration-500"
                   style={{ width: `${action.progress}%` }}
                 />
               </div>

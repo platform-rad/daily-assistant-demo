@@ -228,8 +228,8 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
     <div className="flex h-full flex-col overflow-hidden">
       {/* Header: title + info tooltip + expand */}
       <div className={`flex items-center gap-2 ${pad} pb-2 border-b border-slate-200 flex-shrink-0`}>
-        <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-          <Mic size={14} className="text-amber-600" />
+        <div className="w-7 h-7 rounded-lg bg-rad-indigo-100 flex items-center justify-center flex-shrink-0">
+          <Mic size={14} className="text-rad-indigo-600" />
         </div>
         <h2 className="text-sm font-bold text-slate-900 flex-1 truncate">CRM+ Agent · Meena</h2>
         <Tooltip>
@@ -277,7 +277,7 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
                     </button>
                     <button
                       onClick={handleSendToCrm}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition"
+                      className="flex items-center gap-1 px-2.5 py-1 rounded bg-rad-indigo-600 hover:bg-rad-indigo-700 text-white text-2xs font-medium transition"
                     >
                       <Upload size={11} />
                       Send to CRM+
@@ -286,9 +286,9 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
                 )}
               </div>
             ) : (
-              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${recordingState === 'recording' ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}>
-                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${recordingState === 'recording' ? 'bg-red-500 animate-pulse' : 'bg-amber-500'}`} />
-                <span className={`text-2xs font-medium flex-1 ${recordingState === 'recording' ? 'text-red-700' : 'text-amber-700'}`}>
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${recordingState === 'recording' ? 'bg-red-50 border-red-200' : 'bg-slate-100 border-slate-300'}`}>
+                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${recordingState === 'recording' ? 'bg-red-500 animate-pulse' : 'bg-slate-500'}`} />
+                <span className={`text-2xs font-medium flex-1 ${recordingState === 'recording' ? 'text-red-700' : 'text-slate-700'}`}>
                   {recordingState === 'recording' ? 'Recording…' : 'Paused'} {formatTime(seconds)}
                 </span>
                 {recordingState === 'recording' ? (
@@ -336,7 +336,7 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
                     <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                       <div
                         className={`max-w-[85%] rounded-lg px-2.5 py-1.5 text-2xs leading-snug ${
-                          msg.role === 'user' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-900'
+                          msg.role === 'user' ? 'bg-rad-indigo-600 text-white' : 'bg-slate-100 text-slate-900'
                         }`}
                       >
                         {msg.content}
@@ -359,10 +359,10 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
                   onChange={(e) => setLiveInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAskLive()}
                   placeholder="Ask the AI about this meeting..."
-                  className="w-full h-8 rounded-lg border border-slate-200 bg-white pl-3 pr-9 text-2xs focus:border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  className="w-full h-8 rounded-lg border border-slate-200 bg-white pl-3 pr-9 text-2xs focus:border-rad-indigo-300 focus:outline-none focus:ring-1 focus:ring-rad-indigo-500"
                 />
-                <button onClick={handleAskLive} className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 hover:bg-amber-50 rounded transition">
-                  <Send size={14} className="text-amber-600" />
+                <button onClick={handleAskLive} className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 hover:bg-rad-indigo-50 rounded transition">
+                  <Send size={14} className="text-rad-indigo-600" />
                 </button>
               </div>
             </div>
@@ -375,7 +375,7 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
             <div className={`${pad} py-2 border-b border-slate-200 flex-shrink-0`}>
               <button
                 onClick={startRecording}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition"
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-rad-indigo-600 hover:bg-rad-indigo-700 text-white text-2xs font-medium transition"
               >
                 <Mic size={13} />
                 Record a note for this topic
@@ -411,7 +411,7 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
                   <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div
                       className={`max-w-[85%] rounded-lg px-2.5 py-1.5 text-2xs leading-snug ${
-                        msg.role === 'user' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-900'
+                        msg.role === 'user' ? 'bg-rad-indigo-600 text-white' : 'bg-slate-100 text-slate-900'
                       }`}
                     >
                       {msg.content}
@@ -429,10 +429,10 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                     placeholder="Continue the conversation..."
-                    className="w-full h-8 rounded-lg border border-slate-200 bg-white pl-3 pr-9 text-2xs focus:border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    className="w-full h-8 rounded-lg border border-slate-200 bg-white pl-3 pr-9 text-2xs focus:border-rad-indigo-300 focus:outline-none focus:ring-1 focus:ring-rad-indigo-500"
                   />
-                  <button onClick={handleSend} className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 hover:bg-amber-50 rounded transition">
-                    <Send size={14} className="text-amber-600" />
+                  <button onClick={handleSend} className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 hover:bg-rad-indigo-50 rounded transition">
+                    <Send size={14} className="text-rad-indigo-600" />
                   </button>
                 </div>
               </div>
@@ -443,14 +443,14 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={startRecording}
-                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition"
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-rad-indigo-600 hover:bg-rad-indigo-700 text-white text-2xs font-medium transition"
                 >
                   <Mic size={14} />
                   Start recording
                 </button>
                 <button
                   onClick={handleNewConversation}
-                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-amber-300 text-amber-700 hover:bg-amber-50 transition text-2xs font-medium"
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-rad-indigo-300 text-rad-indigo-700 hover:bg-rad-indigo-50 transition text-2xs font-medium"
                 >
                   <Plus size={14} />
                   New conversation
@@ -463,7 +463,7 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
                   <button
                     key={d.id}
                     onClick={() => setOpenId(d.id)}
-                    className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-amber-300 hover:bg-amber-50/40 transition"
+                    className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-rad-indigo-300 hover:bg-rad-indigo-50/40 transition"
                   >
                     <div className="min-w-0 flex-1">
                       <p className="text-2xs font-semibold text-slate-900 truncate">{d.client}</p>

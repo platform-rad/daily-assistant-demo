@@ -35,12 +35,12 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
   }
 
   return (
-    <div className="flex flex-col border-b border-slate-200">
-      {/* Barre unique : burger + onglets épinglés + accès direct à l'historique */}
-      <div className="px-3 py-2.5 flex items-center gap-1.5">
+    <div className="flex flex-col">
+      {/* Barre unique : burger + onglets épinglés + accès direct à l'historique — même marine que la nav de gauche */}
+      <div className="px-3 py-2.5 flex items-center gap-1.5 bg-rad-navy">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="p-2 hover:bg-slate-100 rounded-lg transition flex-shrink-0"
+          className="p-2 hover:bg-white/10 rounded-lg transition flex-shrink-0 text-slate-300"
           title="Menu"
         >
           {menuOpen ? <X size={18} /> : <Menu size={18} />}
@@ -50,14 +50,14 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
           {pinnedTabs.map((tabId) => {
             const item = PINNABLE_ITEMS.find((n) => n.id === tabId)
             if (!item) return null
+            const isActive = currentView === tabId
             return (
               <button
                 key={tabId}
                 onClick={() => onViewChange(tabId)}
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg whitespace-nowrap text-xs font-medium transition flex-shrink-0 ${
-                  currentView === tabId ? 'text-white' : 'text-slate-700 hover:bg-slate-100'
+                  isActive ? 'bg-rad-indigo-600 text-white' : 'text-slate-300 hover:bg-white/10'
                 }`}
-                style={currentView === tabId ? { background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' } : {}}
               >
                 {item.icon}
                 <span className="hidden sm:inline">{item.label}</span>
@@ -69,7 +69,7 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
         <button
           onClick={() => onViewChange('history')}
           className={`p-2 rounded-lg transition flex-shrink-0 ${
-            currentView === 'history' ? 'bg-purple-100 text-purple-700' : 'hover:bg-slate-100 text-slate-600'
+            currentView === 'history' ? 'bg-rad-indigo-600 text-white' : 'hover:bg-white/10 text-slate-300'
           }`}
           title="Historique des conversations"
         >
@@ -79,7 +79,7 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
 
       {/* Menu déroulant : liste complète + gestion des épinglés */}
       {menuOpen && (
-        <div className="border-t border-slate-200 bg-slate-50">
+        <div className="bg-rad-navy border-t border-white/10">
           <nav className="px-2 py-2 space-y-1">
             {PINNABLE_ITEMS.map((item) => (
               <div key={item.id} className="group flex items-center">
@@ -89,9 +89,8 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
                     setMenuOpen(false)
                   }}
                   className={`flex-1 flex items-center gap-3 px-3 py-2.5 rounded-lg transition text-left ${
-                    currentView === item.id ? 'text-white' : 'text-slate-700 hover:bg-slate-100'
+                    currentView === item.id ? 'bg-rad-indigo-600 text-white' : 'text-slate-300 hover:bg-white/10'
                   }`}
-                  style={currentView === item.id ? { background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' } : {}}
                 >
                   <span className="flex-shrink-0">{item.icon}</span>
                   <span className="text-sm font-medium">{item.label}</span>
@@ -100,11 +99,11 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
                 {/* Pin Button - Always visible, at right */}
                 <button
                   onClick={() => togglePin(item.id)}
-                  className="p-1.5 opacity-0 group-hover:opacity-100 transition hover:bg-slate-200 rounded flex-shrink-0"
+                  className="p-1.5 opacity-0 group-hover:opacity-100 transition hover:bg-white/10 rounded flex-shrink-0"
                   title={pinnedTabs.includes(item.id) ? 'Dépingler' : 'Épingler'}
                 >
                   {pinnedTabs.includes(item.id) ? (
-                    <PinOff size={14} className="text-red-500" />
+                    <PinOff size={14} className="text-rad-indigo-300" />
                   ) : (
                     <Pin size={14} className="text-slate-400" />
                   )}
@@ -119,9 +118,8 @@ export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
                 setMenuOpen(false)
               }}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition text-left ${
-                currentView === 'history' ? 'text-white' : 'text-slate-700 hover:bg-slate-100'
+                currentView === 'history' ? 'bg-rad-indigo-600 text-white' : 'text-slate-300 hover:bg-white/10'
               }`}
-              style={currentView === 'history' ? { background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' } : {}}
             >
               <Clock size={18} className="flex-shrink-0" />
               <span className="text-sm font-medium">Historique</span>

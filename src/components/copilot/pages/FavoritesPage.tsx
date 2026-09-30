@@ -40,7 +40,7 @@ export function FavoritesPage({ onSelectPrompt }: FavoritesPageProps) {
     <div className="flex-1 overflow-y-auto">
       <div className="max-w-4xl mx-auto px-6 py-6 space-y-4">
         {/* Add New Favorite Button */}
-        <button className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-dashed border-orange-300 text-orange-600 hover:bg-orange-50 transition font-medium">
+        <button className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-dashed border-rad-indigo-300 text-rad-indigo-600 hover:bg-rad-indigo-50 transition font-medium">
           <Plus size={18} />
           Ajouter un nouveau prompt favoris
         </button>
@@ -50,12 +50,12 @@ export function FavoritesPage({ onSelectPrompt }: FavoritesPageProps) {
           {favorites.map((fav) => (
             <div
               key={fav.id}
-              className="p-4 rounded-lg border border-slate-200 bg-white hover:shadow-md hover:border-orange-300 transition group"
+              className="p-4 rounded-lg border border-slate-200 bg-white hover:shadow-md hover:border-rad-indigo-300 transition group"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <h3 className="font-semibold text-slate-900 flex items-center gap-2">
-                    <Star size={16} className="text-orange-500 fill-orange-500" />
+                    <Star size={16} className="text-rad-indigo-500 fill-rad-indigo-500" />
                     {fav.title}
                   </h3>
                   <span className="text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600 mt-2 inline-block">
@@ -70,7 +70,7 @@ export function FavoritesPage({ onSelectPrompt }: FavoritesPageProps) {
               <div className="flex gap-2 justify-end">
                 <button
                   onClick={() => onSelectPrompt?.(fav.prompt)}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition text-sm font-medium"
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rad-indigo-500 text-white hover:bg-rad-indigo-600 transition text-sm font-medium"
                 >
                   Utiliser
                 </button>

@@ -57,10 +57,10 @@ export function DigestCard() {
   const today = new Date().toISOString().slice(0, 10)
 
   return (
-    <div className="rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50/60 to-transparent overflow-hidden">
+    <div className="rounded-lg border border-rad-indigo-200 bg-gradient-to-br from-rad-indigo-50/60 to-transparent overflow-hidden">
       <div className="px-3 py-2.5 flex items-start gap-2">
-        <div className="w-7 h-7 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-          <Mail size={14} className="text-purple-600" />
+        <div className="w-7 h-7 rounded-lg bg-rad-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+          <Mail size={14} className="text-rad-indigo-600" />
         </div>
         <div className="min-w-0">
           <p className="text-2xs font-bold text-slate-900">Good Morning Jessica 👋</p>
@@ -70,16 +70,16 @@ export function DigestCard() {
         </div>
       </div>
 
-      <div className="border-t border-purple-100">
+      <div className="border-t border-rad-indigo-100">
         {SECTIONS.map((section) => {
           const isOpen = openSection === section.id
           return (
-            <div key={section.id} className="border-b border-purple-100 last:border-b-0">
+            <div key={section.id} className="border-b border-rad-indigo-100 last:border-b-0">
               <button
                 onClick={() => setOpenSection(isOpen ? null : section.id)}
-                className="w-full px-3 py-2 flex items-center gap-2 hover:bg-purple-50/60 transition text-left"
+                className="w-full px-3 py-2 flex items-center gap-2 hover:bg-rad-indigo-50/60 transition text-left"
               >
-                <span className="text-purple-600 flex-shrink-0">{section.icon}</span>
+                <span className="text-rad-indigo-600 flex-shrink-0">{section.icon}</span>
                 <span className="text-2xs font-semibold text-slate-800 flex-1 truncate">{section.title}</span>
                 {isOpen ? (
                   <ChevronUp size={13} className="text-slate-400 flex-shrink-0" />
