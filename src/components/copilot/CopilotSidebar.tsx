@@ -98,19 +98,22 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
       style={{ width: `${width}px` }}
     >
       {/* Header */}
-      <div className="border-b border-slate-200 bg-white px-4 py-3 flex items-center justify-between">
+      <div
+        className="px-4 py-3 flex items-center justify-between"
+        style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}
+      >
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #7D4FFE 0%, #6D3BF0 100%)' }}>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/15">
             <Sparkles size={18} className="text-white" />
           </div>
-          <span className="font-semibold text-slate-900 text-sm">Copilot</span>
+          <span className="font-semibold text-white text-sm">Copilot</span>
         </div>
         <button
           onClick={onToggleCollapse}
-          className="p-1 hover:bg-slate-100 rounded transition"
+          className="p-1 hover:bg-white/15 rounded transition"
           title="Réduire sidebar"
         >
-          <ChevronRight size={20} className="text-slate-600" />
+          <ChevronRight size={20} className="text-white" />
         </button>
       </div>
 
