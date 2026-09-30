@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { Settings, ChevronRight, Sparkles } from 'lucide-react'
 import { HomePage } from './pages/HomePage'
-import { WorkPlansPage } from './pages/WorkPlansPage'
+import { CrmAgentPage } from './pages/CrmAgentPage'
+import { CapCbsAgentPage } from './pages/CapCbsAgentPage'
 import { HistoryPage } from './pages/HistoryPage'
 import { FavoritesPage } from './pages/FavoritesPage'
 import { ActiveActionsPage } from './pages/ActiveActionsPage'
@@ -130,14 +131,8 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
             sidebarWidth={width}
           />
         )}
-        {currentView === 'work-plans' && (
-          <WorkPlansPage
-            onGoHome={() => setCurrentView('home')}
-            onOpenMeena={onOpenMeena}
-            onNavigate={onNavigate}
-            isCompact
-          />
-        )}
+        {currentView === 'crm-agent' && <CrmAgentPage onOpenMeena={onOpenMeena} isCompact />}
+        {currentView === 'cap-cbs' && <CapCbsAgentPage onNavigate={onNavigate} isCompact />}
         {currentView === 'history' && <HistoryPage />}
         {currentView === 'favorites' && <FavoritesPage onSelectPrompt={handleSelectPrompt} />}
         {currentView === 'active-actions' && <ActiveActionsPage />}

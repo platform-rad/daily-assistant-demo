@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Menu, X, Plus, Home, Clock, Star, Zap, Pin, PinOff, LayoutGrid } from 'lucide-react'
+import { Menu, X, Plus, Home, Clock, Star, Zap, Pin, PinOff, Mic, ClipboardList } from 'lucide-react'
 
-export type NavView = 'home' | 'work-plans' | 'active-actions' | 'history' | 'favorites'
+export type NavView = 'home' | 'crm-agent' | 'cap-cbs' | 'active-actions' | 'history' | 'favorites'
 
 interface NavItem {
   id: NavView
@@ -16,11 +16,12 @@ interface SidebarNavProps {
 
 export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [pinnedTabs, setPinnedTabs] = useState<NavView[]>(['home', 'work-plans'])
+  const [pinnedTabs, setPinnedTabs] = useState<NavView[]>(['home', 'crm-agent', 'cap-cbs'])
 
   const navItems: NavItem[] = [
     { id: 'home', label: 'Accueil', icon: <Home size={18} /> },
-    { id: 'work-plans', label: 'Plans de travail', icon: <LayoutGrid size={18} /> },
+    { id: 'crm-agent', label: 'CRM+ Agent', icon: <Mic size={18} /> },
+    { id: 'cap-cbs', label: 'CAP / CBS', icon: <ClipboardList size={18} /> },
     { id: 'active-actions', label: 'Actions en cours', icon: <Zap size={18} /> },
     { id: 'history', label: 'Historique', icon: <Clock size={18} /> },
     { id: 'favorites', label: 'Prompts Favoris', icon: <Star size={18} /> },
