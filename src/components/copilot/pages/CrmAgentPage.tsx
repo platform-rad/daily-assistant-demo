@@ -554,6 +554,35 @@ export function CrmAgentPage({ onOpenMeena, currentClientName, isCompact = true 
                 </button>
               </div>
 
+              {/* Rend explicite ce que compte le badge de la barre d'onglets — pas de notif sans preuve visible */}
+              {dossiers.some((d) => d.status === 'Pending Review') && (
+                <div>
+                  <p className="text-2xs font-semibold text-amber-700 uppercase tracking-wide pt-1 flex items-center gap-1">
+                    <ShieldCheck size={11} />
+                    Needs your review ({dossiers.filter((d) => d.status === 'Pending Review').length})
+                  </p>
+                  <div className="space-y-1.5 mt-1">
+                    {dossiers.filter((d) => d.status === 'Pending Review').map((d) => (
+                      <div
+                        key={d.id}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200"
+                      >
+                        <button onClick={() => setOpenId(d.id)} className="min-w-0 flex-1 text-left">
+                          <p className="text-2xs font-semibold text-slate-900 truncate">{d.client}</p>
+                          <p className="text-2xs text-slate-500 truncate">{d.subject}</p>
+                        </button>
+                        <button
+                          onClick={() => handleApprove(d.id)}
+                          className="px-2 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition flex-shrink-0"
+                        >
+                          Approve
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide pt-1">Recent topics</p>
               <div className="space-y-1.5">
                 {dossiers.map((d) => (
