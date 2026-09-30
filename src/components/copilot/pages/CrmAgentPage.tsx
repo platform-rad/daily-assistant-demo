@@ -370,16 +370,18 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
         </div>
       ) : (
         <>
-          {/* Idle: start recording */}
-          <div className={`${pad} py-2 border-b border-slate-200 flex-shrink-0`}>
-            <button
-              onClick={startRecording}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition"
-            >
-              <Mic size={13} />
-              {openDossier ? 'Record a note for this topic' : 'Start recording'}
-            </button>
-          </div>
+          {/* Idle: start recording (topic detail only — list view pairs it with "New conversation" below) */}
+          {openDossier && (
+            <div className={`${pad} py-2 border-b border-slate-200 flex-shrink-0`}>
+              <button
+                onClick={startRecording}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition"
+              >
+                <Mic size={13} />
+                Record a note for this topic
+              </button>
+            </div>
+          )}
 
           {openDossier ? (
             /* Topic detail: message history + composer */
@@ -438,13 +440,22 @@ export function CrmAgentPage({ onOpenMeena, isCompact = true }: CrmAgentPageProp
           ) : (
             /* Topics list */
             <div className={`flex-1 overflow-y-auto ${pad} space-y-2`}>
-              <button
-                onClick={handleNewConversation}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-amber-300 text-amber-700 hover:bg-amber-50 transition text-2xs font-medium"
-              >
-                <Plus size={14} />
-                New conversation
-              </button>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={startRecording}
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-2xs font-medium transition"
+                >
+                  <Mic size={14} />
+                  Start recording
+                </button>
+                <button
+                  onClick={handleNewConversation}
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-amber-300 text-amber-700 hover:bg-amber-50 transition text-2xs font-medium"
+                >
+                  <Plus size={14} />
+                  New conversation
+                </button>
+              </div>
 
               <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide pt-1">Recent topics</p>
               <div className="space-y-1.5">
