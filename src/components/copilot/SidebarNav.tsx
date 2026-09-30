@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Menu, X, Plus, Home, Clock, Star, Zap, Pin, PinOff } from 'lucide-react'
+import { Menu, X, Plus, Home, Clock, Star, Zap, Pin, PinOff, LayoutGrid } from 'lucide-react'
 
-export type NavView = 'home' | 'active-actions' | 'history' | 'favorites'
+export type NavView = 'home' | 'work-plans' | 'active-actions' | 'history' | 'favorites'
 
 interface NavItem {
   id: NavView
@@ -16,10 +16,11 @@ interface SidebarNavProps {
 
 export function SidebarNav({ currentView, onViewChange }: SidebarNavProps) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [pinnedTabs, setPinnedTabs] = useState<NavView[]>(['home'])
+  const [pinnedTabs, setPinnedTabs] = useState<NavView[]>(['home', 'work-plans'])
 
   const navItems: NavItem[] = [
     { id: 'home', label: 'Accueil', icon: <Home size={18} /> },
+    { id: 'work-plans', label: 'Plans de travail', icon: <LayoutGrid size={18} /> },
     { id: 'active-actions', label: 'Actions en cours', icon: <Zap size={18} /> },
     { id: 'history', label: 'Historique', icon: <Clock size={18} /> },
     { id: 'favorites', label: 'Prompts Favoris', icon: <Star size={18} /> },

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Settings, ChevronRight, Sparkles } from 'lucide-react'
 import { HomePage } from './pages/HomePage'
+import { WorkPlansPage } from './pages/WorkPlansPage'
 import { HistoryPage } from './pages/HistoryPage'
 import { FavoritesPage } from './pages/FavoritesPage'
 import { ActiveActionsPage } from './pages/ActiveActionsPage'
@@ -125,9 +126,16 @@ export function CopilotSidebar({ isCollapsed, onToggleCollapse, onSelectPrompt, 
             onSelectPrompt={handleSelectPrompt}
             onCreateCreditMemo={onCreateCreditMemo}
             onNavigate={onNavigate}
-            onOpenMeena={onOpenMeena}
             layout="compact"
             sidebarWidth={width}
+          />
+        )}
+        {currentView === 'work-plans' && (
+          <WorkPlansPage
+            onGoHome={() => setCurrentView('home')}
+            onOpenMeena={onOpenMeena}
+            onNavigate={onNavigate}
+            isCompact
           />
         )}
         {currentView === 'history' && <HistoryPage />}

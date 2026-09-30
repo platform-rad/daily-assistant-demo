@@ -1,4 +1,4 @@
-import { TrendingUp, AlertCircle, Target, Zap, Brain, FileText, BarChart3, ArrowRight, Send, Clock, Mic, ClipboardList } from 'lucide-react'
+import { TrendingUp, AlertCircle, Target, Zap, Brain, FileText, BarChart3, ArrowRight, Send, Clock } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import React from 'react'
 import type { HostRoute } from '@/data/types'
@@ -26,8 +26,6 @@ interface HomePageProps {
   onOpenMyClientDev?: (route?: HostRoute) => void
   /** Change de route SANS relancer le mode hôte (on est déjà dans Daily Assistant). */
   onNavigate?: (route: HostRoute) => void
-  /** Ouvre Meena (agent CRM+ — notes de réunion) en fenêtre flottante. */
-  onOpenMeena?: () => void
   /** 'compact' for sidebar, 'full' for desktop standalone */
   layout?: 'compact' | 'full'
   /** Width of the sidebar in pixels (for responsive adjustments) */
@@ -45,7 +43,6 @@ export function HomePage({
   onCreateCreditMemo,
   onOpenMyClientDev,
   onNavigate,
-  onOpenMeena,
   layout = 'compact',
   sidebarWidth = 320,
   currentConversation: _currentConversation,
@@ -383,31 +380,6 @@ export function HomePage({
           </div>
         </section>
 
-        {/* Vos plans de travail — autres espaces accessibles via l'IA */}
-        <section>
-          <h2 className={`${sectionTitleSize} font-bold text-slate-900 ${isCompact ? 'mb-1.5' : 'mb-4'}`}>
-            🗂️ Vos plans de travail
-          </h2>
-          <div className={`grid ${isCompact ? (isVeryNarrow || isNarrow ? 'grid-cols-1' : 'grid-cols-2') : 'grid-cols-1 md:grid-cols-2'} ${gap}`}>
-            <WorkPlanCard
-              title="CRM+ Agent · Meena"
-              description="Rédigez vos notes de réunion à la voix et synchronisez-les avec CRM+"
-              icon={<Mic size={actionCardIconSize} />}
-              onSelect={() => onOpenMeena?.()}
-              isCompact={isCompact}
-              accent="amber"
-            />
-            <WorkPlanCard
-              title="CAP / CBS"
-              description="Stratégie commerciale client : 5 axes CBS, plan d'action CAP et validation"
-              icon={<ClipboardList size={actionCardIconSize} />}
-              onSelect={() => openWorkPlan('cap-cbs')}
-              isCompact={isCompact}
-              accent="purple"
-            />
-          </div>
-        </section>
-
         {/* Pinned Conversations */}
         {!isCompact && (
         <section>
@@ -520,53 +492,6 @@ function ActionCard({ title, description, icon, prompt, onSelect, onCreateCredit
         <ArrowRight size={arrowSize} className="text-slate-400 opacity-0 group-hover:opacity-100 transition flex-shrink-0 ml-1" />
       </div>
       <h3 className={`${titleSize} text-slate-900 group-hover:text-purple-700 transition`}>{title}</h3>
-      <p className={`${descSize} text-slate-600 ${isCompact ? 'mt-0.5' : 'mt-1'} line-clamp-2`}>{description}</p>
-    </button>
-  )
-}
-
-interface WorkPlanCardProps {
-  title: string
-  description: string
-  icon: React.ReactNode
-  onSelect: () => void
-  isCompact?: boolean
-  accent: 'purple' | 'amber'
-}
-
-const WORK_PLAN_ACCENTS = {
-  purple: {
-    border: 'hover:border-purple-300',
-    bg: 'hover:bg-purple-50/30',
-    iconBg: 'bg-purple-100 group-hover:bg-purple-200',
-    iconColor: 'text-purple-600',
-    title: 'group-hover:text-purple-700',
-  },
-  amber: {
-    border: 'hover:border-amber-300',
-    bg: 'hover:bg-amber-50/30',
-    iconBg: 'bg-amber-100 group-hover:bg-amber-200',
-    iconColor: 'text-amber-600',
-    title: 'group-hover:text-amber-700',
-  },
-} as const
-
-function WorkPlanCard({ title, description, icon, onSelect, isCompact = false, accent }: WorkPlanCardProps) {
-  const cardPadding = isCompact ? 'p-2' : 'p-4'
-  const iconPadding = isCompact ? 'p-1' : 'p-2'
-  const titleSize = isCompact ? 'text-2xs font-semibold' : 'text-sm font-semibold'
-  const descSize = isCompact ? 'text-2xs' : 'text-xs'
-  const tone = WORK_PLAN_ACCENTS[accent]
-
-  return (
-    <button
-      onClick={onSelect}
-      className={`${cardPadding} rounded-lg border border-slate-200 bg-white ${tone.border} hover:shadow-md ${tone.bg} transition group text-left`}
-    >
-      <div className={`${iconPadding} rounded-lg ${tone.iconBg} transition flex-shrink-0 inline-flex mb-0.5`}>
-        <span className={tone.iconColor}>{icon}</span>
-      </div>
-      <h3 className={`${titleSize} text-slate-900 ${tone.title} transition`}>{title}</h3>
       <p className={`${descSize} text-slate-600 ${isCompact ? 'mt-0.5' : 'mt-1'} line-clamp-2`}>{description}</p>
     </button>
   )
