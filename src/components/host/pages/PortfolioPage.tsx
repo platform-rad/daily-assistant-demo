@@ -17,6 +17,7 @@ import {
   Lightbulb,
   EyeOff,
   Trash2,
+  ChevronRight,
   type LucideIcon,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -174,6 +175,34 @@ const DIGEST_SECTIONS: DigestSection[] = [
   },
 ]
 
+/* ───────────────────────── Aller plus loin ───────────────────────── */
+/* Plutôt qu'une liste d'articles génériques sans rapport, on relie chaque info aux AUTRES infos
+   du digest — toutes sections confondues — qui parlent du même client : c'est littéralement
+   "le même évènement" vu par d'autres sources (presse, Client 360, échéances, veille concu). */
+interface RelatedDigestItem {
+  id: string
+  sectionTitle: string
+  text: string
+  tag: string
+  date?: string
+}
+
+function extractMentionedClient(text: string): string | undefined {
+  return PORTFOLIO_CLIENTS.find((c) => text.includes(c.name))?.name
+}
+
+function findRelatedDigestItems(currentId: string, client: string): RelatedDigestItem[] {
+  const related: RelatedDigestItem[] = []
+  DIGEST_SECTIONS.forEach((section) => {
+    section.items.forEach((item, idx) => {
+      const id = `${section.id}-${idx}`
+      if (id === currentId || !item.text.includes(client)) return
+      related.push({ id, sectionTitle: section.title, text: item.text, tag: item.tag, date: item.date })
+    })
+  })
+  return related
+}
+
 /* ───────────────────────── Évaluation ligne par ligne ───────────────────────── */
 /* Chaque info du digest peut être triée par le lecteur : à traiter, pour info, pas pertinent ici,
    ou carrément à sortir du flux. L'affordance vient de 4 icônes distinctes (jamais de texte seul
@@ -219,15 +248,23 @@ const RATING_ACTIONS: Array<{
 ]
 
 function DigestItemRow({
+  id,
   item,
   rating,
   onRate,
+  expanded,
+  onToggleExpand,
 }: {
+  id: string
   item: { text: string; tag: string; date?: string }
   rating?: ItemRating
   onRate: (action: ItemRating) => void
+  expanded: boolean
+  onToggleExpand: () => void
 }) {
   const active = RATING_ACTIONS.find((a) => a.key === rating)
+  const client = extractMentionedClient(item.text)
+  const related = expanded && client ? findRelatedDigestItems(id, client) : []
   return (
     <div
       className={cn(
@@ -256,6 +293,14 @@ function DigestItemRow({
         ) : (
           <span className="text-2xs text-slate-300">Évaluer :</span>
         )}
+        <button
+          onClick={onToggleExpand}
+          aria-expanded={expanded}
+          className="flex items-center gap-0.5 text-2xs font-medium text-rad-indigo-600 hover:text-rad-indigo-700 transition"
+        >
+          Aller plus loin
+          {expanded ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
+        </button>
         <div className="ml-auto flex items-center gap-0.5">
           {RATING_ACTIONS.map((action) => (
             <Tooltip key={action.key}>
@@ -279,6 +324,31 @@ function DigestItemRow({
           ))}
         </div>
       </div>
+      {expanded && (
+        <div className="mt-2 ml-5 rounded-lg border border-slate-100 bg-slate-50/70 p-2.5 space-y-1.5">
+          <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide">
+            {client ? `Autres signaux liés à ${client}` : 'Signaux liés'}
+          </p>
+          {!client && (
+            <p className="text-2xs text-slate-400">Aucun client identifié dans cette info pour relier d'autres signaux.</p>
+          )}
+          {client && related.length === 0 && (
+            <p className="text-2xs text-slate-400">Aucun autre signal lié à cet évènement pour l'instant.</p>
+          )}
+          {related.map((r) => (
+            <div key={r.id} className="flex items-start gap-2">
+              <span className="text-2xs px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-500 flex-shrink-0 whitespace-nowrap">
+                {r.sectionTitle}
+              </span>
+              <span className="text-2xs text-slate-600 leading-snug flex-1">{r.text}</span>
+              <span className="text-2xs text-slate-400 flex-shrink-0 whitespace-nowrap">
+                {r.tag}
+                {r.date ? ` · ${r.date}` : ''}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -287,11 +357,16 @@ function DigestView() {
   const [openSection, setOpenSection] = useState<string | null>('must-read')
   const [ratings, setRatings] = useState<Record<string, ItemRating | undefined>>({})
   const [showHidden, setShowHidden] = useState<Record<string, boolean>>({})
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({})
   const today = new Date().toISOString().slice(0, 10)
   const totalItems = DIGEST_SECTIONS.reduce((sum, s) => sum + s.items.length, 0)
 
   const rate = (id: string, action: ItemRating) => {
     setRatings((prev) => ({ ...prev, [id]: prev[id] === action ? undefined : action }))
+  }
+
+  const toggleExpand = (id: string) => {
+    setExpandedItems((prev) => ({ ...prev, [id]: !prev[id] }))
   }
 
   return (
@@ -340,7 +415,15 @@ function DigestView() {
                       </button>
                     )}
                     {visibleItems.map(({ item, id }) => (
-                      <DigestItemRow key={id} item={item} rating={ratings[id]} onRate={(action) => rate(id, action)} />
+                      <DigestItemRow
+                        key={id}
+                        id={id}
+                        item={item}
+                        rating={ratings[id]}
+                        onRate={(action) => rate(id, action)}
+                        expanded={!!expandedItems[id]}
+                        onToggleExpand={() => toggleExpand(id)}
+                      />
                     ))}
                   </div>
                 )}
