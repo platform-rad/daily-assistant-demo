@@ -13,9 +13,15 @@ import {
   ShieldAlert,
   ClipboardList,
   CalendarClock,
+  Flag,
+  Lightbulb,
+  EyeOff,
+  Trash2,
+  type LucideIcon,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { DataTable, StatStrip } from '../DataTable'
 import { PORTFOLIO_CLIENTS, PORTFOLIO_SUMMARY } from '@/data/portfolio'
 import { cn } from '@/lib/utils'
@@ -168,10 +174,125 @@ const DIGEST_SECTIONS: DigestSection[] = [
   },
 ]
 
+/* ───────────────────────── Évaluation ligne par ligne ───────────────────────── */
+/* Chaque info du digest peut être triée par le lecteur : à traiter, pour info, pas pertinent ici,
+   ou carrément à sortir du flux. L'affordance vient de 4 icônes distinctes (jamais de texte seul
+   à deviner), toujours visibles (pas cachées au survol) avec tooltip, et d'un retour visuel
+   immédiat (couleur de la ligne + étiquette) qui confirme que le clic a bien été pris en compte. */
+type ItemRating = 'must-read' | 'good-to-know' | 'not-relevant' | 'deleted'
+
+const RATING_ACTIONS: Array<{
+  key: ItemRating
+  label: string
+  confirmLabel: string
+  icon: LucideIcon
+  activeClass: string
+}> = [
+  {
+    key: 'must-read',
+    label: 'Must read — à traiter en priorité',
+    confirmLabel: 'Must read',
+    icon: Flag,
+    activeClass: 'border-red-200 bg-red-100 text-red-600',
+  },
+  {
+    key: 'good-to-know',
+    label: 'Good to know — pour information',
+    confirmLabel: 'Good to know',
+    icon: Lightbulb,
+    activeClass: 'border-sky-200 bg-sky-100 text-sky-600',
+  },
+  {
+    key: 'not-relevant',
+    label: "Pas intéressant dans cette section",
+    confirmLabel: 'Masqué de cette section',
+    icon: EyeOff,
+    activeClass: 'border-slate-300 bg-slate-200 text-slate-600',
+  },
+  {
+    key: 'deleted',
+    label: "Supprimer — n'a rien à faire là",
+    confirmLabel: 'Supprimé',
+    icon: Trash2,
+    activeClass: 'border-red-200 bg-red-100 text-red-600',
+  },
+]
+
+function DigestItemRow({
+  item,
+  rating,
+  onRate,
+}: {
+  item: { text: string; tag: string; date?: string }
+  rating?: ItemRating
+  onRate: (action: ItemRating) => void
+}) {
+  const active = RATING_ACTIONS.find((a) => a.key === rating)
+  return (
+    <div
+      className={cn(
+        'rounded-lg border p-2.5 transition',
+        rating === 'must-read' && 'border-red-200 bg-red-50/60',
+        rating === 'good-to-know' && 'border-sky-200 bg-sky-50/50',
+        rating === 'not-relevant' && 'border-slate-200 bg-slate-50 opacity-60',
+        !rating && 'border-transparent hover:border-slate-100 hover:bg-slate-50/70'
+      )}
+    >
+      <div className="flex items-start gap-2 pl-5">
+        <span className="text-xs text-slate-600 leading-snug flex-1">{item.text}</span>
+        <span className="flex flex-col items-end gap-0.5 flex-shrink-0">
+          <span className="text-2xs px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded whitespace-nowrap">
+            {item.tag}
+          </span>
+          {item.date && <span className="text-2xs text-slate-400">{item.date}</span>}
+        </span>
+      </div>
+      <div className="mt-1.5 flex items-center gap-1.5 pl-5">
+        {active ? (
+          <span className={cn('flex items-center gap-1 rounded px-1.5 py-0.5 text-2xs font-medium border', active.activeClass)}>
+            <active.icon className="size-3" />
+            {active.confirmLabel}
+          </span>
+        ) : (
+          <span className="text-2xs text-slate-300">Évaluer :</span>
+        )}
+        <div className="ml-auto flex items-center gap-0.5">
+          {RATING_ACTIONS.map((action) => (
+            <Tooltip key={action.key}>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => onRate(action.key)}
+                  aria-label={action.label}
+                  aria-pressed={rating === action.key}
+                  className={cn(
+                    'flex size-6 items-center justify-center rounded-md border transition',
+                    rating === action.key
+                      ? action.activeClass
+                      : 'border-transparent text-slate-400 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-600'
+                  )}
+                >
+                  <action.icon className="size-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top">{action.label}</TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function DigestView() {
   const [openSection, setOpenSection] = useState<string | null>('must-read')
+  const [ratings, setRatings] = useState<Record<string, ItemRating | undefined>>({})
+  const [showHidden, setShowHidden] = useState<Record<string, boolean>>({})
   const today = new Date().toISOString().slice(0, 10)
   const totalItems = DIGEST_SECTIONS.reduce((sum, s) => sum + s.items.length, 0)
+
+  const rate = (id: string, action: ItemRating) => {
+    setRatings((prev) => ({ ...prev, [id]: prev[id] === action ? undefined : action }))
+  }
 
   return (
     <div className="space-y-4">
@@ -186,6 +307,11 @@ function DigestView() {
         <div>
           {DIGEST_SECTIONS.map((section) => {
             const isOpen = openSection === section.id
+            const itemsWithIds = section.items.map((item, idx) => ({ item, id: `${section.id}-${idx}` }))
+            const hiddenCount = itemsWithIds.filter(({ id }) => ratings[id] === 'deleted').length
+            const visibleItems = showHidden[section.id]
+              ? itemsWithIds
+              : itemsWithIds.filter(({ id }) => ratings[id] !== 'deleted')
             return (
               <div key={section.id} className="border-b border-slate-100 last:border-b-0">
                 <button
@@ -203,16 +329,18 @@ function DigestView() {
                 </button>
                 {isOpen && (
                   <div className="px-4 pb-3 space-y-2">
-                    {section.items.map((item, idx) => (
-                      <div key={idx} className="flex items-start gap-2 pl-5">
-                        <span className="text-xs text-slate-600 leading-snug flex-1">{item.text}</span>
-                        <span className="flex flex-col items-end gap-0.5 flex-shrink-0">
-                          <span className="text-2xs px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded whitespace-nowrap">
-                            {item.tag}
-                          </span>
-                          {item.date && <span className="text-2xs text-slate-400">{item.date}</span>}
-                        </span>
-                      </div>
+                    {hiddenCount > 0 && (
+                      <button
+                        onClick={() => setShowHidden((prev) => ({ ...prev, [section.id]: !prev[section.id] }))}
+                        className="pl-5 text-2xs text-slate-400 hover:text-slate-600 underline underline-offset-2"
+                      >
+                        {showHidden[section.id]
+                          ? 'Masquer les éléments supprimés'
+                          : `${hiddenCount} élément${hiddenCount > 1 ? 's' : ''} supprimé${hiddenCount > 1 ? 's' : ''} · Afficher`}
+                      </button>
+                    )}
+                    {visibleItems.map(({ item, id }) => (
+                      <DigestItemRow key={id} item={item} rating={ratings[id]} onRate={(action) => rate(id, action)} />
                     ))}
                   </div>
                 )}
@@ -242,9 +370,19 @@ export function PortfolioPage({ onOpenClient }: { onOpenClient: (clientName: str
       <StatStrip stats={PORTFOLIO_SUMMARY} />
 
       <Tabs defaultValue="portfolio">
-        <TabsList>
-          <TabsTrigger value="portfolio">Vue portefeuille</TabsTrigger>
-          <TabsTrigger value="digest">Vue Digest</TabsTrigger>
+        <TabsList className="w-full gap-1 rounded-lg border-0 bg-slate-100 p-1">
+          <TabsTrigger
+            value="portfolio"
+            className="mb-0 flex flex-1 items-center justify-center rounded-md border-0 px-3 py-2 text-slate-600 data-[state=active]:border-0 data-[state=active]:bg-white data-[state=active]:text-rad-indigo-700 data-[state=active]:shadow-sm"
+          >
+            Vue portefeuille
+          </TabsTrigger>
+          <TabsTrigger
+            value="digest"
+            className="mb-0 flex flex-1 items-center justify-center rounded-md border-0 px-3 py-2 text-slate-600 data-[state=active]:border-0 data-[state=active]:bg-white data-[state=active]:text-rad-indigo-700 data-[state=active]:shadow-sm"
+          >
+            Vue Digest
+          </TabsTrigger>
         </TabsList>
         <div className="pt-4">
           <TabsContent value="portfolio">
