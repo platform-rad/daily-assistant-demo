@@ -227,20 +227,9 @@ const DIGEST_SECTIONS: DigestSection[] = [
 ]
 
 /* ───────────────────────── Aller plus loin ───────────────────────── */
-/* Deux choses distinctes sous "Aller plus loin" :
-   1) une suggestion d'article EXTERNE proposée par l'IA sur le même sujet (nom, source, lien
-      cliquable qui ouvre un nouvel onglet) — ce que demande le produit ;
-   2) les AUTRES infos déjà présentes ailleurs dans ce digest qui parlent du même client
-      (presse, Client 360, échéances, veille concu) — gardé en complément, mais clairement
-      distingué pour ne pas confondre "suggestion IA" et "déjà dans ce digest". */
-interface RelatedDigestItem {
-  id: string
-  sectionTitle: string
-  text: string
-  tag: string
-  date?: string
-  detail?: string
-}
+/* "Aller plus loin" propose plusieurs articles EXTERNES suggérés par l'IA sur le même sujet
+   (nom, source, explication brève, lien cliquable qui ouvre un nouvel onglet) — rien d'interne
+   au digest, uniquement du contexte marché public et vérifiable. */
 
 /* Les items "Secteur 360" ne nomment pas toujours le client directement — on retombe sur un
    mot-clé sectoriel pour quand même proposer une suggestion IA pertinente. */
@@ -264,63 +253,106 @@ interface AiArticleSuggestion {
   blurb: string
 }
 
-/** Une suggestion d'article externe par client — proposée par l'IA pour aller plus loin que
+/** Plusieurs suggestions d'articles externes par client — l'IA propose un éventail de sources
+ *  (agences, presse spécialisée, presse locale) plutôt qu'une seule, pour aller plus loin que
  *  les données internes (CRM, dossiers CAP/CBS) avec du contexte marché public et vérifiable. */
-const CLIENT_AI_SUGGESTION: Record<string, AiArticleSuggestion> = {
-  'AeroDynamics Group': {
-    title: 'European aerospace primes accelerate defence-unit carve-outs amid M&A wave',
-    source: 'Reuters',
-    url: 'https://www.reuters.com/',
-    blurb:
-      "L'IA propose cet article car il éclaire la tendance sectorielle derrière la revue stratégique de la division Défense d'AeroDynamics Group — utile pour évaluer la probabilité et la valorisation d'un carve-out.",
-  },
-  'Nordwind Turbines': {
-    title: 'Offshore wind developers rush to lock in green financing as rates stabilise',
-    source: 'Bloomberg',
-    url: 'https://www.bloomberg.com/',
-    blurb:
-      "Suggéré par l'IA pour le contexte marché du green bond inaugural en cours de structuration avec DCM EMEA — la fenêtre de financement verte reste jugée favorable par les investisseurs institutionnels.",
-  },
-  'Ferrovia Lombarda': {
-    title: 'European rail operators squeezed by rising steel and input costs',
-    source: 'Financial Times',
-    url: 'https://www.ft.com/',
-    blurb:
-      "L'IA relie cet article à la dégradation de perspective évoquée par un analyste crédit indépendant — la pression sur les coûts matières est un facteur sectoriel, pas isolé à Ferrovia Lombarda.",
-  },
-  'Iberia Chemicals': {
-    title: 'Specialty chemicals groups ramp up green capex to defend margins',
-    source: 'Financial Times',
-    url: 'https://www.ft.com/',
-    blurb:
-      "Contexte sectoriel suggéré par l'IA pour le plan d'investissement de €120 M dans la chimie verte — la décarbonation devient un argument de différenciation face à la pression sur les marges.",
-  },
-  'Helvetia Precision': {
-    title: 'Precision engineering consolidation gathers pace in the DACH region',
-    source: 'Handelsblatt',
-    url: 'https://www.handelsblatt.com/',
-    blurb:
-      "L'IA propose cet article en lien avec la rumeur de rapprochement avec un concurrent allemand — la consolidation du secteur en zone DACH est documentée depuis plusieurs mois.",
-  },
-  'Baltic Shipyards': {
-    title: 'Marine and defence shipbuilders see order books swell on naval spending',
-    source: 'Reuters',
-    url: 'https://www.reuters.com/',
-    blurb:
-      "Suggéré par l'IA pour contextualiser la visite de site prévue — la hausse des budgets de défense navale en Europe soutient le carnet de commandes du secteur.",
-  },
-}
-
-function findRelatedDigestItems(currentId: string, client: string): RelatedDigestItem[] {
-  const related: RelatedDigestItem[] = []
-  DIGEST_SECTIONS.forEach((section) => {
-    section.items.forEach((item, idx) => {
-      const id = `${section.id}-${idx}`
-      if (id === currentId || !item.text.includes(client)) return
-      related.push({ id, sectionTitle: section.title, text: item.text, tag: item.tag, date: item.date, detail: item.detail })
-    })
-  })
-  return related
+const CLIENT_AI_SUGGESTIONS: Record<string, AiArticleSuggestion[]> = {
+  'AeroDynamics Group': [
+    {
+      title: 'European aerospace primes accelerate defence-unit carve-outs amid M&A wave',
+      source: 'Reuters',
+      url: 'https://www.reuters.com/',
+      blurb:
+        "L'IA propose cet article car il éclaire la tendance sectorielle derrière la revue stratégique de la division Défense d'AeroDynamics Group — utile pour évaluer la probabilité et la valorisation d'un carve-out.",
+    },
+    {
+      title: 'Aerospace composites suppliers see order backlogs stretch into 2028',
+      source: 'Financial Times',
+      url: 'https://www.ft.com/',
+      blurb:
+        "Deuxième angle suggéré par l'IA : la demande structurelle sur les structures composites, cœur de métier d'AeroDynamics Group, reste tendue — pertinent pour la valorisation d'un éventuel carve-out.",
+    },
+  ],
+  'Nordwind Turbines': [
+    {
+      title: 'Offshore wind developers rush to lock in green financing as rates stabilise',
+      source: 'Bloomberg',
+      url: 'https://www.bloomberg.com/',
+      blurb:
+        "Suggéré par l'IA pour le contexte marché du green bond inaugural en cours de structuration avec DCM EMEA — la fenêtre de financement verte reste jugée favorable par les investisseurs institutionnels.",
+    },
+    {
+      title: 'Germany and Denmark fast-track offshore wind permitting to meet 2030 targets',
+      source: 'Reuters',
+      url: 'https://www.reuters.com/',
+      blurb:
+        "L'IA relie cet article aux deux appels d'offres remportés en Allemagne et au Danemark — l'accélération réglementaire soutient directement le carnet de commandes annoncé en hausse de 18 %.",
+    },
+  ],
+  'Ferrovia Lombarda': [
+    {
+      title: 'European rail operators squeezed by rising steel and input costs',
+      source: 'Financial Times',
+      url: 'https://www.ft.com/',
+      blurb:
+        "L'IA relie cet article à la dégradation de perspective évoquée par un analyste crédit indépendant — la pression sur les coûts matières est un facteur sectoriel, pas isolé à Ferrovia Lombarda.",
+    },
+    {
+      title: 'Credit rating agencies turn cautious on European rail operators',
+      source: 'Bloomberg',
+      url: 'https://www.bloomberg.com/',
+      blurb:
+        "Deuxième suggestion de l'IA, en écho direct au covenant de levier en breach (4,6× vs 4,50×) — la prudence des agences de notation sur le secteur confirme le signal interne.",
+    },
+  ],
+  'Iberia Chemicals': [
+    {
+      title: 'Specialty chemicals groups ramp up green capex to defend margins',
+      source: 'Financial Times',
+      url: 'https://www.ft.com/',
+      blurb:
+        "Contexte sectoriel suggéré par l'IA pour le plan d'investissement de €120 M dans la chimie verte — la décarbonation devient un argument de différenciation face à la pression sur les marges.",
+    },
+    {
+      title: 'EU carbon border tax reshapes investment plans for chemicals makers',
+      source: 'Reuters',
+      url: 'https://www.reuters.com/',
+      blurb:
+        "L'IA ajoute cet angle réglementaire : le mécanisme carbone aux frontières de l'UE est un facteur direct derrière l'accélération des investissements verts du secteur.",
+    },
+  ],
+  'Helvetia Precision': [
+    {
+      title: 'Precision engineering consolidation gathers pace in the DACH region',
+      source: 'Handelsblatt',
+      url: 'https://www.handelsblatt.com/',
+      blurb:
+        "L'IA propose cet article en lien avec la rumeur de rapprochement avec un concurrent allemand — la consolidation du secteur en zone DACH est documentée depuis plusieurs mois.",
+    },
+    {
+      title: 'Swiss precision manufacturers brace for currency headwinds',
+      source: 'NZZ',
+      url: 'https://www.nzz.ch/',
+      blurb:
+        "Deuxième suggestion de l'IA, orientée risque de change — un facteur pertinent à surveiller si un rapprochement transfrontalier venait à se confirmer.",
+    },
+  ],
+  'Baltic Shipyards': [
+    {
+      title: 'Marine and defence shipbuilders see order books swell on naval spending',
+      source: 'Reuters',
+      url: 'https://www.reuters.com/',
+      blurb:
+        "Suggéré par l'IA pour contextualiser la visite de site prévue — la hausse des budgets de défense navale en Europe soutient le carnet de commandes du secteur.",
+    },
+    {
+      title: 'Baltic Sea nations ramp up maritime security investment',
+      source: 'Financial Times',
+      url: 'https://www.ft.com/',
+      blurb:
+        "L'IA ajoute cet angle régional : l'investissement croissant en sécurité maritime en mer Baltique est directement pertinent pour le point sécurité/ESG prévu lors de la visite.",
+    },
+  ],
 }
 
 /* ───────────────────────── Évaluation ligne par ligne ───────────────────────── */
@@ -395,51 +427,13 @@ function AiSuggestionCard({ suggestion }: { suggestion: AiArticleSuggestion }) {
   )
 }
 
-/** Une ligne cliquable dans le panneau "Aller plus loin" — se déplie sur place pour montrer
- *  le contenu complet de l'article lié, sans quitter le digest ni ouvrir une fenêtre à part. */
-function RelatedArticleRow({ article }: { article: RelatedDigestItem }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <div className="rounded-md border border-slate-200 bg-white overflow-hidden">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        className="w-full flex items-start gap-2 p-2 text-left hover:bg-slate-50 transition"
-      >
-        {open ? (
-          <ChevronDown className="size-3 mt-0.5 text-slate-400 flex-shrink-0" />
-        ) : (
-          <ChevronRight className="size-3 mt-0.5 text-slate-400 flex-shrink-0" />
-        )}
-        <span className="text-2xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 flex-shrink-0 whitespace-nowrap">
-          {article.sectionTitle}
-        </span>
-        <span className="text-2xs text-slate-700 leading-snug flex-1">{article.text}</span>
-        <span className="text-2xs text-slate-400 flex-shrink-0 whitespace-nowrap">
-          {article.tag}
-          {article.date ? ` · ${article.date}` : ''}
-        </span>
-      </button>
-      {open && (
-        <div className="px-2 pb-2.5 pl-7">
-          <p className="text-2xs text-slate-600 leading-relaxed border-t border-slate-100 pt-2">
-            {article.detail ?? "Pas de contenu détaillé disponible pour cet évènement — titre complet ci-dessus."}
-          </p>
-        </div>
-      )}
-    </div>
-  )
-}
-
 function DigestItemRow({
-  id,
   item,
   rating,
   onRate,
   expanded,
   onToggleExpand,
 }: {
-  id: string
   item: DigestItemData
   rating?: ItemRating
   onRate: (action: ItemRating) => void
@@ -448,7 +442,7 @@ function DigestItemRow({
 }) {
   const active = RATING_ACTIONS.find((a) => a.key === rating)
   const client = extractMentionedClient(item.text)
-  const related = expanded && client ? findRelatedDigestItems(id, client) : []
+  const suggestions = client ? CLIENT_AI_SUGGESTIONS[client] : undefined
   return (
     <div
       className={cn(
@@ -511,25 +505,12 @@ function DigestItemRow({
       </div>
       {expanded && (
         <div className="mt-2 ml-5 space-y-2">
-          {client && CLIENT_AI_SUGGESTION[client] ? (
-            <AiSuggestionCard suggestion={CLIENT_AI_SUGGESTION[client]} />
+          <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide">Suggestions de l'IA</p>
+          {suggestions && suggestions.length > 0 ? (
+            suggestions.map((s) => <AiSuggestionCard key={s.url + s.title} suggestion={s} />)
           ) : (
             <p className="text-2xs text-slate-400">Pas de suggestion IA disponible pour cet évènement pour l'instant.</p>
           )}
-          <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-2.5 space-y-1.5">
-            <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide">
-              {client ? `Autres mentions dans ce digest — cliquez pour lire` : 'Autres mentions dans ce digest'}
-            </p>
-            {!client && (
-              <p className="text-2xs text-slate-400">Aucun client identifié dans cette info pour relier d'autres mentions.</p>
-            )}
-            {client && related.length === 0 && (
-              <p className="text-2xs text-slate-400">Aucune autre mention de cet évènement pour l'instant.</p>
-            )}
-            {related.map((r) => (
-              <RelatedArticleRow key={r.id} article={r} />
-            ))}
-          </div>
         </div>
       )}
     </div>
@@ -600,7 +581,6 @@ function DigestView() {
                     {visibleItems.map(({ item, id }) => (
                       <DigestItemRow
                         key={id}
-                        id={id}
                         item={item}
                         rating={ratings[id]}
                         onRate={(action) => rate(id, action)}
