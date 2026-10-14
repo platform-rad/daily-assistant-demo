@@ -392,7 +392,7 @@ export function ContextualSuggestions({
           {kpis.map((kpi, idx) => (
             <div
               key={idx}
-              className="rounded border border-slate-200 bg-slate-50 p-2 text-center hover:bg-slate-100 transition"
+              className="rounded border border-slate-200 bg-white p-2 text-center hover:bg-slate-50 transition"
             >
               <p className="text-2xs text-slate-600">{kpi.label}</p>
               <p className={`text-sm font-bold mt-1 ${getStatusColor(kpi.status)}`}>
