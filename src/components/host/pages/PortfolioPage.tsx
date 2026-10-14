@@ -18,6 +18,8 @@ import {
   EyeOff,
   Trash2,
   ChevronRight,
+  ExternalLink,
+  Sparkles,
   type LucideIcon,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -225,9 +227,12 @@ const DIGEST_SECTIONS: DigestSection[] = [
 ]
 
 /* ───────────────────────── Aller plus loin ───────────────────────── */
-/* Plutôt qu'une liste d'articles génériques sans rapport, on relie chaque info aux AUTRES infos
-   du digest — toutes sections confondues — qui parlent du même client : c'est littéralement
-   "le même évènement" vu par d'autres sources (presse, Client 360, échéances, veille concu). */
+/* Deux choses distinctes sous "Aller plus loin" :
+   1) une suggestion d'article EXTERNE proposée par l'IA sur le même sujet (nom, source, lien
+      cliquable qui ouvre un nouvel onglet) — ce que demande le produit ;
+   2) les AUTRES infos déjà présentes ailleurs dans ce digest qui parlent du même client
+      (presse, Client 360, échéances, veille concu) — gardé en complément, mais clairement
+      distingué pour ne pas confondre "suggestion IA" et "déjà dans ce digest". */
 interface RelatedDigestItem {
   id: string
   sectionTitle: string
@@ -237,8 +242,73 @@ interface RelatedDigestItem {
   detail?: string
 }
 
+/* Les items "Secteur 360" ne nomment pas toujours le client directement — on retombe sur un
+   mot-clé sectoriel pour quand même proposer une suggestion IA pertinente. */
+const SECTOR_KEYWORD_CLIENT: Array<{ keyword: string; client: string }> = [
+  { keyword: 'éolien', client: 'Nordwind Turbines' },
+  { keyword: 'ferroviaire', client: 'Ferrovia Lombarda' },
+  { keyword: 'chimie', client: 'Iberia Chemicals' },
+]
+
 function extractMentionedClient(text: string): string | undefined {
-  return PORTFOLIO_CLIENTS.find((c) => text.includes(c.name))?.name
+  const direct = PORTFOLIO_CLIENTS.find((c) => text.includes(c.name))?.name
+  if (direct) return direct
+  const lower = text.toLowerCase()
+  return SECTOR_KEYWORD_CLIENT.find((k) => lower.includes(k.keyword))?.client
+}
+
+interface AiArticleSuggestion {
+  title: string
+  source: string
+  url: string
+  blurb: string
+}
+
+/** Une suggestion d'article externe par client — proposée par l'IA pour aller plus loin que
+ *  les données internes (CRM, dossiers CAP/CBS) avec du contexte marché public et vérifiable. */
+const CLIENT_AI_SUGGESTION: Record<string, AiArticleSuggestion> = {
+  'AeroDynamics Group': {
+    title: 'European aerospace primes accelerate defence-unit carve-outs amid M&A wave',
+    source: 'Reuters',
+    url: 'https://www.reuters.com/',
+    blurb:
+      "L'IA propose cet article car il éclaire la tendance sectorielle derrière la revue stratégique de la division Défense d'AeroDynamics Group — utile pour évaluer la probabilité et la valorisation d'un carve-out.",
+  },
+  'Nordwind Turbines': {
+    title: 'Offshore wind developers rush to lock in green financing as rates stabilise',
+    source: 'Bloomberg',
+    url: 'https://www.bloomberg.com/',
+    blurb:
+      "Suggéré par l'IA pour le contexte marché du green bond inaugural en cours de structuration avec DCM EMEA — la fenêtre de financement verte reste jugée favorable par les investisseurs institutionnels.",
+  },
+  'Ferrovia Lombarda': {
+    title: 'European rail operators squeezed by rising steel and input costs',
+    source: 'Financial Times',
+    url: 'https://www.ft.com/',
+    blurb:
+      "L'IA relie cet article à la dégradation de perspective évoquée par un analyste crédit indépendant — la pression sur les coûts matières est un facteur sectoriel, pas isolé à Ferrovia Lombarda.",
+  },
+  'Iberia Chemicals': {
+    title: 'Specialty chemicals groups ramp up green capex to defend margins',
+    source: 'Financial Times',
+    url: 'https://www.ft.com/',
+    blurb:
+      "Contexte sectoriel suggéré par l'IA pour le plan d'investissement de €120 M dans la chimie verte — la décarbonation devient un argument de différenciation face à la pression sur les marges.",
+  },
+  'Helvetia Precision': {
+    title: 'Precision engineering consolidation gathers pace in the DACH region',
+    source: 'Handelsblatt',
+    url: 'https://www.handelsblatt.com/',
+    blurb:
+      "L'IA propose cet article en lien avec la rumeur de rapprochement avec un concurrent allemand — la consolidation du secteur en zone DACH est documentée depuis plusieurs mois.",
+  },
+  'Baltic Shipyards': {
+    title: 'Marine and defence shipbuilders see order books swell on naval spending',
+    source: 'Reuters',
+    url: 'https://www.reuters.com/',
+    blurb:
+      "Suggéré par l'IA pour contextualiser la visite de site prévue — la hausse des budgets de défense navale en Europe soutient le carnet de commandes du secteur.",
+  },
 }
 
 function findRelatedDigestItems(currentId: string, client: string): RelatedDigestItem[] {
@@ -296,6 +366,34 @@ const RATING_ACTIONS: Array<{
     activeClass: 'border-red-200 bg-red-100 text-red-600',
   },
 ]
+
+/** Carte de suggestion IA — nom de l'article, source, explication brève, lien externe qui
+ *  ouvre l'article dans un nouvel onglet (jamais dans l'app, pour ne pas perdre le digest). */
+function AiSuggestionCard({ suggestion }: { suggestion: AiArticleSuggestion }) {
+  return (
+    <div className="rounded-md border border-rad-indigo-200 bg-rad-indigo-50/50 p-2.5">
+      <div className="flex items-center gap-1.5 mb-1">
+        <Sparkles className="size-3 text-rad-indigo-600 flex-shrink-0" />
+        <span className="text-2xs font-semibold text-rad-indigo-700 uppercase tracking-wide">Suggéré par l'IA</span>
+      </div>
+      <a
+        href={suggestion.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group flex items-start gap-1.5 text-xs font-medium text-slate-900 hover:text-rad-indigo-700 transition"
+      >
+        <span className="flex-1 leading-snug underline decoration-slate-300 decoration-1 underline-offset-2 group-hover:decoration-rad-indigo-400">
+          {suggestion.title}
+        </span>
+        <ExternalLink className="size-3 mt-0.5 flex-shrink-0 text-slate-400 group-hover:text-rad-indigo-600" />
+      </a>
+      <p className="mt-1 text-2xs text-slate-500">
+        Source : <span className="font-medium text-slate-600">{suggestion.source}</span>
+      </p>
+      <p className="mt-1 text-2xs text-slate-600 leading-relaxed">{suggestion.blurb}</p>
+    </div>
+  )
+}
 
 /** Une ligne cliquable dans le panneau "Aller plus loin" — se déplie sur place pour montrer
  *  le contenu complet de l'article lié, sans quitter le digest ni ouvrir une fenêtre à part. */
@@ -412,19 +510,26 @@ function DigestItemRow({
         </div>
       </div>
       {expanded && (
-        <div className="mt-2 ml-5 rounded-lg border border-slate-100 bg-slate-50/70 p-2.5 space-y-1.5">
-          <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide">
-            {client ? `Articles liés à ${client} — cliquez pour lire` : 'Articles liés'}
-          </p>
-          {!client && (
-            <p className="text-2xs text-slate-400">Aucun client identifié dans cette info pour relier d'autres articles.</p>
+        <div className="mt-2 ml-5 space-y-2">
+          {client && CLIENT_AI_SUGGESTION[client] ? (
+            <AiSuggestionCard suggestion={CLIENT_AI_SUGGESTION[client]} />
+          ) : (
+            <p className="text-2xs text-slate-400">Pas de suggestion IA disponible pour cet évènement pour l'instant.</p>
           )}
-          {client && related.length === 0 && (
-            <p className="text-2xs text-slate-400">Aucun autre article lié à cet évènement pour l'instant.</p>
-          )}
-          {related.map((r) => (
-            <RelatedArticleRow key={r.id} article={r} />
-          ))}
+          <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-2.5 space-y-1.5">
+            <p className="text-2xs font-semibold text-slate-500 uppercase tracking-wide">
+              {client ? `Autres mentions dans ce digest — cliquez pour lire` : 'Autres mentions dans ce digest'}
+            </p>
+            {!client && (
+              <p className="text-2xs text-slate-400">Aucun client identifié dans cette info pour relier d'autres mentions.</p>
+            )}
+            {client && related.length === 0 && (
+              <p className="text-2xs text-slate-400">Aucune autre mention de cet évènement pour l'instant.</p>
+            )}
+            {related.map((r) => (
+              <RelatedArticleRow key={r.id} article={r} />
+            ))}
+          </div>
         </div>
       )}
     </div>
